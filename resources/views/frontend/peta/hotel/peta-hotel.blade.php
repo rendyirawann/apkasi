@@ -11,10 +11,15 @@
         .pcard .accent { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; opacity: 0; transition: opacity .25s ease; }
         .pcard:hover .accent, .pcard.is-active .accent { opacity: 1; }
         .pcard.is-active { border-color: #85AB8B !important; box-shadow: 0 16px 32px rgba(43,84,58,.12); transform: translateY(-2px); }
-        .pin { width: 26px; height: 26px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 2px solid #fff; box-shadow: 0 3px 8px rgba(0,0,0,.3); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform .2s ease; }
+        /* Wrapper diposisikan Mapbox — TANPA transform/transition agar marker tidak 'melayang' saat peta digeser */
+        .mk { width: 30px; height: 38px; position: relative; cursor: pointer; }
+        /* Bentuk teardrop di elemen ANAK: rotate-nya tidak ditimpa Mapbox (tidak miring) & tidak ikut beranimasi saat drag */
+        .mk-pin { position: absolute; left: 50%; bottom: 1px; width: 24px; height: 24px; margin-left: -12px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 2.5px solid #fff; box-shadow: 0 3px 8px rgba(0,0,0,.3); transition: transform .2s ease; }
+        .mk-pin::after { content: ''; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: #fff; }
         .pin-venue { background: #336443; } .pin-hotel { background: #D4AF37; } .pin-wisata { background: #3a86b5; }
-        .pin::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; transform: rotate(45deg); }
-        .pin.active { transform: rotate(-45deg) scale(1.32); z-index: 3; }
+        .mk.active { z-index: 3; }
+        .mk.active .mk-pin { transform: rotate(-45deg) scale(1.32); }
+        .mk:hover .mk-pin { transform: rotate(-45deg) scale(1.12); }
         .mapboxgl-popup-content { border-radius: 14px; padding: 13px 16px; font-family: 'Plus Jakarta Sans', sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,.18); }
         .pop-name { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: .95rem; color: #1f2a1d; margin-bottom: 3px; }
         .pop-addr { font-size: .78rem; color: #4b5b47; margin-bottom: 7px; }
@@ -77,7 +82,7 @@
                 Pilih tab kategori, klik kartu untuk menyorot titik, atau buka langsung ke Google Maps.
             </p>
             <div class="mt-7 flex flex-wrap gap-3">
-                @foreach ([['map-pin', $counts['venue'] ?: '—', 'Lokasi Acara'], ['building-2', $counts['hotel'] ?: '—', 'Hotel Rekomendasi'], ['palmtree', $counts['wisata'] ?: '—', 'Destinasi Wisata'], ['plane', "± 20–30'", 'Dari Bandara Kualanamu']] as $st)
+                @foreach ([['landmark', $counts['gedung'] ?: '—', 'Gedung / Venue'], ['map-pin', $counts['lokasi'] ?: '—', 'Lokasi Acara'], ['building-2', $counts['hotel'] ?: '—', 'Hotel'], ['palmtree', $counts['wisata'] ?: '—', 'Destinasi Wisata']] as $st)
                     <div class="flex items-center gap-3 bg-white/8 border border-white/15 rounded-2xl px-4 py-3 backdrop-blur-sm">
                         <div class="w-10 h-10 rounded-xl bg-apkasi-gold/15 flex items-center justify-center shrink-0">
                             <i data-lucide="{{ $st[0] }}" class="w-5 h-5 text-apkasi-gold"></i>
@@ -101,7 +106,7 @@
                     class="w-full bg-apkasi-leaf/30 border border-apkasi-leaf rounded-full pl-11 pr-4 py-2.5 text-sm text-apkasi-dark placeholder:text-apkasi-body/50 focus:outline-none focus:border-apkasi-accent focus:bg-white transition-colors" />
             </div>
             <div class="flex gap-2 flex-wrap" id="filterTabs">
-                @foreach ([['all', 'Semua', $counts['all']], ['venue', 'Lokasi Acara', $counts['venue']], ['hotel', 'Hotel', $counts['hotel']], ['wisata', 'Destinasi', $counts['wisata']]] as $tab)
+                @foreach ([['all', 'Semua', $counts['all']], ['lokasi', 'Lokasi Acara', $counts['lokasi']], ['gedung', 'Gedung', $counts['gedung']], ['hotel', 'Hotel', $counts['hotel']], ['wisata', 'Destinasi', $counts['wisata']]] as $tab)
                     <button type="button" data-cat="{{ $tab[0] }}"
                         class="filter-tab text-sm font-semibold px-4 py-2.5 rounded-full border transition-colors {{ $loop->first ? 'bg-apkasi-heading border-apkasi-heading text-white' : 'bg-white border-apkasi-leaf text-apkasi-body hover:border-apkasi-accent' }}">
                         {{ $tab[1] }} <span class="cnt opacity-60 font-medium ml-0.5" data-cnt="{{ $tab[0] }}">{{ $tab[2] }}</span>
@@ -139,7 +144,7 @@
                         </button>
                     @endif
                     <div class="absolute bottom-3.5 left-3.5 z-[5] bg-white/90 backdrop-blur rounded-xl px-3.5 py-2.5 shadow-md text-xs">
-                        <div class="flex items-center gap-2 font-semibold text-apkasi-body my-0.5"><span class="w-3 h-3 rounded-full bg-apkasi-heading inline-block"></span> Lokasi Acara / Venue</div>
+                        <div class="flex items-center gap-2 font-semibold text-apkasi-body my-0.5"><span class="w-3 h-3 rounded-full bg-apkasi-heading inline-block"></span> Gedung / Venue</div>
                         <div class="flex items-center gap-2 font-semibold text-apkasi-body my-0.5"><span class="w-3 h-3 rounded-full bg-apkasi-gold inline-block"></span> Hotel & Penginapan</div>
                         <div class="flex items-center gap-2 font-semibold text-apkasi-body my-0.5"><span class="w-3 h-3 rounded-full inline-block" style="background:#3a86b5"></span> Destinasi Wisata</div>
                     </div>
@@ -189,13 +194,26 @@
     var LIST_URL = "{{ route('peta-hotel.list') }}";
 
     var CAT = {
-        venue:  { label: 'Lokasi Acara', chip: 'bg-apkasi-heading/10 text-apkasi-heading', accent: 'bg-apkasi-heading', icon: 'map-pinned', pin: 'pin-venue' },
+        venue:  { label: 'Gedung', chip: 'bg-apkasi-heading/10 text-apkasi-heading', accent: 'bg-apkasi-heading', icon: 'landmark', pin: 'pin-venue' },
         hotel:  { label: 'Hotel', chip: 'bg-apkasi-gold/15 text-[#9a7d16]', accent: 'bg-apkasi-gold', icon: 'building-2', pin: 'pin-hotel' },
         wisata: { label: 'Destinasi', chip: 'bg-[#3a86b5]/10 text-[#2f6e95]', accent: 'bg-[#3a86b5]', icon: 'palmtree', pin: 'pin-wisata' },
     };
 
     var activeCat = 'all', query = '', page = 1, lastPage = 1;
-    var map = null, markers = {}, selectedId = null;
+    var map = null, selectedId = null, currentPopup = null;
+    // GeoJSON: koordinat [lng, lat] sebagai angka — dirender layer GL agar PERSIS di titik (anti geser saat zoom).
+    function toFC(list) {
+        return {
+            type: 'FeatureCollection',
+            features: list.map(function (p) {
+                return {
+                    type: 'Feature',
+                    properties: { id: p.id, category: p.category, name: p.name, address: p.address || '', maps_url: p.maps_url || '', is_lokasi_acara: !!p.is_lokasi_acara },
+                    geometry: { type: 'Point', coordinates: [Number(p.lng), Number(p.lat)] }
+                };
+            })
+        };
+    }
 
     function gmaps(p) { return p.maps_url || ('https://www.google.com/maps/search/?api=1&query=' + p.lat + ',' + p.lng); }
     function waLink(no) { var d = (no || '').replace(/[^0-9]/g, ''); if (d.charAt(0) === '0') d = '62' + d.slice(1); return 'https://wa.me/' + d; }
@@ -208,8 +226,8 @@
         var img = p.image
             ? '<img src="' + p.image + '" alt="" loading="lazy" class="w-24 h-24 rounded-xl object-cover shrink-0 bg-apkasi-leaf">'
             : '<div class="w-24 h-24 rounded-xl bg-apkasi-leaf flex items-center justify-center shrink-0 text-apkasi-accent"><i data-lucide="' + m.icon + '" class="w-7 h-7"></i></div>';
-        var lokasi = (p.is_lokasi_acara && p.category !== 'venue')
-            ? '<span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full mb-1.5 ms-1 bg-apkasi-heading/10 text-apkasi-heading">Lokasi Acara</span>' : '';
+        var lokasi = p.is_lokasi_acara
+            ? '<span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full mb-1.5 ms-1 bg-apkasi-gold text-apkasi-dark"><i data-lucide="map-pin" class="inline w-2.5 h-2.5 -mt-0.5"></i> Lokasi Acara</span>' : '';
         var meta = '';
         if (p.rating) meta += '<span class="flex items-center gap-1 font-bold text-[#b9931f]"><i data-lucide="star" class="w-3.5 h-3.5"></i> ' + p.rating + '</span>';
         if (p.rooms) meta += '<span class="inline-flex items-center gap-1 font-semibold"><i data-lucide="bed-double" class="w-3.5 h-3.5"></i> ' + p.rooms + ' kamar</span>';
@@ -305,32 +323,41 @@
     // ── Map ──
     function markerVisible(p) {
         var catOk = activeCat === 'all'
-            || (activeCat === 'venue' && (p.category === 'venue' || p.is_lokasi_acara))
+            || (activeCat === 'lokasi' && p.is_lokasi_acara)
+            || (activeCat === 'gedung' && p.category === 'venue')
             || (activeCat === p.category);
         var qOk = !query || p.name.toLowerCase().indexOf(query) >= 0 || (p.address || '').toLowerCase().indexOf(query) >= 0;
         return catOk && qOk;
     }
     function applyMarkers(fit) {
-        if (!map) return;
-        var pts = [];
-        MARKERS.forEach(function (p) {
-            var vis = markerVisible(p);
-            if (markers[p.id]) markers[p.id].getElement().style.display = vis ? '' : 'none';
-            if (vis) pts.push(p);
-        });
+        if (!map || !map.getSource('places')) return;
+        var pts = MARKERS.filter(markerVisible);
+        map.getSource('places').setData(toFC(pts));
+        // bila titik terpilih tak lagi tampil, bersihkan highlight + popup
+        if (selectedId && !pts.some(function (p) { return String(p.id) === String(selectedId); })) {
+            selectedId = null;
+            if (currentPopup) { currentPopup.remove(); currentPopup = null; }
+            if (map.getSource('sel')) map.getSource('sel').setData(toFC([]));
+        }
         if (fit && pts.length) {
-            if (pts.length === 1) { map.flyTo({ center: [pts[0].lng, pts[0].lat], zoom: 14, duration: 700 }); }
-            else { var b = new mapboxgl.LngLatBounds(); pts.forEach(function (p) { b.extend([p.lng, p.lat]); }); map.fitBounds(b, { padding: 70, maxZoom: 15, duration: 700 }); }
+            if (pts.length === 1) { map.flyTo({ center: [Number(pts[0].lng), Number(pts[0].lat)], zoom: 14, duration: 700 }); }
+            else { var b = new mapboxgl.LngLatBounds(); pts.forEach(function (p) { b.extend([Number(p.lng), Number(p.lat)]); }); map.fitBounds(b, { padding: 70, maxZoom: 15, duration: 700 }); }
         }
     }
     function focusPlace(id) {
         selectedId = id;
         var p = MARKERS.find(function (x) { return String(x.id) === String(id); });
         if (p && map) {
-            map.flyTo({ center: [p.lng, p.lat], zoom: 15, duration: 800 });
-            if (markers[id] && !(markers[id].getPopup() && markers[id].getPopup().isOpen())) markers[id].togglePopup();
+            var ll = [Number(p.lng), Number(p.lat)];
+            map.flyTo({ center: ll, zoom: 15, duration: 800 });
+            if (map.getSource('sel')) map.getSource('sel').setData(toFC([p]));
+            if (currentPopup) currentPopup.remove();
+            currentPopup = new mapboxgl.Popup({ offset: 16, closeButton: false })
+                .setLngLat(ll)
+                .setHTML('<div class="pop-name">' + p.name + '</div><div class="pop-addr">' + (p.address || '') + '</div>' +
+                    '<a class="pop-link" href="' + gmaps(p) + '" target="_blank" rel="noopener">Buka di Google Maps &rarr;</a>')
+                .addTo(map);
         }
-        Object.keys(markers).forEach(function (k) { markers[k].getElement().classList.toggle('active', String(k) === String(id)); });
         highlightActiveCard();
     }
 
@@ -343,17 +370,29 @@
         map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
         map.addControl(new mapboxgl.AttributionControl({ compact: true }));
         map.on('load', function () {
-            MARKERS.forEach(function (p) {
-                var el = document.createElement('div');
-                el.className = 'pin ' + pinClass(p.category);
-                var popup = new mapboxgl.Popup({ offset: 26, closeButton: false }).setHTML(
-                    '<div class="pop-name">' + p.name + '</div><div class="pop-addr">' + (p.address || '') + '</div>' +
-                    '<a class="pop-link" href="' + gmaps(p) + '" target="_blank" rel="noopener">Buka di Google Maps &rarr;</a>'
-                );
-                var marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat([p.lng, p.lat]).setPopup(popup).addTo(map);
-                el.addEventListener('click', function () { focusPlace(p.id); });
-                markers[p.id] = marker;
+            map.addSource('places', { type: 'geojson', data: toFC(MARKERS) });
+            map.addSource('sel', { type: 'geojson', data: toFC([]) });
+
+            // Halo titik terpilih (di belakang)
+            map.addLayer({
+                id: 'sel-halo', type: 'circle', source: 'sel',
+                paint: { 'circle-radius': 18, 'circle-color': '#D4AF37', 'circle-opacity': 0.35, 'circle-blur': 0.25 }
             });
+            // Titik utama — lingkaran berwarna per kategori, persis di koordinat
+            map.addLayer({
+                id: 'places', type: 'circle', source: 'places',
+                paint: {
+                    'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 6, 14, 9],
+                    'circle-color': ['match', ['get', 'category'], 'venue', '#336443', 'hotel', '#D4AF37', 'wisata', '#3a86b5', '#336443'],
+                    'circle-stroke-width': 2.5,
+                    'circle-stroke-color': '#ffffff'
+                }
+            });
+
+            map.on('click', 'places', function (e) { if (e.features[0]) focusPlace(e.features[0].properties.id); });
+            map.on('mouseenter', 'places', function () { map.getCanvas().style.cursor = 'pointer'; });
+            map.on('mouseleave', 'places', function () { map.getCanvas().style.cursor = ''; });
+
             applyMarkers(true);
         });
     }

@@ -38,7 +38,7 @@ class PetaHotelController extends Controller
         // - kategori dibatasi whitelist, default 'all'
         // - query pencarian dipangkas & dibatasi panjangnya
         $cat = (string) $request->get('cat', 'all');
-        if (! in_array($cat, ['all', 'venue', 'hotel', 'wisata'], true)) {
+        if (! in_array($cat, ['all', 'lokasi', 'gedung', 'hotel', 'wisata'], true)) {
             $cat = 'all';
         }
         $q = mb_substr(strtolower(trim((string) $request->get('q', ''))), 0, 100);
@@ -79,7 +79,8 @@ class PetaHotelController extends Controller
     {
         return [
             'all'    => $items->count(),
-            'venue'  => $items->filter(fn ($p) => $p->is_lokasi_acara)->count(),
+            'lokasi' => $items->filter(fn ($p) => $p->is_lokasi_acara)->count(), // tag Lokasi Acara (kategori apa pun)
+            'gedung' => $items->where('category', 'venue')->count(),              // kategori Gedung/Venue
             'hotel'  => $items->where('category', 'hotel')->count(),
             'wisata' => $items->where('category', 'wisata')->count(),
         ];
@@ -89,7 +90,8 @@ class PetaHotelController extends Controller
     {
         return $items->filter(function ($p) use ($cat, $q) {
             $catOk = $cat === 'all'
-                || ($cat === 'venue'  && $p->is_lokasi_acara)
+                || ($cat === 'lokasi' && $p->is_lokasi_acara)
+                || ($cat === 'gedung' && $p->category === 'venue')
                 || ($cat === 'hotel'  && $p->category === 'hotel')
                 || ($cat === 'wisata' && $p->category === 'wisata');
 
