@@ -17,8 +17,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Paksa HTTPS di Production/VPS agar tidak terjadi Mixed Content
-        if (config('app.env') === 'production') {
+        // Samakan root URL & scheme dengan APP_URL agar aset tidak salah skema.
+        // Hanya paksa HTTPS bila APP_URL memang https — supaya deploy via HTTP
+        // (mis. http://10.0.22.22:8279) tidak men-generate aset https yang gagal (Mixed Content).
+        if (str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceRootUrl(config('app.url'));
             URL::forceScheme('https');
         }
