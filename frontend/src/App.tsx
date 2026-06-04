@@ -2,12 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import {
   LogIn, Menu, X, MapPin, Calendar, ChevronRight, Users, Trophy,
   Sparkles, Building2, TreePine, Heart, Star, Clock, ArrowRight,
-  ChevronDown, Phone, ExternalLink
+  ChevronDown, Phone, ExternalLink, Globe
 } from 'lucide-react';
-import BoomerangVideoBg from './BoomerangVideoBg';
-
-const BG_VIDEO =
-  'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260511_131941_d136af49-e243-493a-be14-6ff3f24e09e6.mp4';
+import GlassOrbCursor from './GlassOrbCursor';
 
 const EVENT_DATE = new Date('2026-07-01T19:00:00+07:00');
 
@@ -114,6 +111,7 @@ function App() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { days, hours, mins, secs } = useCountdown(EVENT_DATE);
 
+  const leaders = useInView();
   const about = useInView();
   const agenda = useInView();
   const poi = useInView();
@@ -139,20 +137,21 @@ function App() {
 
   return (
     <div className="min-h-screen bg-apkasi-cream">
+      <GlassOrbCursor />
 
       {/* ═══════════ NAVBAR ═══════════ */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'py-2' : 'py-3 sm:py-4'}`}>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'py-1.5 sm:py-2' : 'py-3 sm:py-4'}`}>
         <div className={`mx-auto flex items-center justify-between transition-all duration-500 ${
           scrolled
-            ? 'max-w-full px-4 sm:px-8 bg-white/90 backdrop-blur-xl shadow-sm border-b border-apkasi-leaf'
+            ? 'max-w-[95%] xl:max-w-[90%] mx-auto px-4 sm:px-6 bg-white shadow-lg border border-gray-100 rounded-2xl'
             : 'max-w-6xl mx-4 sm:mx-6 lg:mx-auto px-4 sm:px-6 bg-white/70 backdrop-blur-md rounded-full shadow-sm border border-white/60'
         } py-2`}>
 
-          {/* Logo - left */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <img src="/logos/apkasi-logo.png" alt="APKASI" className="h-8 sm:h-9 w-auto object-contain" />
-            <div className="hidden sm:block w-px h-6 bg-apkasi-dark/15" />
-            <img src="/logos/hut-apkasi.png" alt="HUT APKASI 2026" className="hidden sm:block h-8 sm:h-9 w-auto object-contain" />
+          {/* Logo - left: DS + APKASI + AOE */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            <img src="/logos/logo-ds.png" alt="Deli Serdang" className="h-8 sm:h-9 w-auto object-contain" />
+            <img src="/logos/apkasi-alt2.png" alt="APKASI" className="h-7 sm:h-8 w-auto object-contain" />
+            <img src="/logos/aoe2026.png" alt="AOE 2026" className="hidden sm:block h-7 sm:h-8 w-auto object-contain" />
           </div>
 
           {/* Center nav */}
@@ -172,7 +171,7 @@ function App() {
             </a>
             <a href="/admin/login"
               className="hidden sm:inline-flex items-center gap-1.5 bg-apkasi-dark hover:bg-apkasi-hover text-white text-sm font-semibold px-5 py-2 rounded-full transition-colors">
-              <LogIn className="w-3.5 h-3.5" /> Admin
+              <Globe className="w-3.5 h-3.5" /> Portal DS
             </a>
             <button onClick={() => setMenuOpen(v => !v)}
               className="lg:hidden relative flex items-center justify-center w-9 h-9 rounded-full bg-apkasi-dark/5 hover:bg-apkasi-dark/10 text-apkasi-dark transition-all duration-300"
@@ -210,43 +209,71 @@ function App() {
               <MapPin className="w-4 h-4" /> Panduan Delegasi
             </a>
             <a href="/admin/login" className="mt-2 bg-apkasi-dark hover:bg-apkasi-hover text-white text-sm font-semibold px-5 py-3 rounded-full transition-colors text-center">
-              Masuk Dashboard Admin
+              Masuk Portal DS
             </a>
           </div>
         </div>
       </div>
 
-      {/* ═══════════ HERO ═══════════ */}
+      {/* ═══════════ HERO — Static Image with Ken Burns ═══════════ */}
       <section id="home" className="relative w-full min-h-[100svh] overflow-hidden flex flex-col">
-        <BoomerangVideoBg src={BG_VIDEO} className="absolute inset-0 w-full h-full" />
+        {/* Animated hero background */}
+        <div className="absolute inset-0 w-full h-full">
+          <img
+            src="/logos/hero-bg.png"
+            alt=""
+            className="w-full h-full object-cover"
+            style={{ animation: 'kenburns 25s ease-in-out infinite alternate' }}
+          />
+          <style>{`
+            @keyframes kenburns {
+              0% { transform: scale(1) translate(0, 0); }
+              100% { transform: scale(1.08) translate(-1%, -1%); }
+            }
+          `}</style>
+        </div>
         {/* gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-apkasi-dark/40 via-apkasi-dark/15 to-apkasi-dark/70 pointer-events-none" />
 
         {/* Center content */}
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-5 sm:px-8 pt-20 pb-32 sm:pb-36">
-          {/* Location badge */}
-          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-5 sm:mb-6">
-            <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-apkasi-goldlt" />
-            <span className="text-white/90 text-[11px] sm:text-xs font-medium tracking-wide">Kabupaten Deli Serdang, Sumatera Utara</span>
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-5 sm:px-8 pt-28 sm:pt-32 pb-32 sm:pb-36">
+
+          {/* ── Hero event logos ── */}
+          <div className="flex items-center justify-center gap-6 sm:gap-10 md:gap-14 mb-8 sm:mb-10">
+            <img
+              src="/logos/hut-apkasi.png"
+              alt="HUT APKASI Ke-26"
+              className="h-28 sm:h-32 md:h-40 lg:h-48 w-auto object-contain drop-shadow-xl"
+            />
+            <img
+              src="/logos/hutds80.png"
+              alt="HUT Deli Serdang Ke-80"
+              className="h-28 sm:h-32 md:h-40 lg:h-48 w-auto object-contain drop-shadow-xl"
+            />
           </div>
 
-          {/* Headline */}
-          <h1 className="font-display font-bold leading-[1.05] text-white text-[1.75rem] sm:text-4xl md:text-5xl lg:text-[3.8rem] xl:text-[4.25rem] max-w-4xl tracking-tight">
-            Bersinergi Membangun{' '}
-            <br className="hidden sm:block" />
-            Daerah{' '}
-            <span className="text-apkasi-accent">
-              Memperkuat
-              <br className="hidden md:block" />{' '}
-              Otonomi Indonesia
-            </span>
-          </h1>
+          {/* Headline — two separate blocks for guaranteed spacing */}
+          <div className="max-w-5xl">
+            <h1 className="font-display font-bold text-white text-[1.65rem] sm:text-3xl md:text-[2.75rem] lg:text-[3.5rem] xl:text-[4rem] tracking-tight">
+              Bersinergi Membangun Daerah
+            </h1>
+            <p className="font-display font-bold text-apkasi-accent text-[1.65rem] sm:text-3xl md:text-[2.75rem] lg:text-[3.5rem] xl:text-[4rem] tracking-tight mt-2 sm:mt-4 md:mt-5">
+              Memperkuat Otonomi Indonesia
+            </p>
+          </div>
+
 
           <p className="mt-4 sm:mt-6 text-white/75 text-sm sm:text-base md:text-lg leading-relaxed max-w-lg font-normal">
             HUT Ke-26 APKASI & HUT Ke-80 Kabupaten Deli Serdang
             <br className="hidden sm:block" />
             1 – 3 Juli 2026
           </p>
+
+          {/* Location badge — above countdown */}
+          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mt-5 sm:mt-6">
+            <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-apkasi-goldlt" />
+            <span className="text-white/90 text-[11px] sm:text-xs font-medium tracking-wide">Kabupaten Deli Serdang, Sumatera Utara</span>
+          </div>
 
           {/* Countdown */}
           <div className="mt-7 sm:mt-9 flex items-center gap-2 sm:gap-3">
@@ -270,6 +297,14 @@ function App() {
           </div>
         </div>
 
+        {/* Mascot floating animation */}
+        <style>{`
+          @keyframes mascotFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+          }
+        `}</style>
+
         {/* Bottom bar */}
         <div className="absolute bottom-0 left-0 right-0 z-10 px-5 sm:px-8 md:px-10 pb-5 sm:pb-7 flex items-end justify-between">
           {/* Left */}
@@ -282,7 +317,7 @@ function App() {
               Informasi agenda, panduan delegasi, akomodasi, dan peta lokasi selama rangkaian kegiatan di Deli Serdang.
             </p>
           </div>
-          {/* Right */}
+          {/* Right — date */}
           <div className="flex items-center gap-2 text-white/70 text-xs ml-auto">
             <Calendar className="w-3.5 h-3.5" />
             <span className="font-medium">1–3 Juli 2026</span>
@@ -290,6 +325,14 @@ function App() {
             <span className="text-white/50">Deli Serdang</span>
           </div>
         </div>
+
+        {/* Mascot — absolute bottom-right */}
+        <img
+          src="/logos/maskot.png"
+          alt="Maskot APKASI"
+          className="absolute z-20 right-4 sm:right-8 md:right-12 bottom-16 sm:bottom-20 h-28 sm:h-36 md:h-44 lg:h-52 w-auto object-contain drop-shadow-2xl"
+          style={{ animation: 'mascotFloat 3.5s ease-in-out infinite' }}
+        />
       </section>
 
       {/* ═══════════ LOGO PARTNERS ═══════════ */}
@@ -312,6 +355,69 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* ═══════════ BUPATI & WAKIL BUPATI ═══════════ */}
+      <section id="pimpinan" className="py-16 sm:py-20 md:py-28 bg-gradient-to-b from-white to-apkasi-cream">
+        <div ref={leaders.ref} className={`max-w-5xl mx-auto px-5 sm:px-8 transition-all duration-700 ${leaders.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className="text-center mb-10 sm:mb-14">
+            <SectionBadge>Pimpinan Daerah Tuan Rumah</SectionBadge>
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-apkasi-dark leading-tight mb-3">
+              Kabupaten Deli Serdang
+            </h2>
+            <p className="text-apkasi-body text-sm sm:text-base max-w-md mx-auto">
+              Menyambut seluruh delegasi APKASI dalam rangkaian peringatan HUT Ke-80 Kabupaten Deli Serdang.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12 md:gap-20">
+            {/* Bupati */}
+            <div className="group flex flex-col items-center text-center max-w-xs">
+              <div className="relative mb-5">
+                <div className="w-44 h-44 sm:w-52 sm:h-52 md:w-60 md:h-60 rounded-full overflow-hidden border-4 border-apkasi-gold/30 shadow-xl group-hover:border-apkasi-gold transition-colors duration-500">
+                  <img src="/logos/bupati.png" alt="Bupati Deli Serdang" className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
+                </div>
+                {/* Gold ribbon badge */}
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-apkasi-gold to-[#c5a028] text-apkasi-dark text-[10px] sm:text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full shadow-md whitespace-nowrap">
+                  Bupati
+                </div>
+              </div>
+              <h3 className="font-display text-lg sm:text-xl font-bold text-apkasi-dark mt-2">H. Ali Yusuf Siregar, S.Sos.</h3>
+              <p className="text-apkasi-body text-xs sm:text-sm mt-1">Bupati Deli Serdang<br/>Periode 2024–2029</p>
+              <div className="mt-3 w-10 h-0.5 bg-apkasi-gold/40 rounded-full group-hover:w-16 transition-all duration-500" />
+            </div>
+
+            {/* Divider — desktop only */}
+            <div className="hidden sm:block w-px h-48 bg-gradient-to-b from-transparent via-apkasi-dark/15 to-transparent" />
+
+            {/* Wakil Bupati */}
+            <div className="group flex flex-col items-center text-center max-w-xs">
+              <div className="relative mb-5">
+                <div className="w-44 h-44 sm:w-52 sm:h-52 md:w-60 md:h-60 rounded-full overflow-hidden border-4 border-apkasi-gold/30 shadow-xl group-hover:border-apkasi-gold transition-colors duration-500">
+                  <img src="/logos/wabup.png" alt="Wakil Bupati Deli Serdang" className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
+                </div>
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-apkasi-gold to-[#c5a028] text-apkasi-dark text-[10px] sm:text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full shadow-md whitespace-nowrap">
+                  Wakil Bupati
+                </div>
+              </div>
+              <h3 className="font-display text-lg sm:text-xl font-bold text-apkasi-dark mt-2">HM. Yusuf Siregar, S.E.</h3>
+              <p className="text-apkasi-body text-xs sm:text-sm mt-1">Wakil Bupati Deli Serdang<br/>Periode 2024–2029</p>
+              <div className="mt-3 w-10 h-0.5 bg-apkasi-gold/40 rounded-full group-hover:w-16 transition-all duration-500" />
+            </div>
+          </div>
+
+          {/* Sambutan quote */}
+          <div className="mt-12 sm:mt-16 max-w-2xl mx-auto text-center">
+            <blockquote className="relative">
+              <span className="absolute -top-4 -left-2 text-5xl sm:text-6xl text-apkasi-gold/20 font-serif leading-none">&ldquo;</span>
+              <p className="text-apkasi-heading text-sm sm:text-base md:text-lg leading-relaxed italic font-medium px-6">
+                Kami sangat bangga menjadi tuan rumah HUT APKASI Ke-26. Deli Serdang siap menyambut seluruh Bupati dan perwakilan kabupaten se-Indonesia untuk bersinergi membangun daerah.
+              </p>
+              <span className="absolute -bottom-6 -right-2 text-5xl sm:text-6xl text-apkasi-gold/20 font-serif leading-none rotate-180">&ldquo;</span>
+            </blockquote>
+            <p className="mt-6 text-xs sm:text-sm text-apkasi-body font-semibold">&mdash; Bupati Deli Serdang</p>
+          </div>
+        </div>
+      </section>
 
       {/* ═══════════ ABOUT ═══════════ */}
       <section id="tentang" className="py-16 sm:py-20 md:py-28 bg-white">
@@ -566,14 +672,14 @@ function App() {
                 Dinas Kominfo Kabupaten Deli Serdang,<br />Sumatera Utara
               </p>
               <a href="/admin/login" className="inline-flex items-center gap-1.5 text-sm font-semibold text-apkasi-gold hover:text-apkasi-goldlt transition-colors">
-                <LogIn className="w-3.5 h-3.5" /> Dashboard Admin
+                <Globe className="w-3.5 h-3.5" /> Portal DS
               </a>
             </div>
           </div>
 
           <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-[11px] text-white/30">
-              © 2026 Pemerintah Kabupaten Deli Serdang & APKASI. All rights reserved.
+              &copy; 2026 Pemerintah Kabupaten Deli Serdang & APKASI. All rights reserved.
             </p>
             <div className="flex items-center gap-2">
               <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Logo_Deli_Serdang.png" alt="Deli Serdang" className="h-7 opacity-50" />
