@@ -5,6 +5,7 @@ import {
   ChevronDown, Phone, ExternalLink, Globe
 } from 'lucide-react';
 import GlassOrbCursor from './GlassOrbCursor';
+import SplashLoader from './SplashLoader';
 
 const EVENT_DATE = new Date('2026-07-01T19:00:00+07:00');
 
@@ -137,6 +138,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-apkasi-cream">
+      <SplashLoader oncePerSession={false} minDuration={3000} />
       <GlassOrbCursor />
 
       {/* ═══════════ NAVBAR ═══════════ */}
@@ -215,23 +217,83 @@ function App() {
         </div>
       </div>
 
-      {/* ═══════════ HERO — Static Image with Ken Burns ═══════════ */}
+      {/* ═══════════ HERO ═══════════ */}
       <section id="home" className="relative w-full min-h-[100svh] overflow-hidden flex flex-col">
-        {/* Animated hero background */}
+        {/* Background with Ken Burns */}
         <div className="absolute inset-0 w-full h-full">
           <img
             src="/logos/hero-bg.png"
             alt=""
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
             style={{ animation: 'kenburns 25s ease-in-out infinite alternate' }}
           />
-          <style>{`
-            @keyframes kenburns {
-              0% { transform: scale(1) translate(0, 0); }
-              100% { transform: scale(1.08) translate(-1%, -1%); }
-            }
-          `}</style>
         </div>
+
+        {/* Animated color splashes — red, green, blue, orange */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ mixBlendMode: 'overlay' }}>
+          <div className="hero-splash splash-red" />
+          <div className="hero-splash splash-blue" />
+          <div className="hero-splash splash-green" />
+          <div className="hero-splash splash-orange" />
+        </div>
+        <style>{`
+          @keyframes kenburns {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.1) translate(-1%, -0.8%); }
+          }
+          .hero-splash {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.45;
+            will-change: transform, opacity;
+          }
+          .splash-red {
+            width: 45vw; height: 45vw;
+            background: radial-gradient(circle, rgba(220,30,30,0.8), rgba(180,10,10,0.3) 60%, transparent 80%);
+            top: -10%; left: -10%;
+            animation: splashFloat1 14s ease-in-out infinite alternate, splashPulse 8s ease-in-out infinite;
+          }
+          .splash-blue {
+            width: 40vw; height: 40vw;
+            background: radial-gradient(circle, rgba(0,100,255,0.8), rgba(0,150,255,0.3) 60%, transparent 80%);
+            bottom: -8%; left: 15%;
+            animation: splashFloat2 16s ease-in-out infinite alternate, splashPulse 10s ease-in-out infinite 2s;
+          }
+          .splash-green {
+            width: 38vw; height: 38vw;
+            background: radial-gradient(circle, rgba(20,180,60,0.8), rgba(0,150,50,0.3) 60%, transparent 80%);
+            top: 5%; right: -8%;
+            animation: splashFloat3 18s ease-in-out infinite alternate, splashPulse 9s ease-in-out infinite 4s;
+          }
+          .splash-orange {
+            width: 35vw; height: 35vw;
+            background: radial-gradient(circle, rgba(255,150,0,0.8), rgba(240,120,0,0.3) 60%, transparent 80%);
+            bottom: -5%; right: -5%;
+            animation: splashFloat4 15s ease-in-out infinite alternate, splashPulse 7s ease-in-out infinite 1s;
+          }
+          @keyframes splashFloat1 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(12vw, 8vh) scale(1.15); }
+          }
+          @keyframes splashFloat2 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(8vw, -10vh) scale(1.1); }
+          }
+          @keyframes splashFloat3 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-10vw, 6vh) scale(1.2); }
+          }
+          @keyframes splashFloat4 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-6vw, -8vh) scale(1.1); }
+          }
+          @keyframes splashPulse {
+            0%, 100% { opacity: 0.35; }
+            50% { opacity: 0.55; }
+          }
+        `}</style>
+
         {/* gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-apkasi-dark/40 via-apkasi-dark/15 to-apkasi-dark/70 pointer-events-none" />
 
