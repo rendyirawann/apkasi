@@ -408,7 +408,7 @@ function App() {
               { src: '/logos/apkasi-full.png', alt: 'APKASI', h: 'h-12 sm:h-14' },
               { src: '/logos/hut-apkasi.png', alt: 'HUT APKASI 2026', h: 'h-10 sm:h-12' },
               { src: '/logos/aoe2026.png', alt: 'AOE 2026', h: 'h-12 sm:h-14' },
-              { src: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Logo_Deli_Serdang.png', alt: 'Kab. Deli Serdang', h: 'h-12 sm:h-14' },
+              { src: '/logos/logo-ds.png', alt: 'Kab. Deli Serdang', h: 'h-12 sm:h-14' },
             ].map(logo => (
               <div key={logo.alt} className="flex items-center justify-center px-2 py-1 opacity-80 hover:opacity-100 transition-opacity duration-300 grayscale hover:grayscale-0">
                 <img src={logo.src} alt={logo.alt} className={`${logo.h} w-auto object-contain`} />
@@ -744,7 +744,7 @@ function App() {
               &copy; 2026 Pemerintah Kabupaten Deli Serdang & APKASI. All rights reserved.
             </p>
             <div className="flex items-center gap-2">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Logo_Deli_Serdang.png" alt="Deli Serdang" className="h-7 opacity-50" />
+              <img src="/logos/logo-ds.png" alt="Deli Serdang" className="h-7 opacity-50" />
               <img src="/logos/aoe2026-trans.png" alt="AOE 2026" className="h-7 opacity-50" />
             </div>
           </div>
