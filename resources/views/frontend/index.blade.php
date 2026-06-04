@@ -19,7 +19,7 @@
 @section('content')
 @include('frontend.partials.splash')
 
-{{-- ═══════════ INTRO HERO (single-page cinematic, scroll-jack 3 tahap) ═══════════ --}}
+{{-- ═══════════ INTRO HERO (scroll-jack 3 tahap) — auto tampil maks 1x / 2 jam per IP; tetap bisa dibuka via scroll mentok ke atas ═══════════ --}}
 <style>
     #intro{position:fixed;inset:0;z-index:9000;overflow:hidden;background:#0a1f15;transform:translateY(0);transition:transform 1s cubic-bezier(.76,0,.24,1);will-change:transform}
     #intro.is-hidden{transform:translateY(-100%)}
@@ -68,7 +68,7 @@
     @media(max-width:640px){.intro-dots{bottom:92px}.intro-hint{bottom:34px}}
     @media(prefers-reduced-motion:reduce){.intro-scene{transition:opacity .4s ease}.intro-scene.is-active{transform:none}#intro{transition:transform .5s ease}}
 </style>
-<section id="intro" aria-label="Pembuka">
+<section id="intro" aria-label="Pembuka" data-auto="{{ ! empty($showIntro) ? '1' : '0' }}" class="{{ ! empty($showIntro) ? '' : 'is-hidden' }}">
     <div class="intro-scene is-active" data-stage="0">
         <span class="blob b-red bf1" style="width:60vw;height:60vw;left:-10%;top:-14%"></span>
         <span class="blob b-org bf2" style="width:50vw;height:50vw;right:-8%;top:0"></span>
@@ -602,7 +602,7 @@
                     </div>
                 </div>
                 <div>
-                    <h4 class="text-white/80 text-xs font-bold uppercase tracking-widest mb-4">Sekretariat</h4>
+                    <h4 class="text-white/80 text-xs font-bold uppercase tracking-widest mb-4">Pemerintahan</h4>
                     <p class="text-sm text-white/50 leading-relaxed mb-3">{{ $g('lp_footer_sekretariat', 'Dinas Kominfo Kabupaten Deli Serdang, Sumatera Utara') }}</p>
                     <a href="https://portal.deliserdangkab.go.id/" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-semibold text-apkasi-gold hover:text-apkasi-goldlt transition-colors">
                         <i data-lucide="globe" class="w-3.5 h-3.5"></i> Portal DS
@@ -828,8 +828,17 @@
             if (!document.getElementById('splash')) { activate(); return; }
             requestAnimationFrame(waitSplash);
         }
-        lock();        // kunci dari awal (di belakang splash)
-        waitSplash();
+
+        if (overlay.dataset.auto === '0') {
+            // Intro di-suppress (sudah tampil < 2 jam): JANGAN auto-muncul & jangan kunci scroll.
+            // Tetap bisa dibuka manual dengan scroll mentok ke paling atas (reopenIntro).
+            open = false;
+            overlay.classList.add('is-hidden');
+            render();
+        } else {
+            lock();        // kunci dari awal (di belakang splash)
+            waitSplash();
+        }
     })();
 </script>
 @endpush

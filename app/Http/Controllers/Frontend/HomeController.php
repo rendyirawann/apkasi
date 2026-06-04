@@ -10,8 +10,16 @@ class HomeController extends Controller
     /**
      * Display the landing page.
      */
-    public function index()
+    public function index(Request $request)
     {
+        // Intro hero tampil maksimal sekali per 2 jam per IP (server-side gate).
+        // Setelah loader selesai, intro hanya muncul bila IP ini belum melihatnya dalam 2 jam terakhir.
+        $introKey = 'intro_shown_' . md5((string) $request->ip());
+        $showIntro = ! \Illuminate\Support\Facades\Cache::has($introKey);
+        if ($showIntro) {
+            \Illuminate\Support\Facades\Cache::put($introKey, true, now()->addHours(2));
+        }
+
         // Target date for countdown (1 July 2026, 19:00:00)
         $eventTargetDate = "2026-07-01 19:00:00";
 
@@ -90,7 +98,7 @@ class HomeController extends Controller
         return view('frontend.index', compact(
             'eventTargetDate', 'rundownHighlights', 'agenda',
             'navbarLogos', 'heroLogos', 'partnerLogos', 'footerBrandLogos', 'footerSideLogos',
-            'faqs', 'countdownTarget', 'eventRangeText'
+            'faqs', 'countdownTarget', 'eventRangeText', 'showIntro'
         ));
     }
 
