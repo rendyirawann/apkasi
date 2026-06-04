@@ -594,7 +594,7 @@ function App() {
           </div>
 
           <div className="text-center mt-8 sm:mt-10">
-            <a href="/panduan" className="inline-flex items-center gap-2 bg-apkasi-heading hover:bg-apkasi-cta text-white text-sm font-semibold px-7 py-3.5 rounded-full transition-colors shadow-md">
+            <a href="/peta-hotel" className="inline-flex items-center gap-2 bg-apkasi-heading hover:bg-apkasi-cta text-white text-sm font-semibold px-7 py-3.5 rounded-full transition-colors shadow-md">
               Lihat Peta Lokasi & Hotel <ArrowRight className="w-4 h-4" />
             </a>
           </div>
@@ -720,8 +720,8 @@ function App() {
             <div>
               <h4 className="text-white/80 text-xs font-bold uppercase tracking-widest mb-4">Panduan</h4>
               <div className="space-y-2.5">
-                <a href="/panduan" className="block text-sm text-white/50 hover:text-white/90 transition-colors">Peta Lokasi Event</a>
-                <a href="/panduan" className="block text-sm text-white/50 hover:text-white/90 transition-colors">Rekomendasi Hotel</a>
+                <a href="/peta-hotel" className="block text-sm text-white/50 hover:text-white/90 transition-colors">Peta Lokasi Event</a>
+                <a href="/peta-hotel" className="block text-sm text-white/50 hover:text-white/90 transition-colors">Rekomendasi Hotel</a>
                 <a href="/panduan" className="block text-sm text-white/50 hover:text-white/90 transition-colors">Destinasi Wisata</a>
                 <a href="/panduan" className="block text-sm text-white/50 hover:text-white/90 transition-colors">Rental Mobil</a>
               </div>

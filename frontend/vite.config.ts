@@ -7,5 +7,12 @@ export default defineConfig({
   server: {
     port: 5173,
     open: true,
+    // Proxy panggilan /api ke backend Laravel (php artisan serve) supaya tanpa CORS saat dev.
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:2707',
+        changeOrigin: true,
+      },
+    },
   },
 })

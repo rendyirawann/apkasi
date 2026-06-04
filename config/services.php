@@ -51,4 +51,9 @@ return [
         'scheme' => env('REVERB_SCHEME', 'https'),
     ],
 
+    'mapbox' => [
+        // Public access token (pk.*) untuk Mapbox GL JS di halaman Peta Lokasi & Hotel.
+        'token' => env('MAPBOX_TOKEN'),
+    ],
+
 ];

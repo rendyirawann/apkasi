@@ -33,6 +33,9 @@ use App\Http\Controllers\Backend\Settings\SettingController;
 // Halaman Depan (Landing Page & Panduan APKASI Deli Serdang)
 Route::get('/', [\App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
 Route::get('/panduan', [\App\Http\Controllers\Frontend\HomeController::class, 'guide'])->name('guide');
+Route::get('/peta-hotel', [\App\Http\Controllers\Frontend\Peta\PetaHotelController::class, 'index'])->name('peta-hotel');
+// Endpoint JSON data tempat (dipakai SPA React di folder frontend/ via proxy Vite)
+Route::get('/api/places', [\App\Http\Controllers\Frontend\Peta\PetaHotelController::class, 'json'])->name('api.places');
 
 Route::any('/dine-sync-pos', function () {
     return redirect('/admin/login');

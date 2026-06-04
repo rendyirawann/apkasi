@@ -318,7 +318,8 @@
             <a href="#about" class="nav-link-custom">Tentang</a>
             <a href="#agenda" class="nav-link-custom">Agenda</a>
             <a href="#poi" class="nav-link-custom">Putri Otonomi</a>
-            <a href="{{ route('guide') }}" class="nav-link-custom">Panduan Peta & Hotel</a>
+            <a href="{{ route('peta-hotel') }}" class="nav-link-custom">Peta & Hotel</a>
+            <a href="{{ route('guide') }}" class="nav-link-custom">Panduan</a>
         </nav>
 
         <div>
