@@ -70,18 +70,23 @@ class HomeController extends Controller
             ->orderBy('tanggal')
             ->get();
 
-        // Logo (per grup) & FAQ untuk landing
-        $navbarLogos      = \App\Models\SiteLogo::grup('navbar')->get();
-        $heroLogos        = \App\Models\SiteLogo::grup('hero')->get();
-        $partnerLogos     = \App\Models\SiteLogo::grup('partners')->get();
-        $footerBrandLogos = \App\Models\SiteLogo::grup('footer_brand')->get();
-        $footerSideLogos  = \App\Models\SiteLogo::grup('footer_side')->get();
+        // Semua logo aktif dlm SATU query lalu dikelompokkan per grup (hindari 5 query terpisah).
+        $logosByGrup = \App\Models\SiteLogo::where('is_active', true)
+            ->orderBy('urut')->orderBy('id')->get()->groupBy('grup');
+        $emptyLogos       = collect();
+        $navbarLogos      = $logosByGrup->get('navbar', $emptyLogos);
+        $heroLogos        = $logosByGrup->get('hero', $emptyLogos);
+        $partnerLogos     = $logosByGrup->get('partners', $emptyLogos);
+        $footerBrandLogos = $logosByGrup->get('footer_brand', $emptyLogos);
+        $footerSideLogos  = $logosByGrup->get('footer_side', $emptyLogos);
         $faqs             = \App\Models\Faq::active()->get();
 
-        // Countdown & rentang tanggal acara dari settings
-        $start = \App\Models\Setting::get('lp_event_start', '2026-07-01');
-        $end   = \App\Models\Setting::get('lp_event_end', '2026-07-03');
-        $time  = \App\Models\Setting::get('lp_countdown_time', '19:00');
+        // Countdown & rentang tanggal acara — ambil dari settings yang SUDAH dimuat (allCached, memoized),
+        // hindari 3 lookup terpisah.
+        $s     = \App\Models\Setting::allCached();
+        $start = $s['lp_event_start'] ?? '2026-07-01';
+        $end   = $s['lp_event_end'] ?? '2026-07-03';
+        $time  = $s['lp_countdown_time'] ?? '19:00';
 
         $countdownTarget = \Carbon\Carbon::parse($start . ' ' . $time, 'Asia/Jakarta')->toIso8601String();
 

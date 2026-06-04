@@ -32,9 +32,17 @@ class PetaHotelController extends Controller
      */
     public function list(Request $request)
     {
-        $items    = $this->resolveItems();
-        $cat      = $request->get('cat', 'all');
-        $q        = strtolower(trim((string) $request->get('q', '')));
+        $items = $this->resolveItems();
+
+        // Sanitasi input (pengamanan sederhana — cegah nilai liar):
+        // - kategori dibatasi whitelist, default 'all'
+        // - query pencarian dipangkas & dibatasi panjangnya
+        $cat = (string) $request->get('cat', 'all');
+        if (! in_array($cat, ['all', 'venue', 'hotel', 'wisata'], true)) {
+            $cat = 'all';
+        }
+        $q = mb_substr(strtolower(trim((string) $request->get('q', ''))), 0, 100);
+
         $filtered = $this->filterItems($items, $cat, $q);
 
         $perPage  = 5;

@@ -9,6 +9,9 @@ class Setting extends Model
 {
     protected $fillable = ['key', 'value'];
 
+    /** Memo per-request agar allCached() tak menembak cache-store berkali-kali (View composer '*'). */
+    protected static ?array $allMemo = null;
+
     /**
      * Get a setting value by key.
      */
@@ -28,6 +31,7 @@ class Setting extends Model
         static::updateOrCreate(['key' => $key], ['value' => $value]);
         Cache::forget("setting.{$key}");
         Cache::forget('settings.all');
+        static::$allMemo = null;
     }
 
     /**
@@ -35,7 +39,11 @@ class Setting extends Model
      */
     public static function allCached(): array
     {
-        return Cache::remember('settings.all', 3600, function () {
+        if (static::$allMemo !== null) {
+            return static::$allMemo;
+        }
+
+        return static::$allMemo = Cache::remember('settings.all', 3600, function () {
             return static::pluck('value', 'key')->toArray();
         });
     }
@@ -50,5 +58,6 @@ class Setting extends Model
             Cache::forget("setting.{$key}");
         }
         Cache::forget('settings.all');
+        static::$allMemo = null;
     }
 }

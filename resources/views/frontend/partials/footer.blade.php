@@ -5,8 +5,8 @@
             {{-- Brand --}}
             <div class="sm:col-span-2 lg:col-span-1">
                 <div class="flex items-center gap-3 mb-4">
-                    <img src="{{ asset('logos/apkasi-logo.png') }}" alt="APKASI" class="h-10 brightness-0 invert" />
-                    <img src="{{ asset('logos/hut-apkasi.png') }}" alt="HUT" class="h-10 brightness-0 invert opacity-80" />
+                    <img src="{{ asset('logos/apkasi-logo.png') }}" alt="APKASI" loading="lazy" decoding="async" class="h-10 brightness-0 invert" />
+                    <img src="{{ asset('logos/hut-apkasi.png') }}" alt="HUT" loading="lazy" decoding="async" class="h-10 brightness-0 invert opacity-80" />
                 </div>
                 <p class="text-white/50 text-xs leading-relaxed max-w-xs">Asosiasi Pemerintah Kabupaten Seluruh Indonesia. Memperkuat otonomi daerah untuk Indonesia Maju.</p>
             </div>
@@ -35,7 +35,7 @@
 
             {{-- Sekretariat --}}
             <div>
-                <h4 class="text-white/80 text-xs font-bold uppercase tracking-widest mb-4">Sekretariat</h4>
+                <h4 class="text-white/80 text-xs font-bold uppercase tracking-widest mb-4">Pemerintahan</h4>
                 <p class="text-sm text-white/50 leading-relaxed mb-3">Dinas Kominfo Kabupaten Deli Serdang,<br />Sumatera Utara</p>
                 <a href="https://portal.deliserdangkab.go.id/" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-semibold text-apkasi-gold hover:text-apkasi-goldlt transition-colors">
                     <i data-lucide="globe" class="w-3.5 h-3.5"></i> Portal DS
@@ -46,8 +46,8 @@
         <div class="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p class="text-[11px] text-white/30">&copy; 2026 Pemerintah Kabupaten Deli Serdang & APKASI. All rights reserved.</p>
             <div class="flex items-center gap-2">
-                <img src="{{ asset('logos/logo-ds.png') }}" alt="Deli Serdang" class="h-7 opacity-50" />
-                <img src="{{ asset('logos/aoe2026-trans.png') }}" alt="AOE 2026" class="h-7 opacity-50" />
+                <img src="{{ asset('logos/logo-ds.png') }}" alt="Deli Serdang" loading="lazy" decoding="async" class="h-7 opacity-50" />
+                <img src="{{ asset('logos/aoe2026-trans.png') }}" alt="AOE 2026" loading="lazy" decoding="async" class="h-7 opacity-50" />
             </div>
         </div>
     </div>

@@ -39,14 +39,20 @@ use App\Http\Controllers\Backend\Settings\LandingController;
 |
 */
 
-// Halaman Depan (Landing Page & Panduan APKASI Deli Serdang)
-Route::get('/', [\App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
-Route::get('/panduan', [\App\Http\Controllers\Frontend\HomeController::class, 'guide'])->name('guide');
-Route::get('/peta-hotel', [\App\Http\Controllers\Frontend\Peta\PetaHotelController::class, 'index'])->name('peta-hotel');
-// Daftar tempat paginasi (AJAX) untuk list di /peta-hotel
-Route::get('/peta-hotel/list', [\App\Http\Controllers\Frontend\Peta\PetaHotelController::class, 'list'])->name('peta-hotel.list');
-// Endpoint JSON data tempat (dipakai SPA React di folder frontend/ via proxy Vite)
-Route::get('/api/places', [\App\Http\Controllers\Frontend\Peta\PetaHotelController::class, 'json'])->name('api.places');
+// Halaman Depan (Landing Page & Panduan APKASI Deli Serdang) — throttle per IP
+// 120 request/menit cukup longgar utk kantor ber-NAT, tapi menahan scraper/abuse.
+Route::middleware('throttle:120,1')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
+    Route::get('/panduan', [\App\Http\Controllers\Frontend\HomeController::class, 'guide'])->name('guide');
+    Route::get('/peta-hotel', [\App\Http\Controllers\Frontend\Peta\PetaHotelController::class, 'index'])->name('peta-hotel');
+});
+// Endpoint AJAX/JSON (sering dipanggil saat paginasi) — limit lebih longgar
+Route::middleware('throttle:240,1')->group(function () {
+    // Daftar tempat paginasi (AJAX) untuk list di /peta-hotel
+    Route::get('/peta-hotel/list', [\App\Http\Controllers\Frontend\Peta\PetaHotelController::class, 'list'])->name('peta-hotel.list');
+    // Endpoint JSON data tempat (dipakai SPA React di folder frontend/ via proxy Vite)
+    Route::get('/api/places', [\App\Http\Controllers\Frontend\Peta\PetaHotelController::class, 'json'])->name('api.places');
+});
 
 Route::any('/dine-sync-pos', function () {
     return redirect('/admin/login');

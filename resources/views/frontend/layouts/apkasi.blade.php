@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     {{-- Jangan pulihkan posisi scroll lama & mulai selalu dari atas --}}
     <script>try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}</script>
     <title>@yield('title', 'HUT Ke-26 APKASI & Deli Serdang Ke-80 — 1-3 Juli 2026')</title>

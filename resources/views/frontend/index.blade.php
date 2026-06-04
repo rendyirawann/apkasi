@@ -307,7 +307,7 @@
             <div class="flex items-center justify-center gap-6 sm:gap-10 md:gap-14 flex-wrap">
                 @foreach ($partnerLogos as $logo)
                     <div class="flex items-center justify-center px-2 py-1 opacity-80 hover:opacity-100 transition-opacity duration-300 grayscale hover:grayscale-0">
-                        <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="h-12 sm:h-14 w-auto object-contain" />
+                        <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" loading="lazy" decoding="async" class="h-12 sm:h-14 w-auto object-contain" />
                     </div>
                 @endforeach
             </div>
@@ -327,7 +327,7 @@
                 <div class="group flex flex-col items-center text-center max-w-xs">
                     <div class="relative mb-5">
                         <div class="w-44 h-44 sm:w-52 sm:h-52 md:w-60 md:h-60 rounded-full overflow-hidden border-4 border-apkasi-gold/30 shadow-xl group-hover:border-apkasi-gold transition-colors duration-500">
-                            <img src="{{ asset($g('lp_bupati_foto', 'assets/apkasi/z_04_LOGO-LOGO APKASI/BUPATI.png')) }}" alt="{{ $g('lp_bupati_nama', 'Bupati') }}" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
+                            <img src="{{ asset($g('lp_bupati_foto', 'assets/apkasi/z_04_LOGO-LOGO APKASI/BUPATI.png')) }}" alt="{{ $g('lp_bupati_nama', 'Bupati') }}" loading="lazy" decoding="async" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-apkasi-gold to-[#c5a028] text-apkasi-dark text-[10px] sm:text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full shadow-md whitespace-nowrap">Bupati</div>
                     </div>
@@ -341,7 +341,7 @@
                 <div class="group flex flex-col items-center text-center max-w-xs">
                     <div class="relative mb-5">
                         <div class="w-44 h-44 sm:w-52 sm:h-52 md:w-60 md:h-60 rounded-full overflow-hidden border-4 border-apkasi-gold/30 shadow-xl group-hover:border-apkasi-gold transition-colors duration-500">
-                            <img src="{{ asset($g('lp_wabup_foto', 'assets/apkasi/z_04_LOGO-LOGO APKASI/WABUPATI.png')) }}" alt="{{ $g('lp_wabup_nama', 'Wakil Bupati') }}" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
+                            <img src="{{ asset($g('lp_wabup_foto', 'assets/apkasi/z_04_LOGO-LOGO APKASI/WABUPATI.png')) }}" alt="{{ $g('lp_wabup_nama', 'Wakil Bupati') }}" loading="lazy" decoding="async" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-apkasi-gold to-[#c5a028] text-apkasi-dark text-[10px] sm:text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full shadow-md whitespace-nowrap">Wakil Bupati</div>
                     </div>
@@ -402,7 +402,7 @@
 
                 <div class="space-y-4">
                     <div class="rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg aspect-[4/3]">
-                        <img src="{{ $img('lp_about_image', 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=900&q=80') }}" alt="{{ $g('lp_about_heading', 'Tentang Event') }}" class="w-full h-full object-cover" />
+                        <img src="{{ $img('lp_about_image', 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=900&q=80') }}" alt="{{ $g('lp_about_heading', 'Tentang Event') }}" loading="lazy" decoding="async" class="w-full h-full object-cover" />
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div class="bg-apkasi-heading rounded-xl sm:rounded-2xl p-4 sm:p-5 text-white">
@@ -435,7 +435,7 @@
                     <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-apkasi-leaf overflow-hidden">
                         <div class="flex items-center gap-3 sm:gap-4 px-5 sm:px-7 py-4 sm:py-5 bg-apkasi-dark text-white">
                             <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-white flex items-center justify-center shrink-0 p-1.5 shadow-sm">
-                                <img src="{{ asset($dayImages[$loop->index % count($dayImages)]) }}" alt="" class="w-full h-full object-contain" />
+                                <img src="{{ asset($dayImages[$loop->index % count($dayImages)]) }}" alt="" loading="lazy" decoding="async" class="w-full h-full object-contain" />
                             </div>
                             <div>
                                 <p class="text-xs font-bold tracking-wide text-apkasi-accent uppercase">{{ $day->label ?: 'Hari ' . $loop->iteration }}</p>
@@ -517,7 +517,7 @@
                         </div>
                     </div>
                     <div class="lg:col-span-2 relative min-h-[280px] sm:min-h-[340px]">
-                        <img src="{{ $img('lp_poi_image', 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=700&q=80') }}" alt="{{ $g('lp_poi_heading2', 'Putri Otonomi Indonesia') }}" class="w-full h-full object-cover" />
+                        <img src="{{ $img('lp_poi_image', 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=700&q=80') }}" alt="{{ $g('lp_poi_heading2', 'Putri Otonomi Indonesia') }}" loading="lazy" decoding="async" class="w-full h-full object-cover" />
                         <div class="absolute inset-0 bg-gradient-to-r from-apkasi-dark/50 via-transparent to-transparent lg:block hidden"></div>
                     </div>
                 </div>
@@ -578,7 +578,7 @@
                 <div class="sm:col-span-2 lg:col-span-1">
                     <div class="flex items-center gap-3 mb-4">
                         @foreach ($footerBrandLogos as $logo)
-                            <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="h-10 brightness-0 invert" />
+                            <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" loading="lazy" decoding="async" class="h-10 brightness-0 invert" />
                         @endforeach
                     </div>
                     <p class="text-white/50 text-xs leading-relaxed max-w-xs">{{ $g('lp_footer_tagline', 'Asosiasi Pemerintah Kabupaten Seluruh Indonesia. Memperkuat otonomi daerah untuk Indonesia Maju.') }}</p>
@@ -614,7 +614,7 @@
                 <p class="text-[11px] text-white/30">{{ $g('lp_footer_copyright', '© 2026 Pemerintah Kabupaten Deli Serdang & APKASI. All rights reserved.') }}</p>
                 <div class="flex items-center gap-2">
                     @foreach ($footerSideLogos as $logo)
-                        <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="h-7 opacity-50" />
+                        <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" loading="lazy" decoding="async" class="h-7 opacity-50" />
                     @endforeach
                 </div>
             </div>
