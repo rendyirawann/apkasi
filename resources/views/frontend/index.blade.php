@@ -33,7 +33,7 @@
 
     {{-- ═══════════ NAVBAR ═══════════ --}}
     <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-3 sm:py-4">
-        <div id="nav-inner" class="mx-auto flex items-center justify-between transition-all duration-500 max-w-6xl mx-4 sm:mx-6 lg:mx-auto px-4 sm:px-6 bg-white/70 backdrop-blur-md rounded-full shadow-sm border border-white/60 py-2">
+        <div id="nav-inner" class="mx-auto flex items-center justify-between transition-all duration-500 max-w-[1400px] mx-4 sm:mx-6 lg:mx-auto px-4 sm:px-6 bg-white/70 backdrop-blur-md rounded-full shadow-sm border border-white/60 py-2">
             <a href="{{ route('home') }}" class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
                 <img src="{{ asset('logos/logo-ds.png') }}" alt="Deli Serdang" class="h-8 sm:h-9 w-auto object-contain" />
                 <img src="{{ asset('logos/apkasi-alt2.png') }}" alt="APKASI" class="h-7 sm:h-8 w-auto object-contain" />
@@ -44,7 +44,7 @@
                 <a href="#tentang" class="text-sm px-4 py-2 rounded-full transition-colors duration-200 font-semibold text-apkasi-dark">Tentang</a>
                 <a href="#agenda" class="text-sm px-4 py-2 rounded-full transition-colors duration-200 font-medium text-apkasi-body hover:text-apkasi-dark hover:bg-apkasi-dark/5">Agenda</a>
                 <a href="#poi" class="text-sm px-4 py-2 rounded-full transition-colors duration-200 font-medium text-apkasi-body hover:text-apkasi-dark hover:bg-apkasi-dark/5">Putri Otonomi</a>
-                <a href="#faq" class="text-sm px-4 py-2 rounded-full transition-colors duration-200 font-medium text-apkasi-body hover:text-apkasi-dark hover:bg-apkasi-dark/5">Panduan</a>
+                <a href="{{ route('guide') }}" class="text-sm px-4 py-2 rounded-full transition-colors duration-200 font-medium text-apkasi-body hover:text-apkasi-dark hover:bg-apkasi-dark/5">Panduan</a>
             </div>
 
             <div class="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -76,14 +76,14 @@
                 <a href="#tentang" class="m-link text-xl font-semibold text-apkasi-dark py-3 border-b border-apkasi-dark/5">Tentang</a>
                 <a href="#agenda" class="m-link text-xl font-semibold text-apkasi-dark py-3 border-b border-apkasi-dark/5">Agenda</a>
                 <a href="#poi" class="m-link text-xl font-semibold text-apkasi-dark py-3 border-b border-apkasi-dark/5">Putri Otonomi</a>
-                <a href="#faq" class="m-link text-xl font-semibold text-apkasi-dark py-3 border-b border-apkasi-dark/5">Panduan</a>
+                <a href="{{ route('guide') }}" class="m-link text-xl font-semibold text-apkasi-dark py-3 border-b border-apkasi-dark/5">Panduan</a>
             </div>
             <div class="mt-8 flex flex-col gap-3">
                 <a href="{{ route('peta-hotel') }}" class="flex items-center gap-2 text-sm font-medium text-apkasi-body">
                     <i data-lucide="map-pin" class="w-4 h-4"></i> Peta Lokasi & Hotel
                 </a>
-                <a href="{{ url('/admin/login') }}" class="mt-2 bg-apkasi-dark hover:bg-apkasi-hover text-white text-sm font-semibold px-5 py-3 rounded-full transition-colors text-center">
-                    Masuk Portal DS
+                <a href="https://portal.deliserdangkab.go.id/" target="_blank" rel="noopener" class="mt-2 bg-apkasi-dark hover:bg-apkasi-hover text-white text-sm font-semibold px-5 py-3 rounded-full transition-colors text-center">
+                    Portal DS
                 </a>
             </div>
         </div>
@@ -190,7 +190,7 @@
 
     {{-- ═══════════ LOGO PARTNERS ═══════════ --}}
     <div class="py-8 sm:py-10 bg-white border-b border-apkasi-leaf">
-        <div class="max-w-5xl mx-auto px-5 sm:px-8">
+        <div class="max-w-[1400px] mx-auto px-5 sm:px-8">
             <p class="text-[10px] sm:text-xs text-apkasi-body/60 font-semibold uppercase tracking-[0.15em] text-center mb-6">Kolaborasi Penyelenggara</p>
             <div class="flex items-center justify-center gap-6 sm:gap-10 md:gap-14 flex-wrap">
                 @foreach ([['apkasi-full.png','APKASI','h-12 sm:h-14'],['hut-apkasi.png','HUT APKASI 2026','h-10 sm:h-12'],['aoe2026.png','AOE 2026','h-12 sm:h-14'],['logo-ds.png','Kab. Deli Serdang','h-12 sm:h-14']] as $lg)
@@ -204,7 +204,7 @@
 
     {{-- ═══════════ BUPATI & WAKIL BUPATI ═══════════ --}}
     <section id="pimpinan" class="py-16 sm:py-20 md:py-28 bg-gradient-to-b from-white to-apkasi-cream">
-        <div data-reveal class="max-w-5xl mx-auto px-5 sm:px-8 transition-all duration-700 opacity-0 translate-y-8">
+        <div data-reveal class="max-w-[1400px] mx-auto px-5 sm:px-8 transition-all duration-700 opacity-0 translate-y-8">
             <div class="text-center mb-10 sm:mb-14">
                 <span class="inline-flex items-center gap-1.5 bg-apkasi-heading/8 text-apkasi-heading text-xs sm:text-sm font-semibold tracking-wide uppercase px-4 py-1.5 rounded-full mb-4">Pimpinan Daerah Tuan Rumah</span>
                 <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-apkasi-dark leading-tight mb-3">Kabupaten Deli Serdang</h2>
@@ -254,7 +254,7 @@
 
     {{-- ═══════════ ABOUT ═══════════ --}}
     <section id="tentang" class="py-16 sm:py-20 md:py-28 bg-white">
-        <div data-reveal class="max-w-6xl mx-auto px-5 sm:px-8 transition-all duration-700 opacity-0 translate-y-8">
+        <div data-reveal class="max-w-[1400px] mx-auto px-5 sm:px-8 transition-all duration-700 opacity-0 translate-y-8">
             <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                 <div>
                     <span class="inline-flex items-center gap-1.5 bg-apkasi-heading/8 text-apkasi-heading text-xs sm:text-sm font-semibold tracking-wide uppercase px-4 py-1.5 rounded-full mb-4">Tentang Event</span>
@@ -303,7 +303,7 @@
 
     {{-- ═══════════ AGENDA ═══════════ --}}
     <section id="agenda" class="py-16 sm:py-20 md:py-28 bg-gradient-to-b from-apkasi-cream to-apkasi-leaf/30">
-        <div data-reveal class="max-w-6xl mx-auto px-5 sm:px-8 transition-all duration-700 opacity-0 translate-y-8">
+        <div data-reveal class="max-w-[1400px] mx-auto px-5 sm:px-8 transition-all duration-700 opacity-0 translate-y-8">
             <div class="text-center mb-12 sm:mb-16">
                 <span class="inline-flex items-center gap-1.5 bg-apkasi-heading/8 text-apkasi-heading text-xs sm:text-sm font-semibold tracking-wide uppercase px-4 py-1.5 rounded-full mb-4">Jadwal Acara</span>
                 <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-apkasi-dark leading-tight mb-3">Rangkaian Acara 1 – 3 Juli 2026</h2>
@@ -354,7 +354,7 @@
 
     {{-- ═══════════ POI ═══════════ --}}
     <section id="poi" class="py-16 sm:py-20 md:py-28 bg-white">
-        <div data-reveal class="max-w-6xl mx-auto px-5 sm:px-8 transition-all duration-700 opacity-0 translate-y-8">
+        <div data-reveal class="max-w-[1400px] mx-auto px-5 sm:px-8 transition-all duration-700 opacity-0 translate-y-8">
             <div class="bg-gradient-to-br from-apkasi-dark via-[#223d2c] to-apkasi-cta rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                 <div class="grid lg:grid-cols-5 gap-0">
                     <div class="lg:col-span-3 p-7 sm:p-10 md:p-14 flex flex-col justify-center">
@@ -391,7 +391,7 @@
 
     {{-- ═══════════ FAQ ═══════════ --}}
     <section id="faq" class="py-16 sm:py-20 md:py-28 bg-gradient-to-b from-apkasi-cream to-apkasi-leaf/20">
-        <div data-reveal class="max-w-3xl mx-auto px-5 sm:px-8 transition-all duration-700 opacity-0 translate-y-8">
+        <div data-reveal class="max-w-5xl mx-auto px-5 sm:px-8 transition-all duration-700 opacity-0 translate-y-8">
             <div class="text-center mb-10 sm:mb-14">
                 <span class="inline-flex items-center gap-1.5 bg-apkasi-heading/8 text-apkasi-heading text-xs sm:text-sm font-semibold tracking-wide uppercase px-4 py-1.5 rounded-full mb-4">Panduan Delegasi</span>
                 <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-apkasi-dark leading-tight mb-3">Informasi Penting</h2>
@@ -424,7 +424,7 @@
 
     {{-- ═══════════ FOOTER ═══════════ --}}
     <footer class="bg-apkasi-dark border-t-4 border-apkasi-gold">
-        <div class="max-w-6xl mx-auto px-5 sm:px-8 py-10 sm:py-14">
+        <div class="max-w-[1400px] mx-auto px-5 sm:px-8 py-10 sm:py-14">
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 mb-10">
                 <div class="sm:col-span-2 lg:col-span-1">
                     <div class="flex items-center gap-3 mb-4">
@@ -439,7 +439,7 @@
                         <a href="#tentang" class="block text-sm text-white/50 hover:text-white/90 transition-colors">Tentang</a>
                         <a href="#agenda" class="block text-sm text-white/50 hover:text-white/90 transition-colors">Agenda</a>
                         <a href="#poi" class="block text-sm text-white/50 hover:text-white/90 transition-colors">Putri Otonomi</a>
-                        <a href="#faq" class="block text-sm text-white/50 hover:text-white/90 transition-colors">Panduan</a>
+                        <a href="{{ route('guide') }}" class="block text-sm text-white/50 hover:text-white/90 transition-colors">Panduan</a>
                     </div>
                 </div>
                 <div>
@@ -454,7 +454,7 @@
                 <div>
                     <h4 class="text-white/80 text-xs font-bold uppercase tracking-widest mb-4">Sekretariat</h4>
                     <p class="text-sm text-white/50 leading-relaxed mb-3">Dinas Kominfo Kabupaten Deli Serdang,<br />Sumatera Utara</p>
-                    <a href="{{ url('/admin/login') }}" class="inline-flex items-center gap-1.5 text-sm font-semibold text-apkasi-gold hover:text-apkasi-goldlt transition-colors">
+                    <a href="https://portal.deliserdangkab.go.id/" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-semibold text-apkasi-gold hover:text-apkasi-goldlt transition-colors">
                         <i data-lucide="globe" class="w-3.5 h-3.5"></i> Portal DS
                     </a>
                 </div>
@@ -493,7 +493,7 @@
     var navInner = document.getElementById('nav-inner');
     var NAV_BASE = 'fixed top-0 left-0 right-0 z-50 transition-all duration-500';
     var INNER_BASE = 'mx-auto flex items-center justify-between transition-all duration-500 py-2';
-    var INNER_TOP = 'max-w-6xl mx-4 sm:mx-6 lg:mx-auto px-4 sm:px-6 bg-white/70 backdrop-blur-md rounded-full shadow-sm border border-white/60';
+    var INNER_TOP = 'max-w-[1400px] mx-4 sm:mx-6 lg:mx-auto px-4 sm:px-6 bg-white/70 backdrop-blur-md rounded-full shadow-sm border border-white/60';
     var INNER_SCR = 'max-w-[95%] xl:max-w-[90%] px-4 sm:px-6 bg-white shadow-lg border border-gray-100 rounded-2xl';
     function onScroll() {
         if (window.scrollY > 40) {

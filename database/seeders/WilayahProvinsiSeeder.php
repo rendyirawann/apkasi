@@ -1,0 +1,61 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\WilayahProvinsi;
+use Illuminate\Database\Seeder;
+
+class WilayahProvinsiSeeder extends Seeder
+{
+    /**
+     * Master 38 provinsi (kode BPS). Termasuk 4 provinsi pemekaran Papua
+     * yang belum ada di wilayah_provinsi.sql: 92, 95, 96, 97.
+     */
+    public function run(): void
+    {
+        $provinsi = [
+            11 => 'Aceh',
+            12 => 'Sumatera Utara',
+            13 => 'Sumatera Barat',
+            14 => 'Riau',
+            15 => 'Jambi',
+            16 => 'Sumatera Selatan',
+            17 => 'Bengkulu',
+            18 => 'Lampung',
+            19 => 'Kepulauan Bangka Belitung',
+            21 => 'Kepulauan Riau',
+            31 => 'Dki Jakarta',
+            32 => 'Jawa Barat',
+            33 => 'Jawa Tengah',
+            34 => 'Di Yogyakarta',
+            35 => 'Jawa Timur',
+            36 => 'Banten',
+            51 => 'Bali',
+            52 => 'Nusa Tenggara Barat',
+            53 => 'Nusa Tenggara Timur',
+            61 => 'Kalimantan Barat',
+            62 => 'Kalimantan Tengah',
+            63 => 'Kalimantan Selatan',
+            64 => 'Kalimantan Timur',
+            65 => 'Kalimantan Utara',
+            71 => 'Sulawesi Utara',
+            72 => 'Sulawesi Tengah',
+            73 => 'Sulawesi Selatan',
+            74 => 'Sulawesi Tenggara',
+            75 => 'Gorontalo',
+            76 => 'Sulawesi Barat',
+            81 => 'Maluku',
+            82 => 'Maluku Utara',
+            91 => 'Papua Barat',
+            92 => 'Papua Barat Daya',
+            94 => 'Papua',
+            95 => 'Papua Selatan',
+            96 => 'Papua Tengah',
+            97 => 'Papua Pegunungan',
+        ];
+
+        foreach ($provinsi as $id => $nama) {
+            WilayahProvinsi::updateOrCreate(['id' => $id], ['nama' => $nama]);
+        }
+    }
+}

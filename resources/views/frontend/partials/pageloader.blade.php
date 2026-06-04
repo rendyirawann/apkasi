@@ -25,12 +25,25 @@
 (function () {
     var el = document.getElementById('pageloader');
     if (!el) return;
+
+    // Mulai dari atas & kunci scroll selama loader (mencegah posisi ter-geser saat peta/aset dimuat).
+    try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+
     var MIN = 700, start = performance.now();
     // Tidak menunggu window 'load' penuh (peta/tiles bisa lama) — cukup durasi minimal.
     function tick() {
         if (performance.now() - start >= MIN) {
             el.classList.remove('in');
             el.classList.add('out');
+            document.documentElement.style.overflow = '';
+            document.body.style.overflow = '';
+            var h = window.location.hash;
+            var tgt = (h && h.length > 1) ? document.getElementById(h.slice(1)) : null;
+            if (tgt) tgt.scrollIntoView({ behavior: 'instant', block: 'start' });
+            else window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
             setTimeout(function () { el.parentNode && el.parentNode.removeChild(el); }, 320);
             return;
         }

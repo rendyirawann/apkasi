@@ -96,6 +96,32 @@
     var root = document.getElementById('splash');
     if (!root) return;
 
+    // Jika datang dari halaman lain menuju section tertentu (mis. /#poi),
+    // lewati splash dan langsung arahkan ke section-nya.
+    var _hash = window.location.hash;
+    if (_hash && _hash.length > 1) {
+        // Catatan: section-nya mungkin belum diparse saat skrip ini jalan (skrip ada di atas
+        // dokumen). Jadi cukup deteksi ADANYA hash utk melewati splash; cari elemen & scroll
+        // setelah DOM siap, lalu perkuat lagi setelah semua aset 'load'.
+        if (root.parentNode) root.parentNode.removeChild(root);
+        var goToSection = function () {
+            var t = document.getElementById(_hash.slice(1));
+            if (t) t.scrollIntoView({ behavior: 'instant', block: 'start' });
+        };
+        var runGo = function () { requestAnimationFrame(goToSection); };
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', runGo);
+        else runGo();
+        window.addEventListener('load', function () { setTimeout(goToSection, 60); });
+        return;
+    }
+
+    // Pastikan halaman mulai dari paling atas & kunci scroll selama splash
+    // (mencegah scroll-anchoring menggeser posisi saat aset/font dimuat di belakang splash).
+    try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+
     // Build tiles
     var tilesWrap = document.getElementById('sp-tiles');
     var cx = (COLS - 1) / 2, cy = (ROWS - 1) / 2, maxd = Math.hypot(cx, cy);
@@ -141,7 +167,12 @@
         finished = true;
         bar.style.width = '100%'; pctEl.textContent = '100%';
         setTimeout(function () { root.classList.add('sp-burst'); }, 250);
-        setTimeout(function () { root.parentNode && root.parentNode.removeChild(root); }, 250 + 800);
+        setTimeout(function () {
+            document.documentElement.style.overflow = '';
+            document.body.style.overflow = '';
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            root.parentNode && root.parentNode.removeChild(root);
+        }, 250 + 800);
     }
 
     function tick() {

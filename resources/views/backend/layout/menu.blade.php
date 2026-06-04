@@ -51,6 +51,42 @@
         @endrole
         <!--end::User Management-->
 
+        <!--begin::Data Master-->
+        @can('view_data_master')
+        @php $isDataMaster = request()->is('admin/hotels*') || request()->is('admin/pics*') || request()->is('admin/destinasi*'); @endphp
+        <div data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="bottom-start"
+            class="menu-item menu-lg-down-accordion me-0 me-lg-2 {{ $isDataMaster ? 'here show menu-here-bg' : '' }}">
+            <span class="menu-link py-3">
+                <span class="menu-icon">
+                    <i class="ki-duotone ki-home-2 fs-3"><span class="path1"></span><span class="path2"></span></i>
+                </span>
+                <span class="menu-title">Data Master</span>
+                <span class="menu-arrow d-lg-none"></span>
+            </span>
+            <div class="menu-sub menu-sub-lg-down-accordion menu-sub-lg-dropdown py-4 w-200px">
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->is('admin/hotels*') ? 'active' : '' }}" href="{{ route('hotels.index') }}">
+                        <span class="menu-icon"><i class="ki-duotone ki-home-2 fs-4"><span class="path1"></span><span class="path2"></span></i></span>
+                        <span class="menu-title">Hotel</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->is('admin/destinasi*') ? 'active' : '' }}" href="{{ route('destinasi.index') }}">
+                        <span class="menu-icon"><i class="ki-duotone ki-geolocation fs-4"><span class="path1"></span><span class="path2"></span></i></span>
+                        <span class="menu-title">Destinasi Wisata</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->is('admin/pics*') ? 'active' : '' }}" href="{{ route('pics.index') }}">
+                        <span class="menu-icon"><i class="ki-duotone ki-user-tick fs-4"><span class="path1"></span><span class="path2"></span></i></span>
+                        <span class="menu-title">PIC</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        @endcan
+        <!--end::Data Master-->
+
         <!--begin::Settings-->
         @role('Superadmin|superadmin')
         <div class="menu-item me-0 me-lg-2 {{ request()->routeIs('settings.*') ? 'here show menu-here-bg' : '' }}">

@@ -1,492 +1,287 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="utf-8" />
-    <title>Panduan Delegasi: Peta & Akomodasi — APKASI Deli Serdang</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="shortcut icon" href="{{ asset('assets/apkasi/z_04_LOGO-LOGO APKASI/03_APKASI_Official Logo_Transparent.png') }}" />
-    
-    <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" />
-    
-    <!-- Metronic Global Stylesheets -->
-    <link href="{{ asset('assets/plugins/global/plugins.bundle.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/css/style.bundle.css') }}" rel="stylesheet" type="text/css" />
+@extends('frontend.layouts.apkasi')
 
+@section('title', 'Panduan Delegasi — HUT Ke-26 APKASI & Deli Serdang Ke-80')
+@section('description', 'Panduan delegasi HUT Ke-26 APKASI: daftar PIC per provinsi dan rental kendaraan.')
+
+@php
+    $wa = function ($no) {
+        $d = preg_replace('/\D/', '', $no ?? '');
+        if (str_starts_with($d, '0')) $d = '62' . substr($d, 1);
+        return 'https://wa.me/' . $d;
+    };
+    $tel = fn($no) => 'tel:' . preg_replace('/[^0-9+]/', '', $no ?? '');
+    $picCount = $pics->count();
+@endphp
+
+@push('head')
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
     <style>
-        :root {
-            --apkasi-green: #2B543A;
-            --apkasi-green-light: #447B5A;
-            --apkasi-accent: #D4AF37; /* Gold */
-            --bs-body-font-family: 'Plus Jakarta Sans', sans-serif;
-            --bs-font-sans-serif: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif !important;
-            background-color: #f6faf7;
-            color: #2F3E35;
-            overflow-x: hidden;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Outfit', sans-serif !important;
-            font-weight: 700;
-        }
-
-        /* Floating glassmorphic header */
-        .glass-header {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 1200px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 50px;
-            z-index: 1000;
-            padding: 10px 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-        }
-
-        .nav-link-custom {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #3e5045 !important;
-            padding: 8px 16px;
-            border-radius: 20px;
-            transition: all 0.2s ease;
-        }
-
-        .nav-link-custom:hover, .nav-link-custom.active {
-            color: var(--apkasi-green) !important;
-            background: rgba(43, 84, 58, 0.06);
-        }
-
-        /* Main Content Padding */
-        .main-content {
-            padding-top: 130px;
-            padding-bottom: 80px;
-        }
-
-        /* Title section */
-        .page-title-section {
-            background: linear-gradient(135deg, #173423 0%, #2b543a 100%);
-            border-radius: 24px;
-            padding: 48px;
-            color: #fff;
-            margin-bottom: 40px;
-            box-shadow: 0 10px 30px rgba(43, 84, 58, 0.15);
-        }
-
-        /* Custom Tabs Styling */
-        .guide-tabs {
-            border: none;
-            background: #fff;
-            padding: 8px;
-            border-radius: 50px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            margin-bottom: 30px;
-            display: inline-flex;
-            width: 100%;
-            justify-content: space-around;
-        }
-
-        @media (max-width: 767.98px) {
-            .guide-tabs {
-                flex-direction: column;
-                border-radius: 20px;
-                padding: 12px;
-                gap: 6px;
-            }
-        }
-
-        .guide-tabs .nav-link {
-            border: none !important;
-            border-radius: 40px;
-            font-weight: 700;
-            color: #556b5e !important;
-            padding: 12px 24px;
-            transition: all 0.2s ease;
-            text-align: center;
-        }
-
-        .guide-tabs .nav-link.active {
-            background: var(--apkasi-green) !important;
-            color: #fff !important;
-            box-shadow: 0 4px 15px rgba(43, 84, 58, 0.2);
-        }
-
-        /* Venue Map Cards */
-        .venue-selector-card {
-            cursor: pointer;
-            border: 1px solid #e2ece5;
-            border-radius: 16px;
-            background: #fff;
-            transition: all 0.25s ease;
-        }
-
-        .venue-selector-card.active {
-            border-color: var(--apkasi-green);
-            background: rgba(43, 84, 58, 0.02);
-            box-shadow: 0 8px 24px rgba(43, 84, 58, 0.05);
-        }
-
-        .venue-selector-card.active .venue-num {
-            background: var(--apkasi-green);
-            color: #fff;
-        }
-
-        .venue-num {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: rgba(43, 84, 58, 0.08);
-            color: var(--apkasi-green);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }
-
-        /* Guide cards (Wisata / Hotel) */
-        .guide-card {
-            border: 1px solid #e5ede7;
-            border-radius: 20px;
-            background: #fff;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-            height: 100%;
-            display: flex;
-            flex-column: column;
-        }
-
-        .guide-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 16px 30px rgba(43, 84, 58, 0.06);
-            border-color: rgba(43, 84, 58, 0.15);
-        }
-
-        .guide-card-img-wrapper {
-            height: 200px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .guide-card-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .guide-card:hover .guide-card-img {
-            transform: scale(1.08);
-        }
-
-        .guide-card-body {
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        /* Map frame wrapper */
-        .map-frame-wrapper {
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid #e2ece5;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
-            height: 480px;
-        }
-
-        @media (max-width: 991.98px) {
-            .map-frame-wrapper {
-                height: 350px;
-                margin-top: 20px;
-            }
-        }
+        /* DataTables disesuaikan dengan tema apkasi */
+        .dt-container { font-family: 'Plus Jakarta Sans', sans-serif; }
+        table.dataTable thead th { background: #336443; color: #fff; font-weight: 700; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; border: 0 !important; padding: 12px 14px; }
+        table.dataTable tbody td { font-size: .85rem; color: #2d3a2a; border-color: #e8f0ea !important; padding: 11px 14px; vertical-align: middle; }
+        table.dataTable tbody tr:hover { background: #f3f7f3; }
+        table.dataTable { border-collapse: separate; }
+        .dt-search input, .dt-length select { border: 1px solid #e8f0ea; border-radius: 9999px; padding: .45rem .9rem; font-size: .82rem; outline: none; background: #fff; }
+        .dt-search input:focus { border-color: #85AB8B; }
+        .dt-search label, .dt-length label, .dt-info { font-size: .8rem; color: #4b5b47; }
+        .dt-paging .dt-paging-button { font-size: .8rem; padding: .3rem .7rem; margin: 0 2px; border-radius: 8px; }
+        .dt-paging .dt-paging-button.current { background: #336443 !important; color: #fff !important; border: 0 !important; }
+        .dt-paging .dt-paging-button:hover:not(.current) { background: #e8f0ea !important; border-color: #e8f0ea !important; color: #336443 !important; }
     </style>
-</head>
+@endpush
 
-<body>
+@push('scripts')
+<script>
+    (function () {
+        var navbar = document.getElementById('navbar');
+        var navInner = document.getElementById('nav-inner');
+        var NAV_BASE = 'fixed top-0 left-0 right-0 z-50 transition-all duration-500';
+        var INNER_BASE = 'mx-auto flex items-center justify-between transition-all duration-500 py-2';
+        var INNER_TOP = 'max-w-[1400px] mx-4 sm:mx-6 lg:mx-auto px-4 sm:px-6 bg-white/70 backdrop-blur-md rounded-full shadow-sm border border-white/60';
+        var INNER_SCR = 'max-w-[95%] xl:max-w-[90%] px-4 sm:px-6 bg-white shadow-lg border border-gray-100 rounded-2xl';
+        function onScroll() {
+            if (window.scrollY > 40) { navbar.className = NAV_BASE + ' py-1.5 sm:py-2'; navInner.className = INNER_BASE + ' ' + INNER_SCR; }
+            else { navbar.className = NAV_BASE + ' py-3 sm:py-4'; navInner.className = INNER_BASE + ' ' + INNER_TOP; }
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+    })();
 
-    <!-- Header / Navigation Bar -->
-    <header class="glass-header d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center gap-3">
-            <a href="{{ route('home') }}">
-                <img src="{{ asset('assets/apkasi/z_04_LOGO-LOGO APKASI/03_APKASI_Official Logo_Transparent.png') }}" alt="Logo APKASI" style="height: 38px;" />
+    // ── DataTables PIC ──
+    var picDT = null;
+    if (window.jQuery) {
+        jQuery(function ($) {
+            picDT = $('#picTable').DataTable({
+                pageLength: 10,
+                lengthMenu: [10, 25, 50, 100],
+                order: [[0, 'asc']],
+                columnDefs: [{ targets: [4], orderable: false, searchable: false }],
+                language: {
+                    search: 'Cari:', searchPlaceholder: 'provinsi / nama',
+                    lengthMenu: 'Tampilkan _MENU_ data',
+                    info: 'Menampilkan _START_–_END_ dari _TOTAL_ PIC',
+                    infoEmpty: 'Tidak ada data', infoFiltered: '(disaring dari _MAX_ total)',
+                    zeroRecords: 'PIC tidak ditemukan',
+                    paginate: { first: '«', previous: '‹', next: '›', last: '»' }
+                }
+            });
+            picDT.on('draw', function () { if (window.lucide) lucide.createIcons(); });
+        });
+    }
+
+    // ── Tab switcher ──
+    function activateTab(t) {
+        document.querySelectorAll('[data-tab]').forEach(function (b) {
+            var on = b.dataset.tab === t;
+            b.classList.toggle('bg-apkasi-heading', on);
+            b.classList.toggle('border-apkasi-heading', on);
+            b.classList.toggle('text-white', on);
+            b.classList.toggle('bg-white', !on);
+            b.classList.toggle('border-apkasi-leaf', !on);
+            b.classList.toggle('text-apkasi-body', !on);
+        });
+        document.querySelectorAll('[data-panel]').forEach(function (p) {
+            p.classList.toggle('hidden', p.dataset.panel !== t);
+        });
+        if (t === 'pic' && picDT) picDT.columns.adjust();
+    }
+    document.querySelectorAll('[data-tab]').forEach(function (b) {
+        b.addEventListener('click', function () { activateTab(b.dataset.tab); });
+    });
+
+    if (window.lucide) lucide.createIcons();
+</script>
+@endpush
+
+@section('content')
+@include('frontend.partials.pageloader')
+
+<div class="min-h-screen bg-apkasi-cream">
+
+    {{-- ═══════════ NAVBAR ═══════════ --}}
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-3 sm:py-4">
+        <div id="nav-inner" class="mx-auto flex items-center justify-between transition-all duration-500 max-w-[1400px] mx-4 sm:mx-6 lg:mx-auto px-4 sm:px-6 bg-white/70 backdrop-blur-md rounded-full shadow-sm border border-white/60 py-2">
+            <a href="{{ route('home') }}" class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                <img src="{{ asset('logos/logo-ds.png') }}" alt="Deli Serdang" class="h-8 sm:h-9 w-auto object-contain" />
+                <img src="{{ asset('logos/apkasi-alt2.png') }}" alt="APKASI" class="h-7 sm:h-8 w-auto object-contain" />
+                <img src="{{ asset('logos/aoe2026.png') }}" alt="AOE 2026" class="hidden sm:block h-7 sm:h-8 w-auto object-contain" />
             </a>
-            <div class="vr h-25px d-none d-sm-block"></div>
-            <img src="{{ asset('assets/apkasi/z_04_LOGO-LOGO APKASI/05_HUT  Apkasi Tahun 2026.png') }}" alt="Logo HUT APKASI" style="height: 38px;" class="d-none d-sm-block" />
-        </div>
-        
-        <nav class="d-none d-md-flex align-items-center gap-2">
-            <a href="{{ route('home') }}" class="nav-link-custom">Beranda</a>
-            <a href="{{ route('home') }}#about" class="nav-link-custom">Tentang</a>
-            <a href="{{ route('home') }}#agenda" class="nav-link-custom">Agenda</a>
-            <a href="{{ route('home') }}#poi" class="nav-link-custom">Putri Otonomi</a>
-            <a href="{{ route('guide') }}" class="nav-link-custom active">Panduan Peta & Hotel</a>
-        </nav>
 
-        <div>
-            <a href="{{ url('/admin/login') }}" class="btn btn-sm btn-primary px-5 py-2.5 rounded-pill" style="background-color: var(--apkasi-green); border-color: var(--apkasi-green);">
-                <i class="ki-duotone ki-user-square fs-5 me-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
-                Area Admin
-            </a>
-        </div>
-    </header>
+            <div class="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
+                <a href="{{ route('home') }}" class="text-sm px-4 py-2 rounded-full font-medium text-apkasi-body hover:text-apkasi-dark hover:bg-apkasi-dark/5 transition-colors">Beranda</a>
+                <a href="{{ route('home') }}#agenda" class="text-sm px-4 py-2 rounded-full font-medium text-apkasi-body hover:text-apkasi-dark hover:bg-apkasi-dark/5 transition-colors">Agenda</a>
+                <a href="{{ route('peta-hotel') }}" class="text-sm px-4 py-2 rounded-full font-medium text-apkasi-body hover:text-apkasi-dark hover:bg-apkasi-dark/5 transition-colors">Peta & Hotel</a>
+                <span class="text-sm px-4 py-2 rounded-full font-semibold text-apkasi-dark bg-apkasi-dark/5">Panduan</span>
+            </div>
 
-    <main class="container main-content">
-        <!-- Page Title Banner -->
-        <div class="page-title-section text-center text-md-start">
-            <div class="row align-items-center justify-content-between">
-                <div class="col-md-8">
-                    <span class="badge badge-light-success text-success fw-bold px-4 py-2 rounded-pill fs-7 text-uppercase mb-3">Panduan Delegasi</span>
-                    <h1 class="text-white mb-2 fs-1">Panduan Akomodasi & Peta Lokasi</h1>
-                    <p class="text-white text-opacity-80 fs-6 mb-0">Temukan lokasi event resmi, destinasi pariwisata unggulan, rekomendasi hotel, dan fasilitas sewa mobil di Kabupaten Deli Serdang.</p>
-                </div>
-                <div class="col-md-3 text-md-end mt-6 mt-md-0">
-                    <a href="{{ route('home') }}" class="btn btn-warning px-6 py-3 rounded-pill fw-bold" style="background-color: var(--apkasi-accent); border-color: var(--apkasi-accent); color: #173423;">
-                        <i class="ki-duotone ki-left fs-5 me-1"></i> Kembali ke Beranda
-                    </a>
-                </div>
+            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <a href="{{ route('home') }}" class="hidden md:inline-flex items-center gap-1.5 text-sm font-medium text-apkasi-body hover:text-apkasi-dark transition-colors">
+                    <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Beranda
+                </a>
+                <a href="https://portal.deliserdangkab.go.id/" target="_blank" rel="noopener" class="hidden sm:inline-flex items-center gap-1.5 bg-apkasi-dark hover:bg-apkasi-hover text-white text-sm font-semibold px-5 py-2 rounded-full transition-colors">
+                    <i data-lucide="globe" class="w-3.5 h-3.5"></i> Portal DS
+                </a>
             </div>
         </div>
+    </nav>
 
-        <!-- Navigation Tabs -->
-        <div class="text-center">
-            <ul class="nav nav-tabs guide-tabs" id="guideTabs" role="tablist">
-                <li class="nav-item flex-grow-1" role="presentation">
-                    <button class="nav-link w-100 active" id="event-tab" data-bs-toggle="tab" data-bs-target="#event-pane" type="button" role="tab" aria-controls="event-pane" aria-selected="true">
-                        <i class="ki-duotone ki-map fs-4 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
-                        1. Peta Lokasi Event
-                    </button>
-                </li>
-                <li class="nav-item flex-grow-1" role="presentation">
-                    <button class="nav-link w-100" id="wisata-tab" data-bs-toggle="tab" data-bs-target="#wisata-pane" type="button" role="tab" aria-controls="wisata-pane" aria-selected="false">
-                        <i class="ki-duotone ki-geolocation fs-4 me-2"><span class="path1"></span><span class="path2"></span></i>
-                        2. Destinasi Wisata
-                    </button>
-                </li>
-                <li class="nav-item flex-grow-1" role="presentation">
-                    <button class="nav-link w-100" id="hotel-tab" data-bs-toggle="tab" data-bs-target="#hotel-pane" type="button" role="tab" aria-controls="hotel-pane" aria-selected="false">
-                        <i class="ki-duotone ki-home fs-4 me-2"><span class="path1"></span><span class="path2"></span></i>
-                        3. Hotel & Akomodasi
-                    </button>
-                </li>
-                <li class="nav-item flex-grow-1" role="presentation">
-                    <button class="nav-link w-100" id="car-tab" data-bs-toggle="tab" data-bs-target="#car-pane" type="button" role="tab" aria-controls="car-pane" aria-selected="false">
-                        <i class="ki-duotone ki-delivery-3 fs-4 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
-                        4. Rental Mobil
-                    </button>
-                </li>
-            </ul>
-        </div>
+    {{-- ═══════════ HERO ═══════════ --}}
+    <section class="relative overflow-hidden bg-gradient-to-br from-apkasi-dark via-[#223d2c] to-apkasi-cta pt-32 sm:pt-36 pb-16 sm:pb-20">
+        <div class="absolute -right-20 -bottom-28 w-[380px] h-[380px] rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(212,175,55,0.22), transparent 70%)"></div>
+        <div class="absolute -left-24 -top-24 w-[320px] h-[320px] rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(255,255,255,0.06), transparent 70%)"></div>
 
-        <!-- Tab Panes -->
-        <div class="tab-content" id="guideTabsContent">
-            
-            <!-- TAB 1: EVENT VENUES -->
-            <div class="tab-pane fade show active" id="event-pane" role="tabpanel" aria-labelledby="event-tab">
-                <div class="row g-6">
-                    <div class="col-lg-5">
-                        <h3 class="text-gray-900 mb-4 fw-bold">Venue Rangkaian Acara</h3>
-                        <p class="text-muted fs-7 mb-6">Klik pada salah satu lokasi di bawah ini untuk memperbarui peta lokasi secara dinamis dan mendapatkan arah navigasi jalan.</p>
-                        
-                        <div class="d-flex flex-column gap-4">
-                            @foreach($venues as $idx => $venue)
-                                <div class="venue-selector-card p-5 d-flex gap-4 {{ $idx === 0 ? 'active' : '' }}" 
-                                     data-map-embed="{{ $venue['map_embed'] }}"
-                                     data-map-link="{{ $venue['map_link'] }}"
-                                     onclick="changeActiveVenue(this)">
-                                    <div class="venue-num">{{ $idx + 1 }}</div>
-                                    <div>
-                                        <h5 class="text-gray-800 mb-1 fw-bold">{{ $venue['name'] }}</h5>
-                                        <span class="badge badge-light-success text-success fs-9 fw-bold mb-2">{{ $venue['type'] }}</span>
-                                        <p class="text-muted fs-8 mb-1"><i class="ki-duotone ki-pin fs-9 me-1"><span class="path1"></span><span class="path2"></span></i> {{ $venue['address'] }}</p>
-                                        <p class="text-gray-600 fs-8 mb-0 mt-2">{{ $venue['details'] }}</p>
-                                    </div>
-                                </div>
-                            @endforeach
+        <div class="relative max-w-[1400px] mx-auto px-5 sm:px-8">
+            <div class="text-xs text-white/55 mb-4">
+                <a href="{{ route('home') }}" class="hover:text-apkasi-goldlt transition-colors">Beranda</a>
+                <span class="mx-2">/</span> Panduan Delegasi
+            </div>
+            <span class="inline-flex items-center gap-2 bg-white/10 border border-white/15 text-white text-xs font-semibold px-4 py-1.5 rounded-full backdrop-blur-sm mb-4">
+                <i data-lucide="book-open" class="w-3.5 h-3.5 text-apkasi-goldlt"></i> Informasi Delegasi
+            </span>
+            <h1 class="font-display font-bold text-white text-3xl sm:text-4xl md:text-[3rem] leading-tight tracking-tight">
+                Panduan <span class="text-apkasi-accent">Delegasi</span>
+            </h1>
+            <p class="mt-3 text-white/75 text-sm sm:text-base leading-relaxed max-w-2xl">
+                Kontak PIC tiap provinsi dan rental kendaraan untuk delegasi. Untuk venue, hotel, dan destinasi wisata,
+                lihat halaman <a href="{{ route('peta-hotel') }}" class="text-apkasi-goldlt font-semibold hover:underline">Peta & Hotel</a>.
+            </p>
+
+            <div class="mt-7 flex flex-wrap gap-3">
+                @foreach ([['users', $picCount, 'PIC Provinsi'], ['car', count($rentals), 'Rental Kendaraan'], ['calendar', '1–3 Juli', 'Rangkaian Acara 2026']] as $st)
+                    <div class="flex items-center gap-3 bg-white/8 border border-white/15 rounded-2xl px-4 py-3 backdrop-blur-sm">
+                        <div class="w-10 h-10 rounded-xl bg-apkasi-gold/15 flex items-center justify-center shrink-0">
+                            <i data-lucide="{{ $st[0] }}" class="w-5 h-5 text-apkasi-gold"></i>
+                        </div>
+                        <div>
+                            <div class="font-display font-extrabold text-white text-base leading-none">{{ $st[1] }}</div>
+                            <div class="text-[11px] text-white/65 mt-1">{{ $st[2] }}</div>
                         </div>
                     </div>
-                    <div class="col-lg-7">
-                        <div class="map-frame-wrapper position-relative">
-                            <!-- Direct Navigation Button -->
-                            <a href="{{ $venues[0]['map_link'] }}" target="_blank" id="btn-direct-nav" class="btn btn-sm btn-light px-4 py-2.5 rounded-pill position-absolute top-10px right-10px shadow-sm z-index-2">
-                                <i class="ki-duotone ki-compass text-primary fs-5 me-1"><span class="path1"></span><span class="path2"></span></i> Arah Google Maps
-                            </a>
-                            <iframe src="{{ $venues[0]['map_embed'] }}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" id="iframe-venue-map"></iframe>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    {{-- ═══════════ TABS ═══════════ --}}
+    <div class="max-w-[1400px] mx-auto px-5 sm:px-8 -mt-9 relative z-10">
+        <div class="bg-white border border-apkasi-leaf rounded-2xl shadow-[0_18px_40px_rgba(43,84,58,0.08)] p-3 inline-flex gap-2">
+            <button type="button" data-tab="pic" class="text-sm font-semibold px-5 py-2.5 rounded-full border bg-apkasi-heading border-apkasi-heading text-white transition-colors inline-flex items-center gap-2">
+                <i data-lucide="users" class="w-4 h-4"></i> PIC per Provinsi
+            </button>
+            <button type="button" data-tab="rental" class="text-sm font-semibold px-5 py-2.5 rounded-full border bg-white border-apkasi-leaf text-apkasi-body hover:border-apkasi-accent transition-colors inline-flex items-center gap-2">
+                <i data-lucide="car" class="w-4 h-4"></i> Rental Kendaraan
+            </button>
+        </div>
+    </div>
+
+    {{-- ═══════════ PANEL: PIC (DataTables) ═══════════ --}}
+    <section data-panel="pic" class="max-w-[1400px] mx-auto px-5 sm:px-8 pt-8 pb-16 sm:pb-20">
+        <div class="mb-5">
+            <h2 class="font-display text-2xl font-bold text-apkasi-dark leading-tight">Nama & No HP PIC per Provinsi</h2>
+            <p class="text-apkasi-body text-sm mt-1">Penanggung jawab (PIC) pendampingan delegasi tiap provinsi. Gunakan kolom <em>Cari</em> untuk memfilter.</p>
+        </div>
+
+        <div class="bg-white border border-apkasi-leaf rounded-2xl shadow-sm p-4 sm:p-5 overflow-x-auto">
+            <table id="picTable" class="display w-full" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Provinsi</th>
+                        <th>PIC</th>
+                        <th>No HP</th>
+                        <th>Kontak</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($pics as $p)
+                        @php $prov = optional($p->provinsi)->nama ?? '-'; @endphp
+                        <tr>
+                            <td>{{ $p->urut }}</td>
+                            <td class="font-semibold text-apkasi-dark">{{ $prov }}</td>
+                            <td>{{ $p->nama }}</td>
+                            <td class="tabular-nums">{{ $p->no_hp ?: '-' }}</td>
+                            <td>
+                                @if ($p->no_hp)
+                                    <div class="flex items-center gap-1.5">
+                                        <a href="{{ $wa($p->no_hp) }}" target="_blank" rel="noopener" title="WhatsApp" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-full bg-apkasi-heading/10 text-apkasi-heading hover:bg-apkasi-heading hover:text-white transition-colors">
+                                            <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WA
+                                        </a>
+                                        <a href="{{ $tel($p->no_hp) }}" title="Telepon" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-apkasi-gold/15 text-[#9a7d16] hover:bg-apkasi-gold hover:text-apkasi-dark transition-colors">
+                                            <i data-lucide="phone" class="w-3.5 h-3.5"></i>
+                                        </a>
+                                    </div>
+                                @else
+                                    <span class="text-apkasi-body/50 text-xs">-</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        <p class="text-xs text-apkasi-body/60 mt-3">Catatan: DKI Jakarta belum tercantum PIC pada dokumen sumber.</p>
+    </section>
+
+    {{-- ═══════════ PANEL: RENTAL ═══════════ --}}
+    <section data-panel="rental" class="hidden max-w-[1400px] mx-auto px-5 sm:px-8 pt-8 pb-16 sm:pb-20">
+        <div class="mb-5">
+            <h2 class="font-display text-2xl font-bold text-apkasi-dark leading-tight">Rental Kendaraan</h2>
+            <p class="text-apkasi-body text-sm mt-1">Kontak penyedia sewa kendaraan untuk delegasi & rombongan.</p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            @foreach ($rentals as $r)
+                <div class="bg-white rounded-2xl border border-apkasi-leaf p-5 hover:shadow-lg transition-all duration-300 flex flex-col">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-11 h-11 rounded-xl bg-apkasi-heading/10 flex items-center justify-center shrink-0">
+                            <i data-lucide="car" class="w-5 h-5 text-apkasi-heading"></i>
                         </div>
+                        <h3 class="font-bold text-apkasi-dark text-[15px] leading-snug">{{ $r['company'] }}</h3>
+                    </div>
+                    <p class="text-xs text-apkasi-body/80 leading-relaxed">{{ $r['services'] }}</p>
+                    <p class="text-xs text-apkasi-body/60 italic leading-relaxed mt-2 flex-1">{{ $r['desc'] }}</p>
+                    <div class="flex items-center gap-2 mt-4">
+                        <a href="https://wa.me/{{ $r['whatsapp'] }}" target="_blank" rel="noopener" class="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full bg-apkasi-heading text-white hover:bg-apkasi-cta transition-colors">
+                            <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
+                        </a>
+                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $r['phone_format']) }}" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full border border-apkasi-leaf text-apkasi-heading hover:bg-apkasi-leaf/50 transition-colors">
+                            <i data-lucide="phone" class="w-4 h-4"></i> {{ $r['phone_format'] }}
+                        </a>
                     </div>
                 </div>
-            </div>
-
-            <!-- TAB 2: TOURIST ATTRACTIONS -->
-            <div class="tab-pane fade" id="wisata-pane" role="tabpanel" aria-labelledby="wisata-tab">
-                <div class="row g-6">
-                    @foreach($tourisms as $tour)
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card guide-card shadow-sm">
-                                <div class="guide-card-img-wrapper">
-                                    <img src="{{ $tour['image'] }}" alt="{{ $tour['name'] }}" class="guide-card-img" />
-                                    <span class="badge bg-dark bg-opacity-75 text-white fs-9 px-3 py-2 rounded-pill position-absolute bottom-10px left-10px">
-                                        <i class="ki-duotone ki-watch text-warning fs-9 me-1"><span class="path1"></span><span class="path2"></span></i> {{ $tour['distance'] }}
-                                    </span>
-                                </div>
-                                <div class="guide-card-body">
-                                    <h4 class="text-gray-900 fw-bold mb-1 fs-5">{{ $tour['name'] }}</h4>
-                                    <span class="text-primary fs-8 fw-semibold mb-3">{{ $tour['location'] }}</span>
-                                    <p class="text-muted fs-7 flex-grow-1 leading-relaxed mb-6">{{ $tour['description'] }}</p>
-                                    
-                                    <div class="separator mb-4"></div>
-                                    <a href="{{ $tour['map_link'] }}" target="_blank" class="btn btn-light-success btn-sm w-100 rounded-pill py-2.5 fw-bold">
-                                        <i class="ki-duotone ki-map fs-6 me-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i> Buka Rute Peta
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- TAB 3: HOTELS -->
-            <div class="tab-pane fade" id="hotel-pane" role="tabpanel" aria-labelledby="hotel-tab">
-                <div class="row g-6">
-                    @foreach($hotels as $hotel)
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card guide-card shadow-sm">
-                                <div class="guide-card-img-wrapper">
-                                    <img src="{{ $hotel['image'] }}" alt="{{ $hotel['name'] }}" class="guide-card-img" />
-                                </div>
-                                <div class="guide-card-body">
-                                    <span class="badge badge-light-warning text-warning fs-9 fw-bold mb-2">{{ $hotel['class'] }}</span>
-                                    <h4 class="text-gray-900 fw-bold mb-2 fs-5">{{ $hotel['name'] }}</h4>
-                                    <p class="text-muted fs-8 mb-3"><i class="ki-duotone ki-pin fs-9 me-1"><span class="path1"></span><span class="path2"></span></i> {{ $hotel['address'] }}</p>
-                                    
-                                    <div class="bg-light p-3 rounded-lg mb-6 fs-8">
-                                        <div class="d-flex align-items-center gap-1.5 text-gray-700 mb-1">
-                                            <i class="ki-duotone ki-delivery-3 fs-8"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
-                                            <strong>Jarak:</strong> {{ $hotel['distance'] }}
-                                        </div>
-                                        <div class="d-flex align-items-center gap-1.5 text-gray-700">
-                                            <i class="ki-duotone ki-phone fs-8"><span class="path1"></span><span class="path2"></span></i>
-                                            <strong>Telp:</strong> {{ $hotel['phone'] }}
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mt-auto d-flex gap-2">
-                                        <a href="tel:{{ str_replace(' ', '', $hotel['phone']) }}" class="btn btn-light-primary btn-icon btn-sm rounded-circle w-35px h-35px flex-shrink-0">
-                                            <i class="ki-duotone ki-phone fs-5"><span class="path1"></span><span class="path2"></span></i>
-                                        </a>
-                                        <a href="{{ $hotel['map_link'] }}" target="_blank" class="btn btn-light-success btn-sm w-100 rounded-pill py-2.5 fw-bold fs-8">
-                                            <i class="ki-duotone ki-compass fs-6 me-1"><span class="path1"></span><span class="path2"></span></i> Buka Rute
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- TAB 4: CAR RENTALS -->
-            <div class="tab-pane fade" id="car-pane" role="tabpanel" aria-labelledby="car-tab">
-                <div class="row g-6 justify-content-center">
-                    @foreach($rentals as $rental)
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card border border-2 border-dashed border-gray-300 rounded-xl p-8 bg-white h-100 d-flex flex-column">
-                                <div class="d-flex align-items-center gap-4 mb-4">
-                                    <div class="symbol symbol-50px symbol-circle bg-light-success text-success d-flex align-items-center justify-content-center">
-                                        <i class="ki-duotone ki-delivery-2 fs-1 text-success"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span><span class="path7"></span><span class="path8"></span></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-gray-900 fw-bold mb-0">{{ $rental['company'] }}</h4>
-                                        <span class="text-success fs-8 fw-semibold">Penyedia Terverifikasi</span>
-                                    </div>
-                                </div>
-                                <p class="text-muted fs-7 flex-grow-1 leading-relaxed mb-6">{{ $rental['services'] }} <br/><br/><em>*{{ $rental['desc'] }}</em></p>
-                                
-                                <div class="separator separator-dashed mb-6"></div>
-                                
-                                <!-- WhatsApp prefilled message link -->
-                                @php
-                                    $waMessage = "Halo " . $rental['company'] . ", saya delegasi HUT APKASI 2026 Deli Serdang ingin menanyakan informasi ketersediaan armada rental mobil.";
-                                    $waUrl = "https://wa.me/" . $rental['whatsapp'] . "?text=" . urlencode($waMessage);
-                                @endphp
-                                <a href="{{ $waUrl }}" target="_blank" class="btn btn-success w-100 rounded-pill py-3 fw-bold d-flex align-items-center justify-content-center gap-2" style="background-color: #25D366; border-color: #25D366;">
-                                    <i class="ki-duotone ki-message-text fs-4 text-white"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
-                                    Hubungi Via WhatsApp ({{ $rental['phone_format'] }})
-                                </a>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-
+            @endforeach
         </div>
-    </main>
+    </section>
 
-    <!-- Footer -->
-    <footer class="py-12 text-center" style="background-color: #173423; color: rgba(255, 255, 255, 0.7); border-top: 5px solid var(--apkasi-accent);">
-        <div class="container">
-            <div class="d-flex justify-content-center align-items-center gap-4 mb-6">
-                <img src="{{ asset('assets/apkasi/z_04_LOGO-LOGO APKASI/03_APKASI_Official Logo_Transparent.png') }}" alt="Logo APKASI" style="height: 45px;" />
-                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Logo_Deli_Serdang.png" alt="Logo Deli Serdang" style="height: 45px;" />
+    {{-- ═══════════ CTA: PETA ═══════════ --}}
+    <section class="max-w-[1400px] mx-auto px-5 sm:px-8 pb-16 sm:pb-20">
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-apkasi-dark to-apkasi-cta p-8 sm:p-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+            <div class="absolute -right-16 -top-16 w-56 h-56 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(212,175,55,0.22), transparent 70%)"></div>
+            <div class="relative">
+                <h3 class="font-display text-white text-lg sm:text-xl font-bold mb-2">Venue, Hotel & Destinasi Wisata</h3>
+                <p class="text-white/75 text-sm max-w-xl">Semua lokasi venue acara, rekomendasi hotel, dan destinasi wisata Deli Serdang tersedia di peta interaktif.</p>
             </div>
-            
-            <h5 class="text-white fw-bold mb-2">HUT Ke-26 APKASI & HUT Ke-80 Kabupaten Deli Serdang</h5>
-            <p class="fs-7 text-white text-opacity-50 mb-6">
-                Sekretariat APKASI & Dinas Kominfo Kabupaten Deli Serdang, Sumatera Utara.
-            </p>
-            
-            <div class="separator separator-dashed border-white border-opacity-10 mb-6"></div>
-            
-            <p class="fs-8 text-white text-opacity-40 mb-0">
-                &copy; 2026 Pemerintah Kabupaten Deli Serdang & APKASI. All Rights Reserved. Designed for premium experience.
-            </p>
+            <a href="{{ route('peta-hotel') }}" class="relative shrink-0 inline-flex items-center gap-2 bg-apkasi-gold hover:bg-apkasi-goldlt text-apkasi-dark text-sm font-bold px-6 py-3 rounded-full transition-colors">
+                Buka Peta Lokasi & Hotel <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+        </div>
+    </section>
+
+    {{-- ═══════════ FOOTER ═══════════ --}}
+    <footer class="bg-apkasi-dark border-t-4 border-apkasi-gold">
+        <div class="max-w-[1400px] mx-auto px-5 sm:px-8 py-10 text-center">
+            <div class="flex items-center justify-center gap-4 mb-5">
+                <img src="{{ asset('logos/apkasi-logo.png') }}" alt="APKASI" class="h-10 brightness-0 invert" />
+                <img src="{{ asset('logos/logo-ds.png') }}" alt="Deli Serdang" class="h-10" />
+            </div>
+            <h5 class="font-display text-white font-bold mb-1.5">HUT Ke-26 APKASI & HUT Ke-80 Kabupaten Deli Serdang</h5>
+            <p class="text-white/50 text-xs mb-5">Sekretariat APKASI & Dinas Kominfo Kabupaten Deli Serdang, Sumatera Utara.</p>
+            <div class="border-t border-white/10 pt-5">
+                <p class="text-[11px] text-white/30">&copy; 2026 Pemerintah Kabupaten Deli Serdang & APKASI. All rights reserved.</p>
+            </div>
         </div>
     </footer>
-
-    <!-- Javascript -->
-    <script src="{{ asset('assets/plugins/global/plugins.bundle.js') }}"></script>
-    <script src="{{ asset('assets/js/scripts.bundle.js') }}"></script>
-    
-    <script>
-        // Tab switching event listener to adjust map iframe or grid layouts if needed
-        var triggerTabList = [].slice.call(document.querySelectorAll('#guideTabs button'))
-        triggerTabList.forEach(function (triggerEl) {
-            var tabTrigger = new bootstrap.Tab(triggerEl)
-            triggerEl.addEventListener('click', function (event) {
-                event.preventDefault()
-                tabTrigger.show()
-            })
-        })
-
-        // Event Map interactive updater
-        function changeActiveVenue(element) {
-            // Remove active class from all selectors
-            document.querySelectorAll('.venue-selector-card').forEach(function(card) {
-                card.classList.remove('active');
-            });
-
-            // Add active class to clicked card
-            element.classList.add('active');
-
-            // Get map properties
-            var embedUrl = element.getAttribute('data-map-embed');
-            var directUrl = element.getAttribute('data-map-link');
-
-            // Update iframe and direct nav link
-            document.getElementById('iframe-venue-map').src = embedUrl;
-            document.getElementById('btn-direct-nav').href = directUrl;
-        }
-    </script>
-</body>
-</html>
+</div>
+@endsection

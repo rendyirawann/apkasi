@@ -19,6 +19,11 @@ use App\Http\Controllers\Backend\UserManagement\RoleController;
 use App\Http\Controllers\Backend\Help\LogActivityController;
 use App\Http\Controllers\Backend\Settings\SettingController;
 
+// Import Controller DATA MASTER (Hotel, PIC, Destinasi Wisata)
+use App\Http\Controllers\Backend\DataMaster\HotelController;
+use App\Http\Controllers\Backend\DataMaster\PicController;
+use App\Http\Controllers\Backend\DataMaster\DestinasiWisataController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -34,6 +39,8 @@ use App\Http\Controllers\Backend\Settings\SettingController;
 Route::get('/', [\App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
 Route::get('/panduan', [\App\Http\Controllers\Frontend\HomeController::class, 'guide'])->name('guide');
 Route::get('/peta-hotel', [\App\Http\Controllers\Frontend\Peta\PetaHotelController::class, 'index'])->name('peta-hotel');
+// Daftar tempat paginasi (AJAX) untuk list di /peta-hotel
+Route::get('/peta-hotel/list', [\App\Http\Controllers\Frontend\Peta\PetaHotelController::class, 'list'])->name('peta-hotel.list');
 // Endpoint JSON data tempat (dipakai SPA React di folder frontend/ via proxy Vite)
 Route::get('/api/places', [\App\Http\Controllers\Frontend\Peta\PetaHotelController::class, 'json'])->name('api.places');
 
@@ -141,6 +148,38 @@ Route::middleware(['auth', 'forbid-banned-user'])->group(function () {
     Route::middleware('can:view_help')->group(function () {
         Route::resource('/admin/log-activity', LogActivityController::class);
         Route::get('/admin/get-datalogactivity', [LogActivityController::class, 'getDataLogActivity'])->name('get-datalogactivity');
+    });
+
+    // ====================================================
+    // DATA MASTER (Hotel & PIC): view_data_master
+    // ====================================================
+    Route::middleware('can:view_data_master')->group(function () {
+        // Hotels
+        Route::get('/admin/hotels', [HotelController::class, 'index'])->name('hotels.index');
+        Route::get('/admin/hotels/data', [HotelController::class, 'data'])->name('hotels.data');
+        Route::post('/admin/hotels', [HotelController::class, 'store'])->name('hotels.store');
+        Route::get('/admin/hotels/{id}', [HotelController::class, 'show'])->name('hotels.show');
+        Route::get('/admin/hotels/{id}/edit', [HotelController::class, 'edit'])->name('hotels.edit');
+        Route::put('/admin/hotels/{id}', [HotelController::class, 'update'])->name('hotels.update');
+        Route::delete('/admin/hotels/{id}', [HotelController::class, 'destroy'])->name('hotels.destroy');
+
+        // PICs
+        Route::get('/admin/pics', [PicController::class, 'index'])->name('pics.index');
+        Route::get('/admin/pics/data', [PicController::class, 'data'])->name('pics.data');
+        Route::post('/admin/pics', [PicController::class, 'store'])->name('pics.store');
+        Route::get('/admin/pics/{id}', [PicController::class, 'show'])->name('pics.show');
+        Route::get('/admin/pics/{id}/edit', [PicController::class, 'edit'])->name('pics.edit');
+        Route::put('/admin/pics/{id}', [PicController::class, 'update'])->name('pics.update');
+        Route::delete('/admin/pics/{id}', [PicController::class, 'destroy'])->name('pics.destroy');
+
+        // Destinasi Wisata
+        Route::get('/admin/destinasi', [DestinasiWisataController::class, 'index'])->name('destinasi.index');
+        Route::get('/admin/destinasi/data', [DestinasiWisataController::class, 'data'])->name('destinasi.data');
+        Route::post('/admin/destinasi', [DestinasiWisataController::class, 'store'])->name('destinasi.store');
+        Route::get('/admin/destinasi/{id}', [DestinasiWisataController::class, 'show'])->name('destinasi.show');
+        Route::get('/admin/destinasi/{id}/edit', [DestinasiWisataController::class, 'edit'])->name('destinasi.edit');
+        Route::put('/admin/destinasi/{id}', [DestinasiWisataController::class, 'update'])->name('destinasi.update');
+        Route::delete('/admin/destinasi/{id}', [DestinasiWisataController::class, 'destroy'])->name('destinasi.destroy');
     });
 });
 

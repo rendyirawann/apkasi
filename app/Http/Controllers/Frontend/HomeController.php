@@ -195,6 +195,12 @@ class HomeController extends Controller
             ]
         ];
 
-        return view('frontend.guide', compact('venues', 'tourisms', 'hotels', 'rentals'));
+        // PIC kegiatan APKASI per provinsi (dari master wilayah_provinsi).
+        $pics = \App\Models\Pic::with('provinsi')
+            ->where('is_active', true)
+            ->orderBy('urut')
+            ->get();
+
+        return view('frontend.guide', compact('venues', 'tourisms', 'hotels', 'rentals', 'pics'));
     }
 }

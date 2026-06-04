@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {{-- Jangan pulihkan posisi scroll lama & mulai selalu dari atas --}}
+    <script>try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}</script>
     <title>@yield('title', 'HUT Ke-26 APKASI & Deli Serdang Ke-80 — 1-3 Juli 2026')</title>
     <meta name="description" content="@yield('description', 'HUT Ke-26 APKASI & HUT Ke-80 Kabupaten Deli Serdang — Bersinergi Membangun Daerah, Memperkuat Otonomi Untuk Indonesia Maju. 1–3 Juli 2026.')" />
     <link rel="icon" type="image/png" href="{{ asset('logos/apkasi-logo.png') }}" />

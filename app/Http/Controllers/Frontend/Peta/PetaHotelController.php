@@ -4,122 +4,141 @@ namespace App\Http\Controllers\Frontend\Peta;
 
 use App\Http\Controllers\Controller;
 use App\Models\Place;
+use App\Models\Hotel;
+use App\Models\DestinasiWisata;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
 class PetaHotelController extends Controller
 {
     /**
-     * Halaman "Peta Lokasi & Hotel".
-     * Ambil data dari tabel places kalau sudah ada; kalau belum, pakai contoh
-     * supaya halaman tetap jalan sebelum migrate/seed.
+     * Halaman "Peta Lokasi, Hotel & Wisata".
+     * Marker peta dimuat semua; daftar tempat dimuat paginasi via AJAX (lihat list()).
      */
     public function index()
     {
-        $places = $this->resolvePlaces();
-
-        // Titik tengah peta (rata-rata koordinat). Default: kompleks Pemkab Deli Serdang.
-        $center = [98.8645, 3.5503]; // [lng, lat]
-        if ($places->count()) {
-            $center = [
-                round($places->avg('lng'), 6),
-                round($places->avg('lat'), 6),
-            ];
-        }
+        $items = $this->resolveItems();
 
         return view('frontend.peta.hotel.peta-hotel', [
-            'places'       => $places->values(),
-            'center'       => $center,
-            'mapboxToken'  => config('services.mapbox.token'),
+            'markers'     => $items->values(),
+            'counts'      => $this->counts($items),
+            'center'      => $this->center($items),
+            'mapboxToken' => config('services.mapbox.token'),
         ]);
     }
 
     /**
-     * Endpoint JSON untuk dikonsumsi SPA React (frontend/) lewat GET /api/places.
-     * Mengembalikan daftar tempat + titik tengah peta.
+     * Daftar tempat paginasi (AJAX) — 5 per halaman, difilter kategori + pencarian.
+     */
+    public function list(Request $request)
+    {
+        $items    = $this->resolveItems();
+        $cat      = $request->get('cat', 'all');
+        $q        = strtolower(trim((string) $request->get('q', '')));
+        $filtered = $this->filterItems($items, $cat, $q);
+
+        $perPage  = 5;
+        $total    = $filtered->count();
+        $lastPage = max(1, (int) ceil($total / $perPage));
+        $page     = min(max(1, (int) $request->get('page', 1)), $lastPage);
+        $data     = $filtered->slice(($page - 1) * $perPage, $perPage)->values();
+
+        return response()->json([
+            'data'      => $data,
+            'page'      => $page,
+            'last_page' => $lastPage,
+            'total'     => $total,
+            'from'      => $total ? ($page - 1) * $perPage + 1 : 0,
+            'to'        => min($page * $perPage, $total),
+            'counts'    => $this->counts($items),
+        ]);
+    }
+
+    /**
+     * Endpoint JSON untuk SPA React (frontend/) via GET /api/places.
      */
     public function json()
     {
-        $places = $this->resolvePlaces();
-
-        $center = [98.8645, 3.5503]; // [lng, lat] default: kompleks Pemkab Deli Serdang
-        if ($places->count()) {
-            $center = [
-                round($places->avg('lng'), 6),
-                round($places->avg('lat'), 6),
-            ];
-        }
+        $items = $this->resolveItems();
 
         return response()->json([
-            'places' => $places->values(),
-            'center' => $center,
+            'places' => $items->values(),
+            'center' => $this->center($items),
         ]);
     }
 
-    /**
-     * Sumber data: DB dulu, fallback ke contoh.
-     */
-    private function resolvePlaces()
-    {
-        if (Schema::hasTable('places')) {
-            $rows = Place::query()
-                ->where('is_active', true)
-                ->whereIn('category', ['venue', 'hotel'])
-                ->orderByRaw("FIELD(category,'venue','hotel')")
-                ->orderBy('sort')
-                ->get([
-                    'id', 'category', 'name', 'address', 'description',
-                    'phone', 'price_range', 'rating', 'image', 'lat', 'lng', 'maps_url',
-                ]);
-
-            if ($rows->count()) {
-                return $rows;
-            }
-        }
-
-        // Fallback contoh (koordinat perkiraan, ganti dengan data asli).
-        return collect($this->sampleData())->map(function ($p, $i) {
-            return (object) array_merge(['id' => $i + 1], $p);
-        });
-    }
-
-    private function sampleData(): array
+    private function counts($items): array
     {
         return [
-            [
-                'category' => 'venue', 'name' => 'Graha Bhineka',
-                'address' => 'Kompleks Pemkab Deli Serdang, Lubuk Pakam',
-                'description' => 'Welcome Dinner & Malam Grand Final POI 2026',
-                'phone' => null, 'price_range' => null, 'rating' => null,
-                'image' => null, 'lat' => 3.5511, 'lng' => 98.8650, 'maps_url' => null,
-            ],
-            [
-                'category' => 'venue', 'name' => 'IKM Hall',
-                'address' => 'Kompleks Pemkab Deli Serdang, Lubuk Pakam',
-                'description' => 'Dialog Otonomi, Women Program & FORBISDA',
-                'phone' => null, 'price_range' => null, 'rating' => null,
-                'image' => null, 'lat' => 3.5498, 'lng' => 98.8639, 'maps_url' => null,
-            ],
-            [
-                'category' => 'venue', 'name' => 'Alun-Alun Deli Serdang',
-                'address' => 'Lubuk Pakam, Deli Serdang',
-                'description' => 'Start & Finish Fun Walk 2026',
-                'phone' => null, 'price_range' => null, 'rating' => null,
-                'image' => null, 'lat' => 3.5505, 'lng' => 98.8662, 'maps_url' => null,
-            ],
-            [
-                'category' => 'hotel', 'name' => 'Hotel Contoh 1 (ganti)',
-                'address' => 'Jl. contoh, Lubuk Pakam',
-                'description' => null, 'phone' => '0812-xxxx',
-                'price_range' => 'Rp350rb', 'rating' => 4.3,
-                'image' => null, 'lat' => 3.5560, 'lng' => 98.8710, 'maps_url' => null,
-            ],
-            [
-                'category' => 'hotel', 'name' => 'Hotel Contoh 2 (ganti)',
-                'address' => 'Jl. contoh, dekat Kualanamu',
-                'description' => null, 'phone' => '0813-xxxx',
-                'price_range' => 'Rp500rb', 'rating' => 4.5,
-                'image' => null, 'lat' => 3.6300, 'lng' => 98.8800, 'maps_url' => null,
-            ],
+            'all'    => $items->count(),
+            'venue'  => $items->filter(fn ($p) => $p->category === 'venue' || $p->is_lokasi_acara)->count(),
+            'hotel'  => $items->where('category', 'hotel')->count(),
+            'wisata' => $items->where('category', 'wisata')->count(),
         ];
+    }
+
+    private function filterItems($items, string $cat, string $q)
+    {
+        return $items->filter(function ($p) use ($cat, $q) {
+            $catOk = $cat === 'all'
+                || ($cat === 'venue'  && ($p->category === 'venue' || $p->is_lokasi_acara))
+                || ($cat === 'hotel'  && $p->category === 'hotel')
+                || ($cat === 'wisata' && $p->category === 'wisata');
+
+            $qOk = $q === ''
+                || str_contains(strtolower($p->name), $q)
+                || str_contains(strtolower((string) $p->address), $q);
+
+            return $catOk && $qOk;
+        })->values();
+    }
+
+    private function center($items): array
+    {
+        if ($items->count()) {
+            return [round($items->avg('lng'), 6), round($items->avg('lat'), 6)];
+        }
+        return [98.8645, 3.5503];
+    }
+
+    /**
+     * Gabungan titik: venue (places) + hotel (hotels) + destinasi (destinasi_wisata),
+     * dinormalkan ke bentuk seragam. `is_lokasi_acara` menandai item yang juga masuk tab Lokasi Acara.
+     */
+    private function resolveItems()
+    {
+        $out = collect();
+
+        if (Schema::hasTable('places')) {
+            Place::query()->where('is_active', true)->where('category', 'venue')->orderBy('sort')->get()
+                ->each(fn ($p) => $out->push((object) [
+                    'id' => 'p' . $p->id, 'category' => 'venue', 'is_lokasi_acara' => true,
+                    'name' => $p->name, 'address' => $p->address, 'description' => $p->description,
+                    'rating' => $p->rating, 'image' => $p->image, 'lat' => (float) $p->lat, 'lng' => (float) $p->lng,
+                    'maps_url' => $p->maps_url, 'rooms' => null, 'wa' => null, 'email' => null, 'harga' => null,
+                ]));
+        }
+
+        if (Schema::hasTable('hotels')) {
+            Hotel::query()->where('is_active', true)->whereNotNull('lat')->whereNotNull('lng')->orderBy('urut')->get()
+                ->each(fn ($h) => $out->push((object) [
+                    'id' => 'h' . $h->id, 'category' => 'hotel', 'is_lokasi_acara' => (bool) $h->is_lokasi_acara,
+                    'name' => $h->nama, 'address' => $h->alamat, 'description' => null,
+                    'rating' => $h->rating, 'image' => $h->image, 'lat' => (float) $h->lat, 'lng' => (float) $h->lng,
+                    'maps_url' => $h->maps_url, 'rooms' => $h->ketersediaan_kamar, 'wa' => $h->contact_wa, 'email' => $h->contact_email, 'harga' => null,
+                ]));
+        }
+
+        if (Schema::hasTable('destinasi_wisata')) {
+            DestinasiWisata::query()->where('is_active', true)->whereNotNull('lat')->whereNotNull('lng')->orderBy('urut')->get()
+                ->each(fn ($d) => $out->push((object) [
+                    'id' => 'd' . $d->id, 'category' => 'wisata', 'is_lokasi_acara' => (bool) $d->is_lokasi_acara,
+                    'name' => $d->nama, 'address' => $d->alamat, 'description' => $d->deskripsi,
+                    'rating' => $d->rating, 'image' => $d->thumbnail, 'lat' => (float) $d->lat, 'lng' => (float) $d->lng,
+                    'maps_url' => $d->maps_url, 'rooms' => null, 'wa' => null, 'email' => null, 'harga' => $d->harga_tiket,
+                ]));
+        }
+
+        return $out;
     }
 }

@@ -64,6 +64,41 @@
             @endrole
             <!--end::User Management-->
 
+            <!--begin::Data Master-->
+            @can('view_data_master')
+            @php $isDataMaster = request()->is('admin/hotels*') || request()->is('admin/pics*') || request()->is('admin/destinasi*'); @endphp
+            <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ $isDataMaster ? 'here show' : '' }}">
+                <span class="menu-link">
+                    <span class="menu-icon">
+                        <i class="ki-duotone ki-home-2 fs-3"><span class="path1"></span><span class="path2"></span></i>
+                    </span>
+                    <span class="menu-title">Data Master</span>
+                    <span class="menu-arrow"></span>
+                </span>
+                <div class="menu-sub menu-sub-accordion {{ $isDataMaster ? 'show' : '' }}">
+                    <div class="menu-item">
+                        <a class="menu-link {{ request()->is('admin/hotels*') ? 'active' : '' }}" href="{{ route('hotels.index') }}">
+                            <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                            <span class="menu-title">Hotel</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a class="menu-link {{ request()->is('admin/destinasi*') ? 'active' : '' }}" href="{{ route('destinasi.index') }}">
+                            <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                            <span class="menu-title">Destinasi Wisata</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a class="menu-link {{ request()->is('admin/pics*') ? 'active' : '' }}" href="{{ route('pics.index') }}">
+                            <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                            <span class="menu-title">PIC</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            @endcan
+            <!--end::Data Master-->
+
             <!--begin::My Account-->
             <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->is('admin/my-*') ? 'here show' : '' }}">
                 <span class="menu-link">

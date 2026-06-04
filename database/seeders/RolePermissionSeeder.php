@@ -45,9 +45,34 @@ class RolePermissionSeeder extends Seeder
             'role.massdelete',
         ];
 
+        // --- Granular Data Master: Hotel ---
+        $hotelPermissions = [
+            'hotel.show',
+            'hotel.create',
+            'hotel.edit',
+            'hotel.delete',
+        ];
+
+        // --- Granular Data Master: PIC ---
+        $picPermissions = [
+            'pic.show',
+            'pic.create',
+            'pic.edit',
+            'pic.delete',
+        ];
+
+        // --- Granular Data Master: Destinasi Wisata ---
+        $destinasiPermissions = [
+            'destinasi.show',
+            'destinasi.create',
+            'destinasi.edit',
+            'destinasi.delete',
+        ];
+
         // Create all permissions
         $allPermissions = array_merge(
-            $navPermissions, $userPermissions, $rolePermissions
+            $navPermissions, $userPermissions, $rolePermissions,
+            $hotelPermissions, $picPermissions, $destinasiPermissions
         );
 
         foreach ($allPermissions as $permission) {
@@ -68,12 +93,12 @@ class RolePermissionSeeder extends Seeder
         // But we still assign explicitly for completeness
         $roleSuperadmin->syncPermissions(Permission::all());
 
-        // ADMIN — All except Resources (User/Role Management)
-        $adminPermissions = [
+        // ADMIN — All except Resources (User/Role Management); bisa kelola Data Master
+        $adminPermissions = array_merge([
             'view_dashboard',
             'view_data_master',
             'view_help',
-        ];
+        ], $hotelPermissions, $picPermissions, $destinasiPermissions);
         $roleAdmin->syncPermissions($adminPermissions);
     }
 }

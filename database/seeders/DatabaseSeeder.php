@@ -17,6 +17,10 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             SuperAdminSeeder::class,
             PlaceSeeder::class,
+            HotelSeeder::class,
+            DestinasiWisataSeeder::class,
+            WilayahProvinsiSeeder::class,
+            PicSeeder::class,
         ]);
     }
 }
