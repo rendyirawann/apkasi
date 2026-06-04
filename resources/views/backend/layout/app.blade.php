@@ -219,42 +219,6 @@
             @if(session('warning')) toastr.warning("{{ session('warning') }}"); @endif
             @if(session('info')) toastr.info("{{ session('info') }}"); @endif
 
-            // --- Quick Search ---
-            const searchPages = [
-                { title: 'Dashboard', url: "{{ route('dashboard') }}", icon: 'ki-element-11', desc: 'Main dashboard overview' },
-                { title: 'Settings', url: "{{ route('settings.index') }}", icon: 'ki-setting-2', desc: 'Application configuration' }
-            ];
-            const searchInput = document.querySelector('[data-kt-search-element="input"]');
-            const resultsEl = document.querySelector('[data-kt-search-element="results"]');
-            const mainEl = document.querySelector('[data-kt-search-element="main"]');
-            const emptyEl = document.querySelector('[data-kt-search-element="empty"]');
-            const resultsContainer = document.getElementById('kt_header_search_results');
-            if(searchInput) {
-                searchInput.addEventListener('input', function(e) {
-                    const query = e.target.value.toLowerCase();
-                    if(query.length > 1) {
-                        mainEl.classList.add('d-none');
-                        const filtered = searchPages.filter(p => p.title.toLowerCase().includes(query) || p.desc.toLowerCase().includes(query));
-                        if(filtered.length > 0) {
-                            emptyEl.classList.add('d-none');
-                            resultsEl.classList.remove('d-none');
-                            let html = '';
-                            filtered.forEach(p => {
-                                html += `<a href="${p.url}" class="d-flex text-gray-900 text-hover-primary align-items-center mb-5"><div class="symbol symbol-40px me-4"><span class="symbol-label bg-light"><i class="ki-duotone ${p.icon} fs-2 text-primary"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i></span></div><div class="d-flex flex-column"><span class="fs-6 fw-bold">${p.title}</span><span class="fs-7 fw-semibold text-muted">${p.desc}</span></div></a>`;
-                            });
-                            resultsContainer.innerHTML = html;
-                        } else {
-                            resultsEl.classList.add('d-none');
-                            emptyEl.classList.remove('d-none');
-                        }
-                    } else {
-                        mainEl.classList.remove('d-none');
-                        resultsEl.classList.add('d-none');
-                        emptyEl.classList.add('d-none');
-                    }
-                });
-            }
-
             // --- Force Logout Listener ---
             @auth
             const userId = "{{ auth()->id() }}";

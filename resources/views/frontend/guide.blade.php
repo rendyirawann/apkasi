@@ -18,18 +18,20 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
     <style>
-        /* DataTables disesuaikan dengan tema apkasi */
+        /* DataTables PIC — compact & estetik */
         .dt-container { font-family: 'Plus Jakarta Sans', sans-serif; }
-        table.dataTable thead th { background: #336443; color: #fff; font-weight: 700; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; border: 0 !important; padding: 12px 14px; }
-        table.dataTable tbody td { font-size: .85rem; color: #2d3a2a; border-color: #e8f0ea !important; padding: 11px 14px; vertical-align: middle; }
-        table.dataTable tbody tr:hover { background: #f3f7f3; }
-        table.dataTable { border-collapse: separate; }
-        .dt-search input, .dt-length select { border: 1px solid #e8f0ea; border-radius: 9999px; padding: .45rem .9rem; font-size: .82rem; outline: none; background: #fff; }
-        .dt-search input:focus { border-color: #85AB8B; }
-        .dt-search label, .dt-length label, .dt-info { font-size: .8rem; color: #4b5b47; }
-        .dt-paging .dt-paging-button { font-size: .8rem; padding: .3rem .7rem; margin: 0 2px; border-radius: 8px; }
-        .dt-paging .dt-paging-button.current { background: #336443 !important; color: #fff !important; border: 0 !important; }
-        .dt-paging .dt-paging-button:hover:not(.current) { background: #e8f0ea !important; border-color: #e8f0ea !important; color: #336443 !important; }
+        #picTable { border-collapse: separate !important; border-spacing: 0; width: 100% !important; }
+        #picTable thead th { background: #f3f7f3; color: #4a6b54; font-weight: 700; font-size: .66rem; text-transform: uppercase; letter-spacing: .07em; border: 0 !important; border-bottom: 1px solid #e3ece5 !important; padding: 9px 14px; }
+        #picTable tbody td { font-size: .82rem; color: #2d3a2a; background: #fff; border: 0 !important; border-bottom: 1px solid #f1f5f1 !important; padding: 7px 14px; vertical-align: middle; }
+        #picTable tbody tr:last-child td { border-bottom: 0 !important; }
+        #picTable tbody tr:hover td { background: #f7faf7; }
+        .dt-container .dt-search input, .dt-container .dt-length select { border: 1px solid #e8f0ea; border-radius: 9999px; padding: .38rem .9rem; font-size: .8rem; outline: none; background: #fff; }
+        .dt-container .dt-search input:focus { border-color: #85AB8B; }
+        .dt-container .dt-search label, .dt-container .dt-length label, .dt-container .dt-info { font-size: .76rem; color: #6b7c70; }
+        .dt-container .dt-paging .dt-paging-button { font-size: .78rem; padding: .25rem .55rem; margin: 0 1px; border-radius: 8px; border: 0 !important; min-width: 30px; }
+        .dt-container .dt-paging .dt-paging-button.current { background: #336443 !important; color: #fff !important; }
+        .dt-container .dt-paging .dt-paging-button:hover:not(.current) { background: #e8f0ea !important; color: #336443 !important; }
+        .dt-container .dt-layout-row { margin-top: .4rem; margin-bottom: .4rem; }
     </style>
 @endpush
 
@@ -183,8 +185,8 @@
             <p class="text-apkasi-body text-sm mt-1">Penanggung jawab (PIC) pendampingan delegasi tiap provinsi. Gunakan kolom <em>Cari</em> untuk memfilter.</p>
         </div>
 
-        <div class="bg-white border border-apkasi-leaf rounded-2xl shadow-sm p-4 sm:p-5 overflow-x-auto">
-            <table id="picTable" class="display w-full" style="width:100%">
+        <div class="bg-white border border-apkasi-leaf rounded-2xl shadow-sm p-3 sm:p-4 overflow-x-auto">
+            <table id="picTable" class="w-full" style="width:100%">
                 <thead>
                     <tr>
                         <th>No</th>
@@ -221,7 +223,7 @@
                 </tbody>
             </table>
         </div>
-        <p class="text-xs text-apkasi-body/60 mt-3">Catatan: DKI Jakarta belum tercantum PIC pada dokumen sumber.</p>
+        <!-- <p class="text-xs text-apkasi-body/60 mt-3">Catatan: DKI Jakarta belum tercantum PIC pada dokumen sumber.</p> -->
     </section>
 
     {{-- ═══════════ PANEL: RENTAL ═══════════ --}}
@@ -232,26 +234,49 @@
         </div>
 
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            @foreach ($rentals as $r)
+            @forelse ($rentals as $r)
+                @php $totalUnit = $r->mobil->sum('jumlah_unit'); @endphp
                 <div class="bg-white rounded-2xl border border-apkasi-leaf p-5 hover:shadow-lg transition-all duration-300 flex flex-col">
                     <div class="flex items-center gap-3 mb-3">
                         <div class="w-11 h-11 rounded-xl bg-apkasi-heading/10 flex items-center justify-center shrink-0">
                             <i data-lucide="car" class="w-5 h-5 text-apkasi-heading"></i>
                         </div>
-                        <h3 class="font-bold text-apkasi-dark text-[15px] leading-snug">{{ $r['company'] }}</h3>
+                        <h3 class="font-bold text-apkasi-dark text-[15px] leading-snug">{{ $r->nama }}</h3>
                     </div>
-                    <p class="text-xs text-apkasi-body/80 leading-relaxed">{{ $r['services'] }}</p>
-                    <p class="text-xs text-apkasi-body/60 italic leading-relaxed mt-2 flex-1">{{ $r['desc'] }}</p>
-                    <div class="flex items-center gap-2 mt-4">
-                        <a href="https://wa.me/{{ $r['whatsapp'] }}" target="_blank" rel="noopener" class="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full bg-apkasi-heading text-white hover:bg-apkasi-cta transition-colors">
-                            <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
-                        </a>
-                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $r['phone_format']) }}" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full border border-apkasi-leaf text-apkasi-heading hover:bg-apkasi-leaf/50 transition-colors">
-                            <i data-lucide="phone" class="w-4 h-4"></i> {{ $r['phone_format'] }}
-                        </a>
+                    @if ($r->alamat)
+                        <p class="flex items-start gap-1.5 text-xs text-apkasi-body leading-relaxed mb-2"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-apkasi-body/50 mt-0.5 shrink-0"></i> {{ $r->alamat }}</p>
+                    @endif
+                    @if ($r->deskripsi)
+                        <p class="text-xs text-apkasi-body/60 italic leading-relaxed mb-2">{{ $r->deskripsi }}</p>
+                    @endif
+                    <div class="flex-1">
+                        @if ($r->mobil->count())
+                            <div class="flex flex-wrap gap-1.5 mb-2">
+                                @foreach ($r->mobil as $m)
+                                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold bg-apkasi-leaf/60 text-apkasi-heading px-2.5 py-1 rounded-full">{{ $m->nama_mobil }} <span class="text-apkasi-body/70">×{{ $m->jumlah_unit }}</span></span>
+                                @endforeach
+                            </div>
+                            <div class="text-xs font-semibold text-apkasi-heading"><i data-lucide="car" class="w-3.5 h-3.5 inline"></i> Total {{ $totalUnit }} unit tersedia</div>
+                        @endif
                     </div>
+                    @if ($r->kontak_wa || $r->telepon)
+                        <div class="flex items-center gap-2 mt-4">
+                            @if ($r->kontak_wa)
+                                <a href="{{ $wa($r->kontak_wa) }}" target="_blank" rel="noopener" class="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full bg-apkasi-heading text-white hover:bg-apkasi-cta transition-colors">
+                                    <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
+                                </a>
+                            @endif
+                            @if ($r->telepon)
+                                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $r->telepon) }}" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full border border-apkasi-leaf text-apkasi-heading hover:bg-apkasi-leaf/50 transition-colors">
+                                    <i data-lucide="phone" class="w-4 h-4"></i> {{ $r->telepon }}
+                                </a>
+                            @endif
+                        </div>
+                    @endif
                 </div>
-            @endforeach
+            @empty
+                <div class="col-span-full text-center py-10 text-sm text-apkasi-body/70">Belum ada data rental.</div>
+            @endforelse
         </div>
     </section>
 
@@ -270,18 +295,6 @@
     </section>
 
     {{-- ═══════════ FOOTER ═══════════ --}}
-    <footer class="bg-apkasi-dark border-t-4 border-apkasi-gold">
-        <div class="max-w-[1400px] mx-auto px-5 sm:px-8 py-10 text-center">
-            <div class="flex items-center justify-center gap-4 mb-5">
-                <img src="{{ asset('logos/apkasi-logo.png') }}" alt="APKASI" class="h-10 brightness-0 invert" />
-                <img src="{{ asset('logos/logo-ds.png') }}" alt="Deli Serdang" class="h-10" />
-            </div>
-            <h5 class="font-display text-white font-bold mb-1.5">HUT Ke-26 APKASI & HUT Ke-80 Kabupaten Deli Serdang</h5>
-            <p class="text-white/50 text-xs mb-5">Sekretariat APKASI & Dinas Kominfo Kabupaten Deli Serdang, Sumatera Utara.</p>
-            <div class="border-t border-white/10 pt-5">
-                <p class="text-[11px] text-white/30">&copy; 2026 Pemerintah Kabupaten Deli Serdang & APKASI. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    @include('frontend.partials.footer')
 </div>
 @endsection

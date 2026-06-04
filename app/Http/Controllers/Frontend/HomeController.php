@@ -55,7 +55,43 @@ class HomeController extends Controller
             ]
         ];
 
-        return view('frontend.index', compact('eventTargetDate', 'rundownHighlights'));
+        // Rundown rangkaian kegiatan (dari tabel rundown + child kegiatan)
+        $agenda = \App\Models\Rundown::with('kegiatan')
+            ->where('is_active', true)
+            ->orderBy('urut')
+            ->orderBy('tanggal')
+            ->get();
+
+        // Logo (per grup) & FAQ untuk landing
+        $navbarLogos      = \App\Models\SiteLogo::grup('navbar')->get();
+        $heroLogos        = \App\Models\SiteLogo::grup('hero')->get();
+        $partnerLogos     = \App\Models\SiteLogo::grup('partners')->get();
+        $footerBrandLogos = \App\Models\SiteLogo::grup('footer_brand')->get();
+        $footerSideLogos  = \App\Models\SiteLogo::grup('footer_side')->get();
+        $faqs             = \App\Models\Faq::active()->get();
+
+        // Countdown & rentang tanggal acara dari settings
+        $start = \App\Models\Setting::get('lp_event_start', '2026-07-01');
+        $end   = \App\Models\Setting::get('lp_event_end', '2026-07-03');
+        $time  = \App\Models\Setting::get('lp_countdown_time', '19:00');
+
+        $countdownTarget = \Carbon\Carbon::parse($start . ' ' . $time, 'Asia/Jakarta')->toIso8601String();
+
+        $cs = \Carbon\Carbon::parse($start)->locale('id');
+        $ce = \Carbon\Carbon::parse($end)->locale('id');
+        if ($cs->isSameDay($ce)) {
+            $eventRangeText = $cs->translatedFormat('j F Y');
+        } elseif ($cs->month === $ce->month && $cs->year === $ce->year) {
+            $eventRangeText = $cs->translatedFormat('j') . ' – ' . $ce->translatedFormat('j F Y');
+        } else {
+            $eventRangeText = $cs->translatedFormat('j M') . ' – ' . $ce->translatedFormat('j M Y');
+        }
+
+        return view('frontend.index', compact(
+            'eventTargetDate', 'rundownHighlights', 'agenda',
+            'navbarLogos', 'heroLogos', 'partnerLogos', 'footerBrandLogos', 'footerSideLogos',
+            'faqs', 'countdownTarget', 'eventRangeText'
+        ));
     }
 
     /**
@@ -170,30 +206,11 @@ class HomeController extends Controller
             ]
         ];
 
-        // Car rentals data
-        $rentals = [
-            [
-                'company' => 'Deli Serdang Rent Car',
-                'whatsapp' => '6281234567890',
-                'phone_format' => '0812-3456-7890',
-                'services' => 'Innova Reborn, Fortuner, Alphard, Avanza. Melayani sistem drop bandara, sewa harian + driver.',
-                'desc' => 'Supir lokal berpengalaman dan sangat paham rute VVIP pemkab.'
-            ],
-            [
-                'company' => 'Kualanamu Trans & Travel',
-                'whatsapp' => '6282165432100',
-                'phone_format' => '0821-6543-2100',
-                'services' => 'Hiace Commuter (15 seat), Avanza, Innova. Sangat cocok untuk rombongan OPD / TP PKK daerah.',
-                'desc' => 'Tersedia layanan penjemputan khusus delegasi dengan papan nama daerah.'
-            ],
-            [
-                'company' => 'Horas Auto Rental',
-                'whatsapp' => '6281398765432',
-                'phone_format' => '0813-9876-5432',
-                'services' => 'Sewa mobil lepas kunci (self-drive) atau dengan supir. Avanza, Brio, Xpander.',
-                'desc' => 'Pemesanan cepat 24 jam dengan syarat mudah khusus delegasi APKASI.'
-            ]
-        ];
+        // Rental mobil (dari DB: tabel rentals + child rental_mobil)
+        $rentals = \App\Models\Rental::with('mobil')
+            ->where('is_active', true)
+            ->orderBy('urut')
+            ->get();
 
         // PIC kegiatan APKASI per provinsi (dari master wilayah_provinsi).
         $pics = \App\Models\Pic::with('provinsi')

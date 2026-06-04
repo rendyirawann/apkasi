@@ -93,23 +93,31 @@
             @yield('content')
             <!--end::Body-->
             <!--begin::Aside-->
-            <div class="d-flex flex-lg-row-fluid">
+            <div class="apkasi-aside d-flex flex-lg-row-fluid">
                 <!--begin::Content-->
-                <div class="d-flex flex-column flex-center pb-0 pb-lg-10 p-10 w-100">
-                    <!--begin::Image-->
-                    <img class="theme-light-show mx-auto mw-100 w-150px w-lg-300px mb-10 mb-lg-20"
-                        src="{{ asset('assets/media/logos/' . $siteLogo) }}" alt="" />
-
-                    <img class="theme-dark-show mx-auto mw-100 w-150px w-lg-300px mb-10 mb-lg-20"
-                        src="{{ asset('assets/media/logos/' . $siteLogo) }}" alt="" />
-
-                    <!--end::Image-->
+                <div class="d-flex flex-column flex-center pb-0 pb-lg-10 p-10 w-100 position-relative">
+                    <!--begin::Logos-->
+                    <div class="apkasi-aside-logos mb-10 mb-lg-15">
+                        <div class="apkasi-aside-logo-pill">
+                            <img class="mw-100 h-70px h-lg-110px d-block"
+                                src="{{ asset('logos/hut-apkasi-2026.png') }}" alt="HUT Ke-26 APKASI" />
+                        </div>
+                        <div class="apkasi-aside-logo-pill">
+                            <img class="mw-100 h-70px h-lg-110px d-block"
+                                src="{{ asset('logos/logo-ds.png') }}" alt="Kabupaten Deli Serdang" />
+                        </div>
+                    </div>
+                    <!--end::Logos-->
                     <!--begin::Title-->
-                    <h1 class="text-gray-800 fs-2qx fw-bold text-center mb-7">
-                        {{ $siteName }}
+                    <h1 class="text-white fs-2qx fw-bold text-center mb-5">
+                        HUT Ke-26 APKASI &amp;<br>HUT Ke-80 Kabupaten Deli Serdang
                     </h1>
-                    <div class="text-gray-600 fs-base text-center fw-semibold">
-                        Manage your operations efficiently with our modern admin dashboard.
+                    <div class="text-white opacity-75 fs-4 text-center fw-semibold mb-5">
+                        Satu Misi, Satu Aksi, Membangun Negeri
+                    </div>
+                    <div class="d-inline-flex align-items-center gap-2 text-white fw-bold fs-6 bg-white bg-opacity-10 rounded-pill px-5 py-2">
+                        <i class="ki-outline ki-geolocation text-white fs-4"></i>
+                        Kabupaten Deli Serdang, Sumatera Utara
                     </div>
                     <!--end::Text-->
                 </div>

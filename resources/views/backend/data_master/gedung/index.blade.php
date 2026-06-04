@@ -1,6 +1,6 @@
 @extends('backend.layout.app')
 
-@section('title', 'Data Hotel')
+@section('title', 'Data Gedung')
 
 @push('stylesheets')
     <meta name="csrf-token" content="{{ csrf_token() }}" />
@@ -10,13 +10,13 @@
 <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-0">
     <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
         <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
-            <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Data Hotel</h1>
+            <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Data Gedung</h1>
             <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
                 <li class="breadcrumb-item text-muted"><a href="{{ route('dashboard') }}" class="text-muted text-hover-primary">Home</a></li>
                 <li class="breadcrumb-item"><span class="bullet bg-gray-500 w-5px h-2px"></span></li>
                 <li class="breadcrumb-item text-muted">Data Master</li>
                 <li class="breadcrumb-item"><span class="bullet bg-gray-500 w-5px h-2px"></span></li>
-                <li class="breadcrumb-item text-gray-900">Hotel</li>
+                <li class="breadcrumb-item text-gray-900">Gedung</li>
             </ul>
         </div>
     </div>
@@ -27,30 +27,29 @@
         <div class="card card-flush">
             <div class="card-header align-items-center py-5 gap-2 gap-md-5">
                 <div class="card-title">
-                    <span class="fs-5 fw-bold">Daftar Hotel di Kabupaten Deli Serdang</span>
+                    <span class="fs-5 fw-bold">Daftar Gedung / Venue di Kabupaten Deli Serdang</span>
                 </div>
                 <div class="card-toolbar">
                     <div class="position-relative my-1 me-3">
                         <i class="ki-outline ki-magnifier fs-3 position-absolute top-50 translate-middle-y ms-4"></i>
-                        <input type="text" id="hotelSearch" class="form-control form-control-solid form-control-sm w-200px w-md-250px ps-11" placeholder="Cari hotel..." autocomplete="off" />
+                        <input type="text" id="gedungSearch" class="form-control form-control-solid form-control-sm w-200px w-md-250px ps-11" placeholder="Cari gedung..." autocomplete="off" />
                     </div>
-                    @can('hotel.create')
-                    <button type="button" class="btn btn-primary btn-sm" id="btnAddHotel">
-                        <i class="ki-outline ki-plus fs-3"></i> Tambah Hotel
+                    @can('gedung.create')
+                    <button type="button" class="btn btn-primary btn-sm" id="btnAddGedung">
+                        <i class="ki-outline ki-plus fs-3"></i> Tambah Gedung
                     </button>
                     @endcan
                 </div>
             </div>
             <div class="card-body pt-0">
-                <table id="hotelTable" class="table align-middle table-row-dashed fs-6 gy-4 w-100">
+                <table id="gedungTable" class="table align-middle table-row-dashed fs-6 gy-4 w-100">
                     <thead>
                         <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
                             <th class="text-center">No</th>
-                            <th>Nama Hotel</th>
+                            <th>Nama Gedung</th>
                             <th>Alamat</th>
-                            <th>Kamar</th>
-                            <th class="text-center">Rating</th>
-                            <th>Kontak</th>
+                            <th>Koordinat</th>
+                            <th>Lokasi Acara</th>
                             <th class="text-center">Status</th>
                             <th class="text-end">Aksi</th>
                         </tr>
@@ -63,82 +62,62 @@
 </div>
 
 {{-- ===== Modal Tambah/Edit ===== --}}
-<div class="modal fade" id="hotelFormModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="gedungFormModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered mw-700px">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="fw-bold" id="hotelFormTitle">Tambah Hotel</h2>
+                <h2 class="fw-bold" id="gedungFormTitle">Tambah Gedung</h2>
                 <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal"><i class="ki-outline ki-cross fs-1"></i></div>
             </div>
-            <form id="hotelForm">
+            <form id="gedungForm">
                 <div class="modal-body py-6 px-lg-10">
-                    <input type="hidden" name="id" id="h_id" />
+                    <input type="hidden" name="id" id="g_id" />
                     <div class="row g-4">
                         <div class="col-md-12">
-                            <label class="required fw-semibold fs-7 mb-1">Nama Hotel</label>
-                            <input type="text" name="nama" id="h_nama" class="form-control form-control-solid" placeholder="Nama hotel" />
+                            <label class="required fw-semibold fs-7 mb-1">Nama Gedung</label>
+                            <input type="text" name="nama" id="g_nama" class="form-control form-control-solid" placeholder="Nama gedung / venue" />
                             <div class="text-danger fs-8 mt-1" data-error="nama"></div>
                         </div>
                         <div class="col-md-12">
                             <label class="fw-semibold fs-7 mb-1">Alamat</label>
-                            <input type="text" name="alamat" id="h_alamat" class="form-control form-control-solid" placeholder="Alamat lengkap" />
+                            <input type="text" name="alamat" id="g_alamat" class="form-control form-control-solid" placeholder="Alamat lengkap" />
                             <div class="text-danger fs-8 mt-1" data-error="alamat"></div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="fw-semibold fs-7 mb-1">Ketersediaan Kamar</label>
-                            <input type="number" name="ketersediaan_kamar" id="h_ketersediaan_kamar" class="form-control form-control-solid" placeholder="cth: 79" min="0" />
-                            <div class="text-danger fs-8 mt-1" data-error="ketersediaan_kamar"></div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="fw-semibold fs-7 mb-1">Rating (0-5)</label>
-                            <input type="number" name="rating" id="h_rating" class="form-control form-control-solid" placeholder="cth: 4.4" step="0.1" min="0" max="5" />
-                            <div class="text-danger fs-8 mt-1" data-error="rating"></div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="fw-semibold fs-7 mb-1">Urutan</label>
-                            <input type="number" name="urut" id="h_urut" class="form-control form-control-solid" placeholder="0" min="0" />
-                            <div class="text-danger fs-8 mt-1" data-error="urut"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="fw-semibold fs-7 mb-1">Kontak WhatsApp</label>
-                            <input type="text" name="contact_wa" id="h_contact_wa" class="form-control form-control-solid" placeholder="cth: 0812xxxxxxx" />
-                            <div class="text-danger fs-8 mt-1" data-error="contact_wa"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="fw-semibold fs-7 mb-1">Email</label>
-                            <input type="text" name="contact_email" id="h_contact_email" class="form-control form-control-solid" placeholder="email@hotel.com" />
-                            <div class="text-danger fs-8 mt-1" data-error="contact_email"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="fw-semibold fs-7 mb-1">Latitude</label>
-                            <input type="text" name="lat" id="h_lat" class="form-control form-control-solid" placeholder="cth: 3.599515" />
+                            <input type="number" step="any" name="lat" id="g_lat" class="form-control form-control-solid" placeholder="cth: 3.599515" />
                             <div class="text-danger fs-8 mt-1" data-error="lat"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="fw-semibold fs-7 mb-1">Longitude</label>
-                            <input type="text" name="lng" id="h_lng" class="form-control form-control-solid" placeholder="cth: 98.833088" />
+                            <input type="number" step="any" name="lng" id="g_lng" class="form-control form-control-solid" placeholder="cth: 98.833088" />
                             <div class="text-danger fs-8 mt-1" data-error="lng"></div>
                         </div>
                         <div class="col-md-12">
                             <label class="fw-semibold fs-7 mb-1">Link Google Maps <span class="text-muted">(opsional)</span></label>
-                            <input type="text" name="maps_url" id="h_maps_url" class="form-control form-control-solid" placeholder="https://maps.google.com/?q=..." />
+                            <input type="url" name="maps_url" id="g_maps_url" class="form-control form-control-solid" placeholder="https://maps.google.com/?q=..." />
                             <div class="text-danger fs-8 mt-1" data-error="maps_url"></div>
                         </div>
                         <div class="col-md-12">
-                            <label class="fw-semibold fs-7 mb-1">Foto Hotel <span class="text-muted">(opsional, maks 3MB — jpg/png/webp)</span></label>
-                            <input type="file" name="image_file" id="h_image_file" accept="image/*" class="form-control form-control-solid" />
+                            <label class="fw-semibold fs-7 mb-1">Foto Gedung <span class="text-muted">(opsional, maks 3MB — jpg/png/webp)</span></label>
+                            <input type="file" name="image_file" id="g_image_file" accept="image/*" class="form-control form-control-solid" />
                             <div class="text-danger fs-8 mt-1" data-error="image_file"></div>
-                            <div id="h_image_preview" class="mt-2"></div>
+                            <div id="g_image_preview" class="mt-2"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="fw-semibold fs-7 mb-1">Urutan</label>
+                            <input type="number" name="urut" id="g_urut" class="form-control form-control-solid" placeholder="0" min="0" />
+                            <div class="text-danger fs-8 mt-1" data-error="urut"></div>
                         </div>
                         <div class="col-md-12">
                             <label class="form-check form-switch form-check-custom form-check-solid">
-                                <input class="form-check-input" type="checkbox" name="is_lokasi_acara" id="h_is_lokasi_acara" value="1" />
+                                <input class="form-check-input" type="checkbox" name="is_lokasi_acara" id="g_is_lokasi_acara" value="1" />
                                 <span class="form-check-label fw-semibold">Tandai sebagai <b>Lokasi Acara</b> (ikut tampil di tab Lokasi Acara pada peta)</span>
                             </label>
                         </div>
                         <div class="col-md-12">
                             <label class="form-check form-switch form-check-custom form-check-solid">
-                                <input class="form-check-input" type="checkbox" name="is_active" id="h_is_active" value="1" checked />
+                                <input class="form-check-input" type="checkbox" name="is_active" id="g_is_active" value="1" checked />
                                 <span class="form-check-label fw-semibold">Aktif (tampil di halaman publik)</span>
                             </label>
                         </div>
@@ -146,7 +125,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary" id="hotelSubmitBtn" data-kt-indicator="off">
+                    <button type="submit" class="btn btn-primary" id="gedungSubmitBtn" data-kt-indicator="off">
                         <span class="indicator-label">Simpan</span>
                         <span class="indicator-progress">Menyimpan... <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
                     </button>
@@ -157,14 +136,14 @@
 </div>
 
 {{-- ===== Modal Detail ===== --}}
-<div class="modal fade" id="hotelViewModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="gedungViewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered mw-650px">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="fw-bold">Detail Hotel</h2>
+                <h2 class="fw-bold">Detail Gedung</h2>
                 <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal"><i class="ki-outline ki-cross fs-1"></i></div>
             </div>
-            <div class="modal-body py-6 px-lg-10" id="hotelViewBody"></div>
+            <div class="modal-body py-6 px-lg-10" id="gedungViewBody"></div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tutup</button>
             </div>
@@ -178,14 +157,14 @@
     $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
 
     const URLS = {
-        data:  "{{ route('hotels.data') }}",
-        store: "{{ route('hotels.store') }}",
-        base:  "{{ url('admin/hotels') }}",
+        data:  "{{ route('gedung.data') }}",
+        store: "{{ route('gedung.store') }}",
+        base:  "{{ url('admin/gedung') }}",
     };
-    const FIELDS = ['nama','alamat','ketersediaan_kamar','rating','urut','contact_wa','contact_email','lat','lng','maps_url'];
+    const FIELDS = ['nama','alamat','urut','lat','lng','maps_url'];
     let mode = 'create';
 
-    const table = $('#hotelTable').DataTable({
+    const table = $('#gedungTable').DataTable({
         dom: "<'row align-items-center'<'col-sm-6 d-flex align-items-center'l><'col-sm-6'>>" +
              "<'table-responsive'tr>" +
              "<'row align-items-center mt-3'<'col-sm-12 col-md-5 text-muted'i><'col-sm-12 col-md-7 d-flex justify-content-md-end'p>>",
@@ -197,10 +176,9 @@
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
             { data: 'nama', name: 'nama' },
             { data: 'alamat', name: 'alamat' },
-            { data: 'kamar', name: 'ketersediaan_kamar', className: 'text-nowrap' },
-            { data: 'rating_badge', name: 'rating', className: 'text-center' },
-            { data: 'kontak', name: 'contact_wa' },
-            { data: 'status', name: 'is_active', className: 'text-center' },
+            { data: 'koordinat', name: 'lat', orderable: false, searchable: false },
+            { data: 'lokasi_acara', name: 'is_lokasi_acara', orderable: false, searchable: false },
+            { data: 'status', name: 'is_active', orderable: false, searchable: false, className: 'text-center' },
             { data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-end' },
         ],
         language: {
@@ -211,60 +189,58 @@
         }
     });
 
-    $('#hotelSearch').on('keyup', function () { table.search(this.value).draw(); });
+    $('#gedungSearch').on('keyup', function () { table.search(this.value).draw(); });
 
     function clearErrors() {
-        document.querySelectorAll('#hotelForm [data-error]').forEach(el => el.textContent = '');
+        document.querySelectorAll('#gedungForm [data-error]').forEach(el => el.textContent = '');
     }
     function setLoading(on) {
-        document.getElementById('hotelSubmitBtn').setAttribute('data-kt-indicator', on ? 'on' : 'off');
-        document.getElementById('hotelSubmitBtn').disabled = on;
+        document.getElementById('gedungSubmitBtn').setAttribute('data-kt-indicator', on ? 'on' : 'off');
+        document.getElementById('gedungSubmitBtn').disabled = on;
     }
-    const formModal = () => bootstrap.Modal.getOrCreateInstance(document.getElementById('hotelFormModal'));
-    const viewModal = () => bootstrap.Modal.getOrCreateInstance(document.getElementById('hotelViewModal'));
+    const formModal = () => bootstrap.Modal.getOrCreateInstance(document.getElementById('gedungFormModal'));
+    const viewModal = () => bootstrap.Modal.getOrCreateInstance(document.getElementById('gedungViewModal'));
 
     // Tambah
-    $('#btnAddHotel').on('click', function () {
+    $('#btnAddGedung').on('click', function () {
         mode = 'create';
-        document.getElementById('hotelForm').reset();
-        document.getElementById('h_id').value = '';
-        document.getElementById('h_is_active').checked = true;
-        document.getElementById('h_is_lokasi_acara').checked = false;
-        document.getElementById('h_image_preview').innerHTML = '';
+        document.getElementById('gedungForm').reset();
+        document.getElementById('g_id').value = '';
+        document.getElementById('g_is_active').checked = true;
+        document.getElementById('g_is_lokasi_acara').checked = false;
+        document.getElementById('g_image_preview').innerHTML = '';
         clearErrors();
-        document.getElementById('hotelFormTitle').textContent = 'Tambah Hotel';
+        document.getElementById('gedungFormTitle').textContent = 'Tambah Gedung';
         formModal().show();
     });
 
     // Edit
-    $('#hotelTable').on('click', '.btn-edit', function () {
+    $('#gedungTable').on('click', '.btn-edit', function () {
         const id = $(this).data('id');
         $.get(URLS.base + '/' + id + '/edit', function (res) {
             const d = res.data;
             mode = 'edit';
             clearErrors();
-            document.getElementById('h_id').value = d.id;
-            FIELDS.forEach(f => { document.getElementById('h_' + f).value = (d[f] ?? ''); });
-            document.getElementById('h_is_active').checked = !!d.is_active;
-            document.getElementById('h_is_lokasi_acara').checked = !!d.is_lokasi_acara;
-            document.getElementById('h_image_file').value = '';
-            document.getElementById('h_image_preview').innerHTML = d.image_url ? '<img src="' + d.image_url + '" class="rounded mt-1" style="height:90px" /> <div class="text-muted fs-8 mt-1">Biarkan kosong jika tidak ingin mengganti foto.</div>' : '<span class="text-muted fs-8">Belum ada foto.</span>';
-            document.getElementById('hotelFormTitle').textContent = 'Edit Hotel';
+            document.getElementById('g_id').value = d.id;
+            FIELDS.forEach(f => { document.getElementById('g_' + f).value = (d[f] ?? ''); });
+            document.getElementById('g_is_active').checked = !!d.is_active;
+            document.getElementById('g_is_lokasi_acara').checked = !!d.is_lokasi_acara;
+            document.getElementById('g_image_file').value = '';
+            document.getElementById('g_image_preview').innerHTML = d.image_url ? '<img src="' + d.image_url + '" class="rounded mt-1" style="height:90px" /> <div class="text-muted fs-8 mt-1">Biarkan kosong jika tidak ingin mengganti foto.</div>' : '<span class="text-muted fs-8">Belum ada foto.</span>';
+            document.getElementById('gedungFormTitle').textContent = 'Edit Gedung';
             formModal().show();
         }).fail(() => Swal.fire('Gagal', 'Tidak dapat memuat data.', 'error'));
     });
 
     // Detail
-    $('#hotelTable').on('click', '.btn-view', function () {
+    $('#gedungTable').on('click', '.btn-view', function () {
         const id = $(this).data('id');
         $.get(URLS.base + '/' + id, function (res) {
             const d = res.data;
             const row = (l, v) => '<div class="d-flex justify-content-between py-2 border-bottom border-gray-200"><span class="text-muted">' + l + '</span><span class="fw-bold text-end ms-4">' + (v ?? '-') + '</span></div>';
-            document.getElementById('hotelViewBody').innerHTML =
+            document.getElementById('gedungViewBody').innerHTML =
                 (d.image_url ? '<img src="' + d.image_url + '" class="rounded w-100 mb-4" style="height:170px;object-fit:cover" />' : '') +
                 row('Nama', d.nama) + row('Alamat', d.alamat) +
-                row('Ketersediaan Kamar', d.ketersediaan_kamar != null ? d.ketersediaan_kamar + ' kamar' : '-') +
-                row('Rating', d.rating ?? '-') + row('WhatsApp', d.contact_wa) + row('Email', d.contact_email) +
                 row('Koordinat', (d.lat && d.lng) ? (d.lat + ', ' + d.lng) : '-') +
                 row('Lokasi Acara', d.is_lokasi_acara ? 'Ya' : 'Tidak') +
                 row('Status', d.is_active ? 'Aktif' : 'Nonaktif') +
@@ -274,25 +250,25 @@
     });
 
     // Submit (create / update)
-    $('#hotelForm').on('submit', function (e) {
+    $('#gedungForm').on('submit', function (e) {
         e.preventDefault();
         clearErrors();
         setLoading(true);
 
         const form = this;
         const fd = new FormData(form);
-        fd.set('is_active', document.getElementById('h_is_active').checked ? '1' : '0');
-        fd.set('is_lokasi_acara', document.getElementById('h_is_lokasi_acara').checked ? '1' : '0');
+        fd.set('is_active', document.getElementById('g_is_active').checked ? '1' : '0');
+        fd.set('is_lokasi_acara', document.getElementById('g_is_lokasi_acara').checked ? '1' : '0');
 
         let url = URLS.store;
-        if (mode === 'edit') { url = URLS.base + '/' + document.getElementById('h_id').value; fd.append('_method', 'PUT'); }
+        if (mode === 'edit') { url = URLS.base + '/' + document.getElementById('g_id').value; fd.append('_method', 'PUT'); }
 
         $.ajax({
             url: url, method: 'POST', data: fd, processData: false, contentType: false,
             success: function (res) {
                 if (res.errors) {
                     Object.keys(res.errors).forEach(k => {
-                        const el = document.querySelector('#hotelForm [data-error="' + k + '"]');
+                        const el = document.querySelector('#gedungForm [data-error="' + k + '"]');
                         if (el) el.textContent = res.errors[k][0];
                     });
                     return;
@@ -310,11 +286,11 @@
     });
 
     // Hapus
-    $('#hotelTable').on('click', '.btn-delete', function () {
+    $('#gedungTable').on('click', '.btn-delete', function () {
         const id = $(this).data('id');
         const nama = $(this).data('nama');
         Swal.fire({
-            title: 'Hapus hotel ini?', html: 'Data <b>' + nama + '</b> akan dihapus permanen.',
+            title: 'Hapus gedung ini?', html: 'Data <b>' + nama + '</b> akan dihapus permanen.',
             icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, hapus', cancelButtonText: 'Batal',
             confirmButtonColor: '#d33'
         }).then((r) => {

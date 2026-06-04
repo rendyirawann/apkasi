@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Hotel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
 class HotelController extends Controller
@@ -76,7 +78,11 @@ class HotelController extends Controller
         }
 
         try {
-            Hotel::create($this->payload($request));
+            $hotel = Hotel::create($this->payload($request));
+            if ($request->hasFile('image_file')) {
+                $hotel->image = $request->file('image_file')->store('hotel', 'public');
+                $hotel->save();
+            }
             return response()->json(['success' => 'Data hotel berhasil ditambahkan.', 'judul' => 'Berhasil'], 201);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan di aplikasi.', 'judul' => 'Gagal', 'errorMessage' => $e->getMessage()], 500);
@@ -106,6 +112,11 @@ class HotelController extends Controller
 
         try {
             $hotel->update($this->payload($request));
+            if ($request->hasFile('image_file')) {
+                $this->deleteFile($hotel->image);
+                $hotel->image = $request->file('image_file')->store('hotel', 'public');
+                $hotel->save();
+            }
             return response()->json(['success' => 'Data hotel berhasil diperbarui.', 'judul' => 'Berhasil']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan di aplikasi.', 'judul' => 'Gagal', 'errorMessage' => $e->getMessage()], 500);
@@ -115,10 +126,19 @@ class HotelController extends Controller
     public function destroy($id)
     {
         try {
-            Hotel::findOrFail($id)->delete();
+            $hotel = Hotel::findOrFail($id);
+            $this->deleteFile($hotel->image);
+            $hotel->delete();
             return response()->json(['success' => 'Data hotel berhasil dihapus.', 'judul' => 'Berhasil']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Data gagal dihapus.', 'judul' => 'Gagal', 'errorMessage' => $e->getMessage()], 500);
+        }
+    }
+
+    private function deleteFile(?string $path): void
+    {
+        if ($path && ! Str::startsWith($path, ['http://', 'https://']) && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
         }
     }
 
@@ -134,7 +154,7 @@ class HotelController extends Controller
             'lat'                => 'nullable|numeric|between:-90,90',
             'lng'                => 'nullable|numeric|between:-180,180',
             'maps_url'           => 'nullable|url|max:255',
-            'image'              => 'nullable|url|max:255',
+            'image_file'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
             'urut'               => 'nullable|integer|min:0',
             'is_lokasi_acara'    => 'nullable|boolean',
         ];
@@ -150,7 +170,9 @@ class HotelController extends Controller
             'lat.numeric'         => 'Latitude harus berupa angka.',
             'lng.numeric'         => 'Longitude harus berupa angka.',
             'maps_url.url'        => 'Link Google Maps harus berupa URL valid.',
-            'image.url'           => 'Link gambar harus berupa URL valid.',
+            'image_file.image'    => 'File harus berupa gambar.',
+            'image_file.mimes'    => 'Format gambar: jpg, jpeg, png, webp.',
+            'image_file.max'      => 'Ukuran gambar maksimal 3 MB.',
             'ketersediaan_kamar.integer' => 'Ketersediaan kamar harus berupa angka bulat.',
         ];
     }
@@ -167,7 +189,6 @@ class HotelController extends Controller
             'lat'                => $request->lat !== null && $request->lat !== '' ? (float) $request->lat : null,
             'lng'                => $request->lng !== null && $request->lng !== '' ? (float) $request->lng : null,
             'maps_url'           => $request->maps_url,
-            'image'              => $request->image,
             'urut'               => (int) ($request->urut ?? 0),
             'is_lokasi_acara'    => $request->boolean('is_lokasi_acara'),
             'is_active'          => $request->boolean('is_active'),

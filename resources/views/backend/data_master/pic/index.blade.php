@@ -30,6 +30,10 @@
                     <span class="fs-5 fw-bold">Daftar PIC Kegiatan APKASI per Provinsi</span>
                 </div>
                 <div class="card-toolbar">
+                    <div class="position-relative my-1 me-3">
+                        <i class="ki-outline ki-magnifier fs-3 position-absolute top-50 translate-middle-y ms-4"></i>
+                        <input type="text" id="picSearch" class="form-control form-control-solid form-control-sm w-200px w-md-250px ps-11" placeholder="Cari PIC / provinsi..." autocomplete="off" />
+                    </div>
                     @can('pic.create')
                     <button type="button" class="btn btn-primary btn-sm" id="btnAddPic">
                         <i class="ki-outline ki-plus fs-3"></i> Tambah PIC
@@ -142,6 +146,9 @@
     let mode = 'create';
 
     const table = $('#picTable').DataTable({
+        dom: "<'row align-items-center'<'col-sm-6 d-flex align-items-center'l><'col-sm-6'>>" +
+             "<'table-responsive'tr>" +
+             "<'row align-items-center mt-3'<'col-sm-12 col-md-5 text-muted'i><'col-sm-12 col-md-7 d-flex justify-content-md-end'p>>",
         processing: true,
         serverSide: true,
         order: [],
@@ -161,6 +168,8 @@
             paginate: { first: '«', previous: '‹', next: '›', last: '»' }
         }
     });
+
+    $('#picSearch').on('keyup', function () { table.search(this.value).draw(); });
 
     function clearErrors() { document.querySelectorAll('#picForm [data-error]').forEach(el => el.textContent = ''); }
     function setLoading(on) {

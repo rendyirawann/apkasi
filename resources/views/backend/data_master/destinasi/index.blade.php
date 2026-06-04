@@ -28,6 +28,10 @@
             <div class="card-header align-items-center py-5 gap-2 gap-md-5">
                 <div class="card-title"><span class="fs-5 fw-bold">Daftar Destinasi Wisata Deli Serdang</span></div>
                 <div class="card-toolbar">
+                    <div class="position-relative my-1 me-3">
+                        <i class="ki-outline ki-magnifier fs-3 position-absolute top-50 translate-middle-y ms-4"></i>
+                        <input type="text" id="destinasiSearch" class="form-control form-control-solid form-control-sm w-200px w-md-250px ps-11" placeholder="Cari destinasi..." autocomplete="off" />
+                    </div>
                     @can('destinasi.create')
                     <button type="button" class="btn btn-primary btn-sm" id="btnAddDest"><i class="ki-outline ki-plus fs-3"></i> Tambah Destinasi</button>
                     @endcan
@@ -75,17 +79,14 @@
                         <div class="col-md-4">
                             <label class="fw-semibold fs-7 mb-1">Harga Tiket</label>
                             <input type="text" name="harga_tiket" id="d_harga_tiket" class="form-control form-control-solid" placeholder="cth: Rp10.000 / Gratis" />
-                            <div class="text-danger fs-8 mt-1" data-error="harga_tiket"></div>
                         </div>
                         <div class="col-md-12">
                             <label class="fw-semibold fs-7 mb-1">Alamat</label>
                             <input type="text" name="alamat" id="d_alamat" class="form-control form-control-solid" placeholder="Alamat lengkap" />
-                            <div class="text-danger fs-8 mt-1" data-error="alamat"></div>
                         </div>
                         <div class="col-md-12">
                             <label class="fw-semibold fs-7 mb-1">Deskripsi</label>
                             <textarea name="deskripsi" id="d_deskripsi" rows="2" class="form-control form-control-solid" placeholder="Deskripsi singkat"></textarea>
-                            <div class="text-danger fs-8 mt-1" data-error="deskripsi"></div>
                         </div>
                         <div class="col-md-4">
                             <label class="fw-semibold fs-7 mb-1">Rating (0-5)</label>
@@ -95,17 +96,16 @@
                         <div class="col-md-4">
                             <label class="fw-semibold fs-7 mb-1">Latitude</label>
                             <input type="text" name="lat" id="d_lat" class="form-control form-control-solid" placeholder="cth: 3.229593" />
-                            <div class="text-danger fs-8 mt-1" data-error="lat"></div>
                         </div>
                         <div class="col-md-4">
                             <label class="fw-semibold fs-7 mb-1">Longitude</label>
                             <input type="text" name="lng" id="d_lng" class="form-control form-control-solid" placeholder="cth: 98.723565" />
-                            <div class="text-danger fs-8 mt-1" data-error="lng"></div>
                         </div>
                         <div class="col-md-8">
-                            <label class="fw-semibold fs-7 mb-1">Gambar Thumbnail (URL)</label>
-                            <input type="text" name="thumbnail" id="d_thumbnail" class="form-control form-control-solid" placeholder="https://..." />
-                            <div class="text-danger fs-8 mt-1" data-error="thumbnail"></div>
+                            <label class="fw-semibold fs-7 mb-1">Gambar Thumbnail <span class="text-muted">(maks 3MB)</span></label>
+                            <input type="file" name="thumbnail_file" id="d_thumbnail_file" accept="image/*" class="form-control form-control-solid" />
+                            <div class="text-danger fs-8 mt-1" data-error="thumbnail_file"></div>
+                            <div id="d_thumb_preview" class="mt-2"></div>
                         </div>
                         <div class="col-md-4">
                             <label class="fw-semibold fs-7 mb-1">Urutan</label>
@@ -117,14 +117,13 @@
                             <div class="text-danger fs-8 mt-1" data-error="maps_url"></div>
                         </div>
 
-                        {{-- Galeri (child) --}}
+                        {{-- Galeri (child, upload file) --}}
                         <div class="col-md-12">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label class="fw-semibold fs-7 mb-0">Galeri Gambar Lain (URL)</label>
-                                <button type="button" class="btn btn-sm btn-light-primary py-1 px-3" id="btnAddGallery"><i class="ki-outline ki-plus fs-5"></i> Tambah Gambar</button>
-                            </div>
-                            <div id="d_gallery" class="d-flex flex-column gap-2"></div>
-                            <div class="text-danger fs-8 mt-1" data-error="gambar.0"></div>
+                            <label class="fw-semibold fs-7 mb-1">Galeri Gambar Lain <span class="text-muted">(bisa pilih beberapa file, maks 3MB/gambar)</span></label>
+                            <div id="d_gallery_existing" class="d-flex flex-wrap gap-2 mb-2"></div>
+                            <input type="file" name="gambar_files[]" id="d_gambar_files" accept="image/*" multiple class="form-control form-control-solid" />
+                            <div class="text-danger fs-8 mt-1" data-error="gambar_files.0"></div>
+                            <div id="d_hapus_gambar" class="d-none"></div>
                         </div>
 
                         <div class="col-md-12">
@@ -172,10 +171,13 @@
 <script>
     $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
     const URLS = { data: "{{ route('destinasi.data') }}", store: "{{ route('destinasi.store') }}", base: "{{ url('admin/destinasi') }}" };
-    const FIELDS = ['nama', 'harga_tiket', 'alamat', 'deskripsi', 'rating', 'lat', 'lng', 'thumbnail', 'urut', 'maps_url'];
+    const FIELDS = ['nama', 'harga_tiket', 'alamat', 'deskripsi', 'rating', 'lat', 'lng', 'urut', 'maps_url'];
     let mode = 'create';
 
     const table = $('#destTable').DataTable({
+        dom: "<'row align-items-center'<'col-sm-6 d-flex align-items-center'l><'col-sm-6'>>" +
+             "<'table-responsive'tr>" +
+             "<'row align-items-center mt-3'<'col-sm-12 col-md-5 text-muted'i><'col-sm-12 col-md-7 d-flex justify-content-md-end'p>>",
         processing: true, serverSide: true, order: [], ajax: { url: URLS.data },
         columns: [
             { data: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
@@ -191,27 +193,35 @@
         language: { search: 'Cari:', searchPlaceholder: 'nama / alamat', lengthMenu: 'Tampilkan _MENU_', info: 'Menampilkan _START_–_END_ dari _TOTAL_', infoEmpty: 'Tidak ada data', zeroRecords: 'Data tidak ditemukan', paginate: { previous: '‹', next: '›' } }
     });
 
+    $('#destinasiSearch').on('keyup', function () { table.search(this.value).draw(); });
+
     const formModal = () => bootstrap.Modal.getOrCreateInstance(document.getElementById('destFormModal'));
     const viewModal = () => bootstrap.Modal.getOrCreateInstance(document.getElementById('destViewModal'));
     function clearErrors() { document.querySelectorAll('#destForm [data-error]').forEach(el => el.textContent = ''); }
     function setLoading(on) { document.getElementById('destSubmitBtn').setAttribute('data-kt-indicator', on ? 'on' : 'off'); document.getElementById('destSubmitBtn').disabled = on; }
 
-    // Galeri dinamis
-    function galleryRow(val) {
-        const wrap = document.createElement('div');
-        wrap.className = 'input-group input-group-sm';
-        wrap.innerHTML = '<input type="text" name="gambar[]" class="form-control form-control-solid" placeholder="https://... (URL gambar)" value="' + (val ? val.replace(/"/g, '&quot;') : '') + '" />' +
-            '<button type="button" class="btn btn-light-danger btn-rm-gallery"><i class="ki-outline ki-trash fs-6"></i></button>';
-        return wrap;
+    function resetMedia() {
+        document.getElementById('d_thumbnail_file').value = '';
+        document.getElementById('d_thumb_preview').innerHTML = '';
+        document.getElementById('d_gambar_files').value = '';
+        document.getElementById('d_gallery_existing').innerHTML = '';
+        document.getElementById('d_hapus_gambar').innerHTML = '';
     }
-    function resetGallery(items) {
-        const c = document.getElementById('d_gallery'); c.innerHTML = '';
-        if (items && items.length) items.forEach(v => c.appendChild(galleryRow(v)));
-        else c.appendChild(galleryRow(''));
+    function renderExistingGallery(items) {
+        const c = document.getElementById('d_gallery_existing'); c.innerHTML = '';
+        (items || []).forEach(function (it) {
+            const div = document.createElement('div');
+            div.className = 'position-relative';
+            div.innerHTML = '<img src="' + it.url + '" class="rounded" style="width:84px;height:64px;object-fit:cover" />' +
+                '<button type="button" class="btn btn-icon btn-danger position-absolute top-0 end-0 rounded-circle btn-rm-existing" data-id="' + it.id + '" style="transform:translate(35%,-35%);width:22px;height:22px"><i class="ki-outline ki-cross fs-7"></i></button>';
+            c.appendChild(div);
+        });
     }
-    document.getElementById('btnAddGallery').addEventListener('click', () => document.getElementById('d_gallery').appendChild(galleryRow('')));
-    document.getElementById('d_gallery').addEventListener('click', function (e) {
-        const b = e.target.closest('.btn-rm-gallery'); if (b) b.closest('.input-group').remove();
+    document.getElementById('d_gallery_existing').addEventListener('click', function (e) {
+        const b = e.target.closest('.btn-rm-existing'); if (!b) return;
+        const h = document.createElement('input'); h.type = 'hidden'; h.name = 'hapus_gambar[]'; h.value = b.dataset.id;
+        document.getElementById('d_hapus_gambar').appendChild(h);
+        b.closest('.position-relative').remove();
     });
 
     $('#btnAddDest').on('click', function () {
@@ -220,7 +230,7 @@
         document.getElementById('d_id').value = '';
         document.getElementById('d_is_active').checked = true;
         document.getElementById('d_is_lokasi_acara').checked = false;
-        resetGallery([]);
+        resetMedia();
         clearErrors();
         document.getElementById('destFormTitle').textContent = 'Tambah Destinasi';
         formModal().show();
@@ -229,12 +239,13 @@
     $('#destTable').on('click', '.btn-edit', function () {
         const id = $(this).data('id');
         $.get(URLS.base + '/' + id + '/edit', function (res) {
-            const d = res.data; mode = 'edit'; clearErrors();
+            const d = res.data; mode = 'edit'; clearErrors(); resetMedia();
             document.getElementById('d_id').value = d.id;
             FIELDS.forEach(f => { document.getElementById('d_' + f).value = (d[f] ?? ''); });
             document.getElementById('d_is_active').checked = !!d.is_active;
             document.getElementById('d_is_lokasi_acara').checked = !!d.is_lokasi_acara;
-            resetGallery(res.gambar || []);
+            document.getElementById('d_thumb_preview').innerHTML = d.thumbnail_url ? '<img src="' + d.thumbnail_url + '" class="rounded" style="height:80px" /> <div class="text-muted fs-8 mt-1">Biarkan kosong jika tidak ingin mengganti.</div>' : '<span class="text-muted fs-8">Belum ada thumbnail.</span>';
+            renderExistingGallery(res.gambar || []);
             document.getElementById('destFormTitle').textContent = 'Edit Destinasi';
             formModal().show();
         }).fail(() => Swal.fire('Gagal', 'Tidak dapat memuat data.', 'error'));
@@ -245,9 +256,9 @@
         $.get(URLS.base + '/' + id, function (res) {
             const d = res.data;
             const row = (l, v) => '<div class="d-flex justify-content-between py-2 border-bottom border-gray-200"><span class="text-muted">' + l + '</span><span class="fw-bold text-end ms-4">' + (v ?? '-') + '</span></div>';
-            let gal = (res.gambar || []).map(g => '<img src="' + g + '" class="rounded" style="width:80px;height:60px;object-fit:cover" />').join('');
+            let gal = (res.gambar || []).map(g => '<img src="' + g.url + '" class="rounded" style="width:84px;height:64px;object-fit:cover" />').join('');
             document.getElementById('destViewBody').innerHTML =
-                (d.thumbnail ? '<img src="' + d.thumbnail + '" class="rounded w-100 mb-4" style="height:180px;object-fit:cover" />' : '') +
+                (d.thumbnail_url ? '<img src="' + d.thumbnail_url + '" class="rounded w-100 mb-4" style="height:180px;object-fit:cover" />' : '') +
                 row('Nama', d.nama) + row('Alamat', d.alamat) + row('Deskripsi', d.deskripsi) +
                 row('Rating', d.rating ?? '-') + row('Harga Tiket', d.harga_tiket) +
                 row('Koordinat', (d.lat && d.lng) ? (d.lat + ', ' + d.lng) : '-') +

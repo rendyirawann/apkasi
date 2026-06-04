@@ -3,27 +3,17 @@
 @section('title', 'HUT Ke-26 APKASI & Deli Serdang Ke-80 — 1-3 Juli 2026')
 
 @php
-    $agenda = [
-        ['day' => 'Hari 1', 'date' => 'Rabu, 1 Juli 2026', 'icon' => 'star', 'events' => [
-            ['time' => '19.00 – 22.00', 'title' => 'Welcome Dinner & Syukuran HUT APKASI', 'place' => 'Graha Bhineka', 'desc' => 'Pemotongan tumpeng, santunan anak yatim, gala dinner, dan tarian selamat datang.'],
-        ]],
-        ['day' => 'Hari 2', 'date' => 'Kamis, 2 Juli 2026', 'icon' => 'users', 'events' => [
-            ['time' => '09.00 – 12.00', 'title' => 'Dialog Strategi Pembiayaan Alternatif Pembangunan Daerah', 'place' => 'IKM Hall', 'desc' => 'Narasumber dari Pemkab Sintang, Sumedang, akademisi, dan BUMN sektor pembiayaan.'],
-            ['time' => '09.00 – 13.00', 'title' => 'Women Program — UMKM & Stunting', 'place' => 'IKM Hall', 'desc' => 'Talkshow penguatan peran perempuan dalam pengembangan UMKM dan penurunan stunting.'],
-            ['time' => '13.00 – 15.00', 'title' => 'Forum Bisnis Daerah (FORBISDA)', 'place' => 'IKM Hall', 'desc' => 'Bersama KADIN, perwakilan Pemkab, pengusaha lokal, Gubernur DKI Jakarta, dan IBA.'],
-            ['time' => '18.30 – 22.00', 'title' => 'Malam Grand Final Putri Otonomi Indonesia 2026', 'place' => 'Graha Bhineka', 'desc' => 'Puncak penobatan duta otonomi daerah dari seluruh kabupaten di Indonesia.'],
-        ]],
-        ['day' => 'Hari 3', 'date' => "Jum'at, 3 Juli 2026", 'icon' => 'tree-pine', 'events' => [
-            ['time' => '06.00 – 10.30', 'title' => 'Fun Walk & Penanaman Pohon', 'place' => 'Alun-Alun Deli Serdang', 'desc' => 'Jalan santai bersama, penanaman pohon, pembagian doorprize, dan hiburan rakyat.'],
-        ]],
-    ];
-
-    $faqs = [
-        ['q' => 'Apa saja dresscode untuk Kepala Daerah selama acara?', 'a' => 'Welcome Dinner: Batik khas Deli Serdang. Dialog & FORBISDA: Kemeja Putih APKASI. Malam Final POI: Batik Resmi APKASI. Fun Walk: Kaos, topi, dan gelang peserta dari APKASI.'],
-        ['q' => 'Di mana dan kapan stempel SPPD / Surat Tugas bisa diproses?', 'a' => 'Di Meja Registrasi Delegasi pada IKM Hall (2 Juli, 08.00–15.00 WIB) dan Graha Bhineka (1 Juli, 18.00–20.00 WIB). Pastikan membawa dokumen cetak Surat Tugas.'],
-        ['q' => 'Bagaimana shuttle bus untuk delegasi daerah?', 'a' => 'Panitia menyediakan bus shuttle dari hotel rekomendasi menuju venue acara (PP). Bagi yang menghendaki mobil privat, tersedia info rental di halaman Panduan Delegasi.'],
-        ['q' => 'Bagaimana cara mendapatkan kaos Fun Walk?', 'a' => 'Kaos, topi, dan gelang peserta (dengan nomor doorprize) disiapkan oleh APKASI dan dibagikan di loket pendaftaran Fun Walk, Alun-Alun Deli Serdang, pukul 06.00 WIB.'],
-    ];
+    // $agenda dikirim dari HomeController@index (dari tabel rundown).
+    $dayIcons = ['star', 'users', 'tree-pine', 'calendar'];
+    // Logo bergantian utk ikon header tiap hari di section Agenda.
+    $dayImages = ['assets/apkasi/logo-ds.png', 'assets/apkasi/z_04_LOGO-LOGO APKASI/01_APKASI_Official Logo alt.png'];
+    // Helper baca konten landing dari settings ($appSettings di-share global)
+    $g = fn($k, $d = '') => ($appSettings[$k] ?? $d);
+    // Helper URL gambar: link http(s) dipakai apa adanya, selainnya lewat asset()
+    $img = function ($k, $d = '') use ($g) {
+        $v = $g($k, $d);
+        return \Illuminate\Support\Str::startsWith($v, ['http://', 'https://']) ? $v : asset($v);
+    };
 @endphp
 
 @section('content')
@@ -35,9 +25,9 @@
     <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-3 sm:py-4">
         <div id="nav-inner" class="mx-auto flex items-center justify-between transition-all duration-500 max-w-[1400px] mx-4 sm:mx-6 lg:mx-auto px-4 sm:px-6 bg-white/70 backdrop-blur-md rounded-full shadow-sm border border-white/60 py-2">
             <a href="{{ route('home') }}" class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-                <img src="{{ asset('logos/logo-ds.png') }}" alt="Deli Serdang" class="h-8 sm:h-9 w-auto object-contain" />
-                <img src="{{ asset('logos/apkasi-alt2.png') }}" alt="APKASI" class="h-7 sm:h-8 w-auto object-contain" />
-                <img src="{{ asset('logos/aoe2026.png') }}" alt="AOE 2026" class="hidden sm:block h-7 sm:h-8 w-auto object-contain" />
+                @foreach ($navbarLogos as $logo)
+                    <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="h-8 sm:h-9 w-auto object-contain" />
+                @endforeach
             </a>
 
             <div class="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
@@ -51,7 +41,7 @@
                 <a href="{{ route('peta-hotel') }}" class="hidden md:inline-flex items-center gap-1.5 text-sm font-medium text-apkasi-body hover:text-apkasi-dark transition-colors">
                     <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Peta & Hotel
                 </a>
-                <a href="{{ url('/admin/login') }}" class="hidden sm:inline-flex items-center gap-1.5 bg-apkasi-dark hover:bg-apkasi-hover text-white text-sm font-semibold px-5 py-2 rounded-full transition-colors">
+                <a href="https://portal.deliserdangkab.go.id/" target="_blank" rel="noopener" class="hidden sm:inline-flex items-center gap-1.5 bg-apkasi-dark hover:bg-apkasi-hover text-white text-sm font-semibold px-5 py-2 rounded-full transition-colors">
                     <i data-lucide="globe" class="w-3.5 h-3.5"></i> Portal DS
                 </a>
                 <button id="menu-btn" class="lg:hidden relative flex items-center justify-center w-9 h-9 rounded-full bg-apkasi-dark/5 hover:bg-apkasi-dark/10 text-apkasi-dark transition-all duration-300" aria-label="Menu">
@@ -119,29 +109,32 @@
         <div class="absolute inset-0 bg-gradient-to-b from-apkasi-dark/40 via-apkasi-dark/15 to-apkasi-dark/70 pointer-events-none"></div>
 
         <div class="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-5 sm:px-8 pt-28 sm:pt-32 pb-32 sm:pb-36">
+            @if ($heroLogos->count())
             <div class="flex items-center justify-center gap-6 sm:gap-10 md:gap-14 mb-8 sm:mb-10">
-                <img src="{{ asset('logos/hut-apkasi.png') }}" alt="HUT APKASI Ke-26" class="h-28 sm:h-32 md:h-40 lg:h-48 w-auto object-contain drop-shadow-xl" />
-                <img src="{{ asset('logos/hutds80.png') }}" alt="HUT Deli Serdang Ke-80" class="h-28 sm:h-32 md:h-40 lg:h-48 w-auto object-contain drop-shadow-xl" />
+                @foreach ($heroLogos as $logo)
+                    <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="h-28 sm:h-32 md:h-40 lg:h-48 w-auto object-contain drop-shadow-xl" />
+                @endforeach
             </div>
+            @endif
 
             <div class="max-w-5xl">
                 <h1 class="font-display font-bold text-white text-[1.65rem] sm:text-3xl md:text-[2.75rem] lg:text-[3.5rem] xl:text-[4rem] tracking-tight">
-                    Bersinergi Membangun Daerah
+                    {{ $g('lp_hero_headline', 'Bersinergi Membangun Daerah') }}
                 </h1>
                 <p class="font-display font-bold text-apkasi-accent text-[1.65rem] sm:text-3xl md:text-[2.75rem] lg:text-[3.5rem] xl:text-[4rem] tracking-tight mt-2 sm:mt-4 md:mt-5">
-                    Memperkuat Otonomi Indonesia
+                    {{ $g('lp_hero_accent', 'Memperkuat Otonomi Indonesia') }}
                 </p>
             </div>
 
             <p class="mt-4 sm:mt-6 text-white/75 text-sm sm:text-base md:text-lg leading-relaxed max-w-lg font-normal">
-                HUT Ke-26 APKASI & HUT Ke-80 Kabupaten Deli Serdang
+                {{ $g('lp_hero_subtitle', 'HUT Ke-26 APKASI & HUT Ke-80 Kabupaten Deli Serdang') }}
                 <br class="hidden sm:block" />
-                1 – 3 Juli 2026
+                {{ $eventRangeText }}
             </p>
 
             <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mt-5 sm:mt-6">
                 <i data-lucide="map-pin" class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-apkasi-goldlt"></i>
-                <span class="text-white/90 text-[11px] sm:text-xs font-medium tracking-wide">Kabupaten Deli Serdang, Sumatera Utara</span>
+                <span class="text-white/90 text-[11px] sm:text-xs font-medium tracking-wide">{{ $g('lp_hero_location', 'Kabupaten Deli Serdang, Sumatera Utara') }}</span>
             </div>
 
             {{-- Countdown --}}
@@ -171,17 +164,17 @@
             <div class="max-w-xs hidden sm:block">
                 <div class="flex items-center gap-2 text-white/85 mb-2">
                     <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                    <span class="text-xs font-semibold tracking-wide">Portal Resmi HUT APKASI 2026</span>
+                    <span class="text-xs font-semibold tracking-wide">{{ $g('lp_hero_tagline_title', 'Portal Resmi HUT APKASI 2026') }}</span>
                 </div>
                 <p class="text-white/60 text-[11px] leading-relaxed">
-                    Informasi agenda, panduan delegasi, akomodasi, dan peta lokasi selama rangkaian kegiatan di Deli Serdang.
+                    {{ $g('lp_hero_tagline_desc', 'Informasi agenda, panduan delegasi, akomodasi, dan peta lokasi selama rangkaian kegiatan di Deli Serdang.') }}
                 </p>
             </div>
             <div class="flex items-center gap-2 text-white/70 text-xs ml-auto">
                 <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
-                <span class="font-medium">1–3 Juli 2026</span>
+                <span class="font-medium">{{ $eventRangeText }}</span>
                 <span class="text-white/40">·</span>
-                <span class="text-white/50">Deli Serdang</span>
+                <span class="text-white/50">{{ $g('lp_hero_footer_place', 'Deli Serdang') }}</span>
             </div>
         </div>
 
@@ -191,11 +184,11 @@
     {{-- ═══════════ LOGO PARTNERS ═══════════ --}}
     <div class="py-8 sm:py-10 bg-white border-b border-apkasi-leaf">
         <div class="max-w-[1400px] mx-auto px-5 sm:px-8">
-            <p class="text-[10px] sm:text-xs text-apkasi-body/60 font-semibold uppercase tracking-[0.15em] text-center mb-6">Kolaborasi Penyelenggara</p>
+            <p class="text-[10px] sm:text-xs text-apkasi-body/60 font-semibold uppercase tracking-[0.15em] text-center mb-6">{{ $g('lp_partners_title', 'Kolaborasi Penyelenggara') }}</p>
             <div class="flex items-center justify-center gap-6 sm:gap-10 md:gap-14 flex-wrap">
-                @foreach ([['apkasi-full.png','APKASI','h-12 sm:h-14'],['hut-apkasi.png','HUT APKASI 2026','h-10 sm:h-12'],['aoe2026.png','AOE 2026','h-12 sm:h-14'],['logo-ds.png','Kab. Deli Serdang','h-12 sm:h-14']] as $lg)
+                @foreach ($partnerLogos as $logo)
                     <div class="flex items-center justify-center px-2 py-1 opacity-80 hover:opacity-100 transition-opacity duration-300 grayscale hover:grayscale-0">
-                        <img src="{{ asset('logos/'.$lg[0]) }}" alt="{{ $lg[1] }}" class="{{ $lg[2] }} w-auto object-contain" />
+                        <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="h-12 sm:h-14 w-auto object-contain" />
                     </div>
                 @endforeach
             </div>
@@ -206,21 +199,21 @@
     <section id="pimpinan" class="py-16 sm:py-20 md:py-28 bg-gradient-to-b from-white to-apkasi-cream">
         <div data-reveal class="max-w-[1400px] mx-auto px-5 sm:px-8 transition-all duration-700 opacity-0 translate-y-8">
             <div class="text-center mb-10 sm:mb-14">
-                <span class="inline-flex items-center gap-1.5 bg-apkasi-heading/8 text-apkasi-heading text-xs sm:text-sm font-semibold tracking-wide uppercase px-4 py-1.5 rounded-full mb-4">Pimpinan Daerah Tuan Rumah</span>
-                <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-apkasi-dark leading-tight mb-3">Kabupaten Deli Serdang</h2>
-                <p class="text-apkasi-body text-sm sm:text-base max-w-md mx-auto">Menyambut seluruh delegasi APKASI dalam rangkaian peringatan HUT Ke-80 Kabupaten Deli Serdang.</p>
+                <span class="inline-flex items-center gap-1.5 bg-apkasi-heading/8 text-apkasi-heading text-xs sm:text-sm font-semibold tracking-wide uppercase px-4 py-1.5 rounded-full mb-4">{{ $g('lp_pimpinan_badge', 'Pimpinan Daerah Tuan Rumah') }}</span>
+                <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-apkasi-dark leading-tight mb-3">{{ $g('lp_pimpinan_heading', 'Kabupaten Deli Serdang') }}</h2>
+                <p class="text-apkasi-body text-sm sm:text-base max-w-md mx-auto">{{ $g('lp_pimpinan_sub', 'Menyambut seluruh delegasi APKASI dalam rangkaian peringatan HUT Ke-80 Kabupaten Deli Serdang.') }}</p>
             </div>
 
             <div class="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12 md:gap-20">
                 <div class="group flex flex-col items-center text-center max-w-xs">
                     <div class="relative mb-5">
                         <div class="w-44 h-44 sm:w-52 sm:h-52 md:w-60 md:h-60 rounded-full overflow-hidden border-4 border-apkasi-gold/30 shadow-xl group-hover:border-apkasi-gold transition-colors duration-500">
-                            <img src="{{ asset('logos/bupati.png') }}" alt="Bupati Deli Serdang" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
+                            <img src="{{ asset($g('lp_bupati_foto', 'assets/apkasi/z_04_LOGO-LOGO APKASI/BUPATI.png')) }}" alt="{{ $g('lp_bupati_nama', 'Bupati') }}" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-apkasi-gold to-[#c5a028] text-apkasi-dark text-[10px] sm:text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full shadow-md whitespace-nowrap">Bupati</div>
                     </div>
-                    <h3 class="font-display text-lg sm:text-xl font-bold text-apkasi-dark mt-2">H. Ali Yusuf Siregar, S.Sos.</h3>
-                    <p class="text-apkasi-body text-xs sm:text-sm mt-1">Bupati Deli Serdang<br/>Periode 2024–2029</p>
+                    <h3 class="font-display text-lg sm:text-xl font-bold text-apkasi-dark mt-2">{{ $g('lp_bupati_nama', 'H. Ali Yusuf Siregar, S.Sos.') }}</h3>
+                    <p class="text-apkasi-body text-xs sm:text-sm mt-1">{{ $g('lp_bupati_jabatan', 'Bupati Deli Serdang') }}<br/>{{ $g('lp_bupati_periode', 'Periode 2024–2029') }}</p>
                     <div class="mt-3 w-10 h-0.5 bg-apkasi-gold/40 rounded-full group-hover:w-16 transition-all duration-500"></div>
                 </div>
 
@@ -229,12 +222,12 @@
                 <div class="group flex flex-col items-center text-center max-w-xs">
                     <div class="relative mb-5">
                         <div class="w-44 h-44 sm:w-52 sm:h-52 md:w-60 md:h-60 rounded-full overflow-hidden border-4 border-apkasi-gold/30 shadow-xl group-hover:border-apkasi-gold transition-colors duration-500">
-                            <img src="{{ asset('logos/wabup.png') }}" alt="Wakil Bupati Deli Serdang" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
+                            <img src="{{ asset($g('lp_wabup_foto', 'assets/apkasi/z_04_LOGO-LOGO APKASI/WABUPATI.png')) }}" alt="{{ $g('lp_wabup_nama', 'Wakil Bupati') }}" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-apkasi-gold to-[#c5a028] text-apkasi-dark text-[10px] sm:text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full shadow-md whitespace-nowrap">Wakil Bupati</div>
                     </div>
-                    <h3 class="font-display text-lg sm:text-xl font-bold text-apkasi-dark mt-2">HM. Yusuf Siregar, S.E.</h3>
-                    <p class="text-apkasi-body text-xs sm:text-sm mt-1">Wakil Bupati Deli Serdang<br/>Periode 2024–2029</p>
+                    <h3 class="font-display text-lg sm:text-xl font-bold text-apkasi-dark mt-2">{{ $g('lp_wabup_nama', 'HM. Yusuf Siregar, S.E.') }}</h3>
+                    <p class="text-apkasi-body text-xs sm:text-sm mt-1">{{ $g('lp_wabup_jabatan', 'Wakil Bupati Deli Serdang') }}<br/>{{ $g('lp_wabup_periode', 'Periode 2024–2029') }}</p>
                     <div class="mt-3 w-10 h-0.5 bg-apkasi-gold/40 rounded-full group-hover:w-16 transition-all duration-500"></div>
                 </div>
             </div>
@@ -243,11 +236,11 @@
                 <blockquote class="relative">
                     <span class="absolute -top-4 -left-2 text-5xl sm:text-6xl text-apkasi-gold/20 font-serif leading-none">&ldquo;</span>
                     <p class="text-apkasi-heading text-sm sm:text-base md:text-lg leading-relaxed italic font-medium px-6">
-                        Kami sangat bangga menjadi tuan rumah HUT APKASI Ke-26. Deli Serdang siap menyambut seluruh Bupati dan perwakilan kabupaten se-Indonesia untuk bersinergi membangun daerah.
+                        {{ $g('lp_pimpinan_quote', 'Kami sangat bangga menjadi tuan rumah HUT APKASI Ke-26. Deli Serdang siap menyambut seluruh Bupati dan perwakilan kabupaten se-Indonesia untuk bersinergi membangun daerah.') }}
                     </p>
                     <span class="absolute -bottom-6 -right-2 text-5xl sm:text-6xl text-apkasi-gold/20 font-serif leading-none rotate-180">&ldquo;</span>
                 </blockquote>
-                <p class="mt-6 text-xs sm:text-sm text-apkasi-body font-semibold">&mdash; Bupati Deli Serdang</p>
+                <p class="mt-6 text-xs sm:text-sm text-apkasi-body font-semibold">&mdash; {{ $g('lp_pimpinan_quote_author', 'Bupati Deli Serdang') }}</p>
             </div>
         </div>
     </section>
@@ -257,20 +250,28 @@
         <div data-reveal class="max-w-[1400px] mx-auto px-5 sm:px-8 transition-all duration-700 opacity-0 translate-y-8">
             <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                 <div>
-                    <span class="inline-flex items-center gap-1.5 bg-apkasi-heading/8 text-apkasi-heading text-xs sm:text-sm font-semibold tracking-wide uppercase px-4 py-1.5 rounded-full mb-4">Tentang Event</span>
-                    <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-apkasi-dark leading-tight mb-5">Dua Hari Jadi Besar,<br />Satu Tekad Bersinergi</h2>
+                    <span class="inline-flex items-center gap-1.5 bg-apkasi-heading/8 text-apkasi-heading text-xs sm:text-sm font-semibold tracking-wide uppercase px-4 py-1.5 rounded-full mb-4">{{ $g('lp_about_badge', 'Tentang Event') }}</span>
+                    <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-apkasi-dark leading-tight mb-5">{{ $g('lp_about_heading', 'Dua Hari Jadi Besar, Satu Tekad Bersinergi') }}</h2>
                     <p class="text-apkasi-body text-sm sm:text-base leading-relaxed mb-4">
-                        Rangkaian ini memperingati <strong>HUT APKASI (Asosiasi Pemerintah Kabupaten Seluruh Indonesia) Ke-26</strong> sekaligus <strong>HUT Kabupaten Deli Serdang Ke-80</strong>, dengan tema besar:
+                        {{ $g('lp_about_p1', 'Rangkaian ini memperingati HUT APKASI (Asosiasi Pemerintah Kabupaten Seluruh Indonesia) Ke-26 sekaligus HUT Kabupaten Deli Serdang Ke-80, dengan tema besar:') }}
                     </p>
                     <blockquote class="border-l-4 border-apkasi-gold pl-4 sm:pl-5 my-5 sm:my-6">
-                        <p class="text-apkasi-heading font-semibold text-base sm:text-lg italic leading-relaxed">"Penguatan Sinergi Antar Pemerintah Kabupaten Dalam Mendukung Pembangunan Daerah dan Otonomi Daerah."</p>
+                        <p class="text-apkasi-heading font-semibold text-base sm:text-lg italic leading-relaxed">{{ $g('lp_about_quote', '"Penguatan Sinergi Antar Pemerintah Kabupaten Dalam Mendukung Pembangunan Daerah dan Otonomi Daerah."') }}</p>
                     </blockquote>
                     <p class="text-apkasi-body text-sm sm:text-base leading-relaxed mb-6">
-                        Pemerintah Kabupaten Deli Serdang, Sumatera Utara, menyambut perwakilan dari seluruh pemerintah kabupaten di Indonesia untuk membahas strategi pembiayaan alternatif, kemandirian ekonomi lokal, dan peran perempuan dalam pemberantasan stunting.
+                        {{ $g('lp_about_p2', 'Pemerintah Kabupaten Deli Serdang, Sumatera Utara, menyambut perwakilan dari seluruh pemerintah kabupaten di Indonesia untuk membahas strategi pembiayaan alternatif, kemandirian ekonomi lokal, dan peran perempuan dalam pemberantasan stunting.') }}
                     </p>
 
+                    @php
+                        $aboutStats = [
+                            ['users', $g('lp_about_stat1_label', '400+ Delegasi'), $g('lp_about_stat1_sub', 'Bupati se-Indonesia')],
+                            ['building-2', $g('lp_about_stat2_label', '3 Venue Utama'), $g('lp_about_stat2_sub', 'Deli Serdang')],
+                            ['trophy', $g('lp_about_stat3_label', 'Grand Final POI'), $g('lp_about_stat3_sub', 'Putri Otonomi 2026')],
+                            ['heart', $g('lp_about_stat4_label', 'Women Program'), $g('lp_about_stat4_sub', 'UMKM & Stunting')],
+                        ];
+                    @endphp
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        @foreach ([['users','400+ Delegasi','Bupati se-Indonesia'],['building-2','3 Venue Utama','Deli Serdang'],['trophy','Grand Final POI','Putri Otonomi 2026'],['heart','Women Program','UMKM & Stunting']] as $s)
+                        @foreach ($aboutStats as $s)
                             <div class="bg-apkasi-leaf/50 rounded-xl p-3 sm:p-4 text-center">
                                 <i data-lucide="{{ $s[0] }}" class="w-5 h-5 text-apkasi-heading mx-auto mb-2"></i>
                                 <p class="text-xs sm:text-sm font-bold text-apkasi-dark leading-tight">{{ $s[1] }}</p>
@@ -282,17 +283,17 @@
 
                 <div class="space-y-4">
                     <div class="rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg aspect-[4/3]">
-                        <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=900&q=80" alt="Seminar Otonomi" class="w-full h-full object-cover" />
+                        <img src="{{ $img('lp_about_image', 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=900&q=80') }}" alt="{{ $g('lp_about_heading', 'Tentang Event') }}" class="w-full h-full object-cover" />
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div class="bg-apkasi-heading rounded-xl sm:rounded-2xl p-4 sm:p-5 text-white">
                             <i data-lucide="calendar" class="w-5 h-5 text-apkasi-accent mb-2"></i>
-                            <p class="text-sm font-bold">1 – 3 Juli 2026</p>
-                            <p class="text-xs text-white/70 mt-0.5">3 hari rangkaian acara</p>
+                            <p class="text-sm font-bold">{{ $eventRangeText }}</p>
+                            <p class="text-xs text-white/70 mt-0.5">Rangkaian acara</p>
                         </div>
                         <div class="bg-apkasi-dark rounded-xl sm:rounded-2xl p-4 sm:p-5 text-white">
                             <i data-lucide="map-pin" class="w-5 h-5 text-apkasi-gold mb-2"></i>
-                            <p class="text-sm font-bold">Deli Serdang</p>
+                            <p class="text-sm font-bold">{{ $g('lp_hero_footer_place', 'Deli Serdang') }}</p>
                             <p class="text-xs text-white/70 mt-0.5">Sumatera Utara</p>
                         </div>
                     </div>
@@ -311,37 +312,45 @@
             </div>
 
             <div class="space-y-6 sm:space-y-8">
-                @foreach ($agenda as $day)
+                @forelse ($agenda as $day)
                     <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-apkasi-leaf overflow-hidden">
                         <div class="flex items-center gap-3 sm:gap-4 px-5 sm:px-7 py-4 sm:py-5 bg-apkasi-dark text-white">
-                            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
-                                <i data-lucide="{{ $day['icon'] }}" class="w-4 h-4 sm:w-5 sm:h-5 text-apkasi-gold"></i>
+                            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-white flex items-center justify-center shrink-0 p-1.5 shadow-sm">
+                                <img src="{{ asset($dayImages[$loop->index % count($dayImages)]) }}" alt="" class="w-full h-full object-contain" />
                             </div>
                             <div>
-                                <p class="text-xs font-bold tracking-wide text-apkasi-accent uppercase">{{ $day['day'] }}</p>
-                                <p class="text-sm sm:text-base font-semibold">{{ $day['date'] }}</p>
+                                <p class="text-xs font-bold tracking-wide text-apkasi-accent uppercase">{{ $day->label ?: 'Hari ' . $loop->iteration }}</p>
+                                <p class="text-sm sm:text-base font-semibold">{{ $day->tanggal_format }}</p>
                             </div>
                         </div>
                         <div class="divide-y divide-apkasi-leaf">
-                            @foreach ($day['events'] as $ev)
+                            @forelse ($day->kegiatan as $ev)
                                 <div class="flex flex-col sm:flex-row gap-3 sm:gap-6 px-5 sm:px-7 py-4 sm:py-5 hover:bg-apkasi-leaf/20 transition-colors">
-                                    <div class="flex items-center gap-2 sm:w-40 shrink-0">
+                                    <div class="flex items-center gap-2 sm:w-44 shrink-0">
                                         <i data-lucide="clock" class="w-3.5 h-3.5 text-apkasi-heading shrink-0"></i>
-                                        <span class="text-xs sm:text-sm font-semibold text-apkasi-heading whitespace-nowrap">{{ $ev['time'] }} WIB</span>
+                                        <span class="text-xs sm:text-sm font-semibold text-apkasi-heading whitespace-nowrap">{{ $ev->waktu }}</span>
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <h4 class="text-sm sm:text-base font-bold text-apkasi-dark leading-snug mb-1">{{ $ev['title'] }}</h4>
-                                        <p class="text-xs sm:text-sm text-apkasi-body leading-relaxed">{{ $ev['desc'] }}</p>
-                                        <div class="flex items-center gap-1.5 mt-2 text-apkasi-heading">
-                                            <i data-lucide="map-pin" class="w-3 h-3"></i>
-                                            <span class="text-xs font-semibold">{{ $ev['place'] }}</span>
-                                        </div>
+                                        <h4 class="text-sm sm:text-base font-bold text-apkasi-dark leading-snug mb-1">{{ $ev->kegiatan }}</h4>
+                                        @if ($ev->rincian)
+                                            <p class="text-xs sm:text-sm text-apkasi-body leading-relaxed">{{ $ev->rincian }}</p>
+                                        @endif
+                                        @if ($ev->lokasi)
+                                            <div class="flex items-center gap-1.5 mt-2 text-apkasi-heading">
+                                                <i data-lucide="map-pin" class="w-3 h-3"></i>
+                                                <span class="text-xs font-semibold">{{ $ev->lokasi }}</span>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
-                            @endforeach
+                            @empty
+                                <div class="px-5 sm:px-7 py-4 text-sm text-apkasi-body/60">Belum ada kegiatan.</div>
+                            @endforelse
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <div class="text-center py-10 text-sm text-apkasi-body/60">Rundown belum tersedia.</div>
+                @endforelse
             </div>
 
             <div class="text-center mt-8 sm:mt-10">
@@ -359,17 +368,25 @@
                 <div class="grid lg:grid-cols-5 gap-0">
                     <div class="lg:col-span-3 p-7 sm:p-10 md:p-14 flex flex-col justify-center">
                         <span class="inline-flex items-center gap-1.5 bg-apkasi-gold/20 text-apkasi-gold text-xs font-bold tracking-wider uppercase px-3 py-1 rounded-full w-fit mb-5">
-                            <i data-lucide="trophy" class="w-3 h-3"></i> Special Event
+                            <i data-lucide="trophy" class="w-3 h-3"></i> {{ $g('lp_poi_badge', 'Special Event') }}
                         </span>
                         <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
-                            Malam Grand Final<br />
-                            <span class="text-apkasi-accent">Putri Otonomi Indonesia</span> 2026
+                            {{ $g('lp_poi_heading1', 'Malam Grand Final') }}<br />
+                            <span class="text-apkasi-accent">{{ $g('lp_poi_heading2', 'Putri Otonomi Indonesia') }}</span> {{ $g('lp_poi_heading3', '2026') }}
                         </h2>
                         <p class="text-white/75 text-sm sm:text-base leading-relaxed mb-6 max-w-lg">
-                            Ajang bergengsi pemilihan duta otonomi daerah dari seluruh kabupaten di Indonesia. Malam penobatan puncak dilaksanakan <strong class="text-white">Kamis, 2 Juli 2026</strong> di <strong class="text-white">Graha Bhineka</strong>.
+                            {{ $g('lp_poi_desc', 'Ajang bergengsi pemilihan duta otonomi daerah dari seluruh kabupaten di Indonesia. Malam penobatan puncak dilaksanakan Kamis, 2 Juli 2026 di Graha Bhineka.') }}
                         </p>
+                        @php
+                            $poiInfo = [
+                                ['trophy', $g('lp_poi_info1_title', 'Penobatan Juara'), $g('lp_poi_info1_sub', 'Duta Otonomi Nasional')],
+                                ['users', $g('lp_poi_info2_title', '400+ Kepala Daerah'), $g('lp_poi_info2_sub', 'Bupati & Tokoh Nasional')],
+                                ['calendar', $g('lp_poi_info3_title', 'Kamis, 2 Juli 2026'), $g('lp_poi_info3_sub', '18.30 – 22.00 WIB')],
+                                ['map-pin', $g('lp_poi_info4_title', 'Graha Bhineka'), $g('lp_poi_info4_sub', 'Deli Serdang')],
+                            ];
+                        @endphp
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                            @foreach ([['trophy','Penobatan Juara','Duta Otonomi Nasional'],['users','400+ Kepala Daerah','Bupati & Tokoh Nasional'],['calendar','Kamis, 2 Juli 2026','18.30 – 22.00 WIB'],['map-pin','Graha Bhineka','Deli Serdang']] as $item)
+                            @foreach ($poiInfo as $item)
                                 <div class="flex items-start gap-3">
                                     <i data-lucide="{{ $item[0] }}" class="w-4 h-4 text-apkasi-gold mt-0.5 shrink-0"></i>
                                     <div>
@@ -381,7 +398,7 @@
                         </div>
                     </div>
                     <div class="lg:col-span-2 relative min-h-[280px] sm:min-h-[340px]">
-                        <img src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=700&q=80" alt="Putri Otonomi Indonesia 2026" class="w-full h-full object-cover" />
+                        <img src="{{ $img('lp_poi_image', 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=700&q=80') }}" alt="{{ $g('lp_poi_heading2', 'Putri Otonomi Indonesia') }}" class="w-full h-full object-cover" />
                         <div class="absolute inset-0 bg-gradient-to-r from-apkasi-dark/50 via-transparent to-transparent lg:block hidden"></div>
                     </div>
                 </div>
@@ -398,18 +415,31 @@
                 <p class="text-apkasi-body text-sm sm:text-base max-w-md mx-auto">Pertanyaan umum seputar registrasi, dresscode, transportasi, dan logistik selama event.</p>
             </div>
 
+            <style>
+                .faq-answer ul { list-style: disc; padding-left: 1.25rem; margin: .25rem 0; }
+                .faq-answer ol { list-style: decimal; padding-left: 1.25rem; margin: .25rem 0; }
+                .faq-answer li { margin: .15rem 0; }
+                .faq-answer a { color: #336443; text-decoration: underline; }
+                .faq-answer strong { font-weight: 700; color: #1f2a1d; }
+                .faq-answer em { font-style: italic; }
+                .faq-answer p { margin: .35rem 0; }
+                .faq-answer p:first-child { margin-top: 0; }
+                .faq-answer p:last-child { margin-bottom: 0; }
+            </style>
             <div class="space-y-3">
-                @foreach ($faqs as $i => $f)
+                @forelse ($faqs as $f)
                     <div class="bg-white rounded-xl sm:rounded-2xl border border-apkasi-leaf overflow-hidden transition-shadow hover:shadow-sm">
-                        <button type="button" class="faq-btn w-full flex items-center justify-between gap-4 px-5 sm:px-6 py-4 sm:py-5 text-left" data-faq="{{ $i }}">
-                            <span class="text-sm sm:text-base font-semibold text-apkasi-dark leading-snug">{{ $f['q'] }}</span>
+                        <button type="button" class="faq-btn w-full flex items-center justify-between gap-4 px-5 sm:px-6 py-4 sm:py-5 text-left" data-faq="{{ $loop->index }}">
+                            <span class="text-sm sm:text-base font-semibold text-apkasi-dark leading-snug">{{ $f->pertanyaan }}</span>
                             <i data-lucide="chevron-down" class="faq-chev w-4 h-4 sm:w-5 sm:h-5 text-apkasi-body shrink-0 transition-transform duration-300"></i>
                         </button>
                         <div class="faq-panel transition-all duration-300 ease-in-out overflow-hidden max-h-0 opacity-0">
-                            <p class="px-5 sm:px-6 pb-5 text-sm text-apkasi-body leading-relaxed">{{ $f['a'] }}</p>
+                            <div class="faq-answer px-5 sm:px-6 pb-5 text-sm text-apkasi-body leading-relaxed">{!! $f->jawaban !!}</div>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <div class="text-center py-8 text-sm text-apkasi-body/60">Belum ada informasi.</div>
+                @endforelse
             </div>
 
             <div class="mt-10 sm:mt-12 bg-apkasi-dark rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-center text-white">
@@ -428,10 +458,11 @@
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 mb-10">
                 <div class="sm:col-span-2 lg:col-span-1">
                     <div class="flex items-center gap-3 mb-4">
-                        <img src="{{ asset('logos/apkasi-logo.png') }}" alt="APKASI" class="h-10 brightness-0 invert" />
-                        <img src="{{ asset('logos/hut-apkasi.png') }}" alt="HUT" class="h-10 brightness-0 invert opacity-80" />
+                        @foreach ($footerBrandLogos as $logo)
+                            <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="h-10 brightness-0 invert" />
+                        @endforeach
                     </div>
-                    <p class="text-white/50 text-xs leading-relaxed max-w-xs">Asosiasi Pemerintah Kabupaten Seluruh Indonesia. Memperkuat otonomi daerah untuk Indonesia Maju.</p>
+                    <p class="text-white/50 text-xs leading-relaxed max-w-xs">{{ $g('lp_footer_tagline', 'Asosiasi Pemerintah Kabupaten Seluruh Indonesia. Memperkuat otonomi daerah untuk Indonesia Maju.') }}</p>
                 </div>
                 <div>
                     <h4 class="text-white/80 text-xs font-bold uppercase tracking-widest mb-4">Navigasi</h4>
@@ -453,7 +484,7 @@
                 </div>
                 <div>
                     <h4 class="text-white/80 text-xs font-bold uppercase tracking-widest mb-4">Sekretariat</h4>
-                    <p class="text-sm text-white/50 leading-relaxed mb-3">Dinas Kominfo Kabupaten Deli Serdang,<br />Sumatera Utara</p>
+                    <p class="text-sm text-white/50 leading-relaxed mb-3">{{ $g('lp_footer_sekretariat', 'Dinas Kominfo Kabupaten Deli Serdang, Sumatera Utara') }}</p>
                     <a href="https://portal.deliserdangkab.go.id/" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-semibold text-apkasi-gold hover:text-apkasi-goldlt transition-colors">
                         <i data-lucide="globe" class="w-3.5 h-3.5"></i> Portal DS
                     </a>
@@ -461,10 +492,11 @@
             </div>
 
             <div class="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <p class="text-[11px] text-white/30">&copy; 2026 Pemerintah Kabupaten Deli Serdang & APKASI. All rights reserved.</p>
+                <p class="text-[11px] text-white/30">{{ $g('lp_footer_copyright', '© 2026 Pemerintah Kabupaten Deli Serdang & APKASI. All rights reserved.') }}</p>
                 <div class="flex items-center gap-2">
-                    <img src="{{ asset('logos/logo-ds.png') }}" alt="Deli Serdang" class="h-7 opacity-50" />
-                    <img src="{{ asset('logos/aoe2026-trans.png') }}" alt="AOE 2026" class="h-7 opacity-50" />
+                    @foreach ($footerSideLogos as $logo)
+                        <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="h-7 opacity-50" />
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -475,7 +507,7 @@
 @push('scripts')
 <script>
     // ── Countdown ──
-    var EVENT_DATE = new Date('2026-07-01T19:00:00+07:00').getTime();
+    var EVENT_DATE = new Date('{{ $countdownTarget }}').getTime();
     function pad(n) { return String(n).padStart(2, '0'); }
     function tickCountdown() {
         var d = EVENT_DATE - Date.now();

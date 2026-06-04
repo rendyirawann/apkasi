@@ -163,19 +163,7 @@
     </section>
 
     {{-- ═══════════ FOOTER ═══════════ --}}
-    <footer class="bg-apkasi-dark border-t-4 border-apkasi-gold">
-        <div class="max-w-[1400px] mx-auto px-5 sm:px-8 py-10 text-center">
-            <div class="flex items-center justify-center gap-4 mb-5">
-                <img src="{{ asset('logos/apkasi-logo.png') }}" alt="APKASI" class="h-10 brightness-0 invert" />
-                <img src="{{ asset('logos/logo-ds.png') }}" alt="Deli Serdang" class="h-10" />
-            </div>
-            <h5 class="font-display text-white font-bold mb-1.5">HUT Ke-26 APKASI & HUT Ke-80 Kabupaten Deli Serdang</h5>
-            <p class="text-white/50 text-xs mb-5">Sekretariat APKASI & Dinas Kominfo Kabupaten Deli Serdang, Sumatera Utara.</p>
-            <div class="border-t border-white/10 pt-5">
-                <p class="text-[11px] text-white/30">&copy; 2026 Pemerintah Kabupaten Deli Serdang & APKASI. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    @include('frontend.partials.footer')
 </div>
 @endsection
 

@@ -4,22 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Hotel extends Model
+class Gedung extends Model
 {
+    protected $table = 'gedung';
+
     protected $fillable = [
-        'nama', 'alamat', 'lat', 'lng', 'ketersediaan_kamar',
-        'contact_wa', 'contact_email', 'rating', 'image', 'maps_url',
-        'is_lokasi_acara', 'urut', 'is_active',
+        'nama', 'alamat', 'lat', 'lng', 'maps_url',
+        'image', 'is_lokasi_acara', 'urut', 'is_active',
     ];
 
     protected $casts = [
-        'lat'                => 'float',
-        'lng'                => 'float',
-        'rating'             => 'float',
-        'ketersediaan_kamar' => 'integer',
-        'urut'               => 'integer',
-        'is_lokasi_acara'    => 'boolean',
-        'is_active'          => 'boolean',
+        'lat'             => 'float',
+        'lng'             => 'float',
+        'urut'            => 'integer',
+        'is_lokasi_acara' => 'boolean',
+        'is_active'       => 'boolean',
     ];
 
     protected $appends = ['image_url'];

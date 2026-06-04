@@ -66,7 +66,7 @@
 
             <!--begin::Data Master-->
             @can('view_data_master')
-            @php $isDataMaster = request()->is('admin/hotels*') || request()->is('admin/pics*') || request()->is('admin/destinasi*'); @endphp
+            @php $isDataMaster = request()->is('admin/gedung*') || request()->is('admin/hotels*') || request()->is('admin/pics*') || request()->is('admin/destinasi*') || request()->is('admin/rentals*') || request()->is('admin/rundown*'); @endphp
             <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ $isDataMaster ? 'here show' : '' }}">
                 <span class="menu-link">
                     <span class="menu-icon">
@@ -76,6 +76,18 @@
                     <span class="menu-arrow"></span>
                 </span>
                 <div class="menu-sub menu-sub-accordion {{ $isDataMaster ? 'show' : '' }}">
+                    <div class="menu-item">
+                        <a class="menu-link {{ request()->is('admin/gedung*') ? 'active' : '' }}" href="{{ route('gedung.index') }}">
+                            <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                            <span class="menu-title">Gedung</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a class="menu-link {{ request()->is('admin/rundown*') ? 'active' : '' }}" href="{{ route('rundown.index') }}">
+                            <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                            <span class="menu-title">Rundown Kegiatan</span>
+                        </a>
+                    </div>
                     <div class="menu-item">
                         <a class="menu-link {{ request()->is('admin/hotels*') ? 'active' : '' }}" href="{{ route('hotels.index') }}">
                             <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
@@ -89,6 +101,12 @@
                         </a>
                     </div>
                     <div class="menu-item">
+                        <a class="menu-link {{ request()->is('admin/rentals*') ? 'active' : '' }}" href="{{ route('rentals.index') }}">
+                            <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                            <span class="menu-title">Rental Mobil</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
                         <a class="menu-link {{ request()->is('admin/pics*') ? 'active' : '' }}" href="{{ route('pics.index') }}">
                             <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
                             <span class="menu-title">PIC</span>
@@ -98,6 +116,19 @@
             </div>
             @endcan
             <!--end::Data Master-->
+
+            <!--begin::Landing Page-->
+            @can('landing.edit')
+            <div class="menu-item">
+                <a class="menu-link {{ request()->is('admin/landing*') ? 'active' : '' }}" href="{{ route('landing.index') }}">
+                    <span class="menu-icon">
+                        <i class="ki-duotone ki-picture fs-3"><span class="path1"></span><span class="path2"></span></i>
+                    </span>
+                    <span class="menu-title">Landing Page</span>
+                </a>
+            </div>
+            @endcan
+            <!--end::Landing Page-->
 
             <!--begin::My Account-->
             <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->is('admin/my-*') ? 'here show' : '' }}">

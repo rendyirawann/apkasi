@@ -53,6 +53,14 @@ class RolePermissionSeeder extends Seeder
             'hotel.delete',
         ];
 
+        // --- Granular Data Master: Gedung ---
+        $gedungPermissions = [
+            'gedung.show',
+            'gedung.create',
+            'gedung.edit',
+            'gedung.delete',
+        ];
+
         // --- Granular Data Master: PIC ---
         $picPermissions = [
             'pic.show',
@@ -69,10 +77,31 @@ class RolePermissionSeeder extends Seeder
             'destinasi.delete',
         ];
 
+        // --- Granular Data Master: Rental Mobil ---
+        $rentalPermissions = [
+            'rental.show',
+            'rental.create',
+            'rental.edit',
+            'rental.delete',
+        ];
+
+        // --- Granular: Rundown Kegiatan ---
+        $rundownPermissions = [
+            'rundown.show',
+            'rundown.create',
+            'rundown.edit',
+            'rundown.delete',
+        ];
+
+        // --- Landing Page CMS ---
+        $landingPermissions = [
+            'landing.edit',
+        ];
+
         // Create all permissions
         $allPermissions = array_merge(
             $navPermissions, $userPermissions, $rolePermissions,
-            $hotelPermissions, $picPermissions, $destinasiPermissions
+            $hotelPermissions, $gedungPermissions, $picPermissions, $destinasiPermissions, $rentalPermissions, $rundownPermissions, $landingPermissions
         );
 
         foreach ($allPermissions as $permission) {
@@ -98,7 +127,7 @@ class RolePermissionSeeder extends Seeder
             'view_dashboard',
             'view_data_master',
             'view_help',
-        ], $hotelPermissions, $picPermissions, $destinasiPermissions);
+        ], $hotelPermissions, $gedungPermissions, $picPermissions, $destinasiPermissions, $rentalPermissions, $rundownPermissions, $landingPermissions);
         $roleAdmin->syncPermissions($adminPermissions);
     }
 }

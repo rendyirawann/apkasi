@@ -53,7 +53,7 @@
 
         <!--begin::Data Master-->
         @can('view_data_master')
-        @php $isDataMaster = request()->is('admin/hotels*') || request()->is('admin/pics*') || request()->is('admin/destinasi*'); @endphp
+        @php $isDataMaster = request()->is('admin/gedung*') || request()->is('admin/hotels*') || request()->is('admin/pics*') || request()->is('admin/destinasi*') || request()->is('admin/rentals*') || request()->is('admin/rundown*'); @endphp
         <div data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="bottom-start"
             class="menu-item menu-lg-down-accordion me-0 me-lg-2 {{ $isDataMaster ? 'here show menu-here-bg' : '' }}">
             <span class="menu-link py-3">
@@ -64,6 +64,18 @@
                 <span class="menu-arrow d-lg-none"></span>
             </span>
             <div class="menu-sub menu-sub-lg-down-accordion menu-sub-lg-dropdown py-4 w-200px">
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->is('admin/gedung*') ? 'active' : '' }}" href="{{ route('gedung.index') }}">
+                        <span class="menu-icon"><i class="ki-duotone ki-bank fs-4"><span class="path1"></span><span class="path2"></span></i></span>
+                        <span class="menu-title">Gedung</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->is('admin/rundown*') ? 'active' : '' }}" href="{{ route('rundown.index') }}">
+                        <span class="menu-icon"><i class="ki-duotone ki-calendar fs-4"><span class="path1"></span><span class="path2"></span></i></span>
+                        <span class="menu-title">Rundown Kegiatan</span>
+                    </a>
+                </div>
                 <div class="menu-item">
                     <a class="menu-link {{ request()->is('admin/hotels*') ? 'active' : '' }}" href="{{ route('hotels.index') }}">
                         <span class="menu-icon"><i class="ki-duotone ki-home-2 fs-4"><span class="path1"></span><span class="path2"></span></i></span>
@@ -77,6 +89,12 @@
                     </a>
                 </div>
                 <div class="menu-item">
+                    <a class="menu-link {{ request()->is('admin/rentals*') ? 'active' : '' }}" href="{{ route('rentals.index') }}">
+                        <span class="menu-icon"><i class="ki-duotone ki-car fs-4"><span class="path1"></span><span class="path2"></span></i></span>
+                        <span class="menu-title">Rental Mobil</span>
+                    </a>
+                </div>
+                <div class="menu-item">
                     <a class="menu-link {{ request()->is('admin/pics*') ? 'active' : '' }}" href="{{ route('pics.index') }}">
                         <span class="menu-icon"><i class="ki-duotone ki-user-tick fs-4"><span class="path1"></span><span class="path2"></span></i></span>
                         <span class="menu-title">PIC</span>
@@ -86,6 +104,17 @@
         </div>
         @endcan
         <!--end::Data Master-->
+
+        <!--begin::Landing Page-->
+        @can('landing.edit')
+        <div class="menu-item me-0 me-lg-2 {{ request()->is('admin/landing*') ? 'here show menu-here-bg' : '' }}">
+            <a class="menu-link py-3" href="{{ route('landing.index') }}">
+                <span class="menu-icon"><i class="ki-duotone ki-picture fs-3"><span class="path1"></span><span class="path2"></span></i></span>
+                <span class="menu-title">Landing Page</span>
+            </a>
+        </div>
+        @endcan
+        <!--end::Landing Page-->
 
         <!--begin::Settings-->
         @role('Superadmin|superadmin')

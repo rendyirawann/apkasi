@@ -21,8 +21,12 @@ use App\Http\Controllers\Backend\Settings\SettingController;
 
 // Import Controller DATA MASTER (Hotel, PIC, Destinasi Wisata)
 use App\Http\Controllers\Backend\DataMaster\HotelController;
+use App\Http\Controllers\Backend\DataMaster\GedungController;
 use App\Http\Controllers\Backend\DataMaster\PicController;
 use App\Http\Controllers\Backend\DataMaster\DestinasiWisataController;
+use App\Http\Controllers\Backend\DataMaster\RentalController;
+use App\Http\Controllers\Backend\DataMaster\RundownController;
+use App\Http\Controllers\Backend\Settings\LandingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -151,9 +155,29 @@ Route::middleware(['auth', 'forbid-banned-user'])->group(function () {
     });
 
     // ====================================================
+    // LANDING PAGE CMS: landing.edit
+    // ====================================================
+    Route::middleware('can:landing.edit')->group(function () {
+        Route::get('/admin/landing', [LandingController::class, 'index'])->name('landing.index');
+        Route::post('/admin/landing', [LandingController::class, 'update'])->name('landing.update');
+        Route::post('/admin/landing/logo', [LandingController::class, 'logoStore'])->name('landing.logo.store');
+        Route::delete('/admin/landing/logo/{id}', [LandingController::class, 'logoDestroy'])->name('landing.logo.destroy');
+        Route::post('/admin/landing/faq', [LandingController::class, 'faqSync'])->name('landing.faq.sync');
+    });
+
+    // ====================================================
     // DATA MASTER (Hotel & PIC): view_data_master
     // ====================================================
     Route::middleware('can:view_data_master')->group(function () {
+        // Gedung / Venue
+        Route::get('/admin/gedung', [GedungController::class, 'index'])->name('gedung.index');
+        Route::get('/admin/gedung/data', [GedungController::class, 'data'])->name('gedung.data');
+        Route::post('/admin/gedung', [GedungController::class, 'store'])->name('gedung.store');
+        Route::get('/admin/gedung/{id}', [GedungController::class, 'show'])->name('gedung.show');
+        Route::get('/admin/gedung/{id}/edit', [GedungController::class, 'edit'])->name('gedung.edit');
+        Route::put('/admin/gedung/{id}', [GedungController::class, 'update'])->name('gedung.update');
+        Route::delete('/admin/gedung/{id}', [GedungController::class, 'destroy'])->name('gedung.destroy');
+
         // Hotels
         Route::get('/admin/hotels', [HotelController::class, 'index'])->name('hotels.index');
         Route::get('/admin/hotels/data', [HotelController::class, 'data'])->name('hotels.data');
@@ -180,6 +204,24 @@ Route::middleware(['auth', 'forbid-banned-user'])->group(function () {
         Route::get('/admin/destinasi/{id}/edit', [DestinasiWisataController::class, 'edit'])->name('destinasi.edit');
         Route::put('/admin/destinasi/{id}', [DestinasiWisataController::class, 'update'])->name('destinasi.update');
         Route::delete('/admin/destinasi/{id}', [DestinasiWisataController::class, 'destroy'])->name('destinasi.destroy');
+
+        // Rental Mobil
+        Route::get('/admin/rentals', [RentalController::class, 'index'])->name('rentals.index');
+        Route::get('/admin/rentals/data', [RentalController::class, 'data'])->name('rentals.data');
+        Route::post('/admin/rentals', [RentalController::class, 'store'])->name('rentals.store');
+        Route::get('/admin/rentals/{id}', [RentalController::class, 'show'])->name('rentals.show');
+        Route::get('/admin/rentals/{id}/edit', [RentalController::class, 'edit'])->name('rentals.edit');
+        Route::put('/admin/rentals/{id}', [RentalController::class, 'update'])->name('rentals.update');
+        Route::delete('/admin/rentals/{id}', [RentalController::class, 'destroy'])->name('rentals.destroy');
+
+        // Rundown Kegiatan
+        Route::get('/admin/rundown', [RundownController::class, 'index'])->name('rundown.index');
+        Route::get('/admin/rundown/data', [RundownController::class, 'data'])->name('rundown.data');
+        Route::post('/admin/rundown', [RundownController::class, 'store'])->name('rundown.store');
+        Route::get('/admin/rundown/{id}', [RundownController::class, 'show'])->name('rundown.show');
+        Route::get('/admin/rundown/{id}/edit', [RundownController::class, 'edit'])->name('rundown.edit');
+        Route::put('/admin/rundown/{id}', [RundownController::class, 'update'])->name('rundown.update');
+        Route::delete('/admin/rundown/{id}', [RundownController::class, 'destroy'])->name('rundown.destroy');
     });
 });
 

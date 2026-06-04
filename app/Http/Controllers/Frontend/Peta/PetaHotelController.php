@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Frontend\Peta;
 
 use App\Http\Controllers\Controller;
-use App\Models\Place;
+use App\Models\Gedung;
 use App\Models\Hotel;
 use App\Models\DestinasiWisata;
 use Illuminate\Http\Request;
@@ -71,7 +71,7 @@ class PetaHotelController extends Controller
     {
         return [
             'all'    => $items->count(),
-            'venue'  => $items->filter(fn ($p) => $p->category === 'venue' || $p->is_lokasi_acara)->count(),
+            'venue'  => $items->filter(fn ($p) => $p->is_lokasi_acara)->count(),
             'hotel'  => $items->where('category', 'hotel')->count(),
             'wisata' => $items->where('category', 'wisata')->count(),
         ];
@@ -81,7 +81,7 @@ class PetaHotelController extends Controller
     {
         return $items->filter(function ($p) use ($cat, $q) {
             $catOk = $cat === 'all'
-                || ($cat === 'venue'  && ($p->category === 'venue' || $p->is_lokasi_acara))
+                || ($cat === 'venue'  && $p->is_lokasi_acara)
                 || ($cat === 'hotel'  && $p->category === 'hotel')
                 || ($cat === 'wisata' && $p->category === 'wisata');
 
@@ -102,20 +102,21 @@ class PetaHotelController extends Controller
     }
 
     /**
-     * Gabungan titik: venue (places) + hotel (hotels) + destinasi (destinasi_wisata),
-     * dinormalkan ke bentuk seragam. `is_lokasi_acara` menandai item yang juga masuk tab Lokasi Acara.
+     * Gabungan titik: gedung (gedung) + hotel (hotels) + destinasi (destinasi_wisata),
+     * dinormalkan ke bentuk seragam. `is_lokasi_acara` menandai item yang masuk tab
+     * Lokasi Acara — sumbernya murni dari tag pada data master (tabel `places` tak dipakai).
      */
     private function resolveItems()
     {
         $out = collect();
 
-        if (Schema::hasTable('places')) {
-            Place::query()->where('is_active', true)->where('category', 'venue')->orderBy('sort')->get()
-                ->each(fn ($p) => $out->push((object) [
-                    'id' => 'p' . $p->id, 'category' => 'venue', 'is_lokasi_acara' => true,
-                    'name' => $p->name, 'address' => $p->address, 'description' => $p->description,
-                    'rating' => $p->rating, 'image' => $p->image, 'lat' => (float) $p->lat, 'lng' => (float) $p->lng,
-                    'maps_url' => $p->maps_url, 'rooms' => null, 'wa' => null, 'email' => null, 'harga' => null,
+        if (Schema::hasTable('gedung')) {
+            Gedung::query()->where('is_active', true)->whereNotNull('lat')->whereNotNull('lng')->orderBy('urut')->get()
+                ->each(fn ($g) => $out->push((object) [
+                    'id' => 'g' . $g->id, 'category' => 'venue', 'is_lokasi_acara' => (bool) $g->is_lokasi_acara,
+                    'name' => $g->nama, 'address' => $g->alamat, 'description' => null,
+                    'rating' => null, 'image' => $g->image_url, 'lat' => (float) $g->lat, 'lng' => (float) $g->lng,
+                    'maps_url' => $g->maps_url, 'rooms' => null, 'wa' => null, 'email' => null, 'harga' => null,
                 ]));
         }
 
@@ -124,7 +125,7 @@ class PetaHotelController extends Controller
                 ->each(fn ($h) => $out->push((object) [
                     'id' => 'h' . $h->id, 'category' => 'hotel', 'is_lokasi_acara' => (bool) $h->is_lokasi_acara,
                     'name' => $h->nama, 'address' => $h->alamat, 'description' => null,
-                    'rating' => $h->rating, 'image' => $h->image, 'lat' => (float) $h->lat, 'lng' => (float) $h->lng,
+                    'rating' => $h->rating, 'image' => $h->image_url, 'lat' => (float) $h->lat, 'lng' => (float) $h->lng,
                     'maps_url' => $h->maps_url, 'rooms' => $h->ketersediaan_kamar, 'wa' => $h->contact_wa, 'email' => $h->contact_email, 'harga' => null,
                 ]));
         }
@@ -134,7 +135,7 @@ class PetaHotelController extends Controller
                 ->each(fn ($d) => $out->push((object) [
                     'id' => 'd' . $d->id, 'category' => 'wisata', 'is_lokasi_acara' => (bool) $d->is_lokasi_acara,
                     'name' => $d->nama, 'address' => $d->alamat, 'description' => $d->deskripsi,
-                    'rating' => $d->rating, 'image' => $d->thumbnail, 'lat' => (float) $d->lat, 'lng' => (float) $d->lng,
+                    'rating' => $d->rating, 'image' => $d->thumbnail_url, 'lat' => (float) $d->lat, 'lng' => (float) $d->lng,
                     'maps_url' => $d->maps_url, 'rooms' => null, 'wa' => null, 'email' => null, 'harga' => $d->harga_tiket,
                 ]));
         }

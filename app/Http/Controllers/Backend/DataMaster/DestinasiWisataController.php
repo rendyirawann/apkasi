@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\DestinasiWisata;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
 class DestinasiWisataController extends Controller
@@ -26,8 +28,8 @@ class DestinasiWisataController extends Controller
         return DataTables::of($query)
             ->addIndexColumn()
             ->addColumn('thumb', function ($row) {
-                return $row->thumbnail
-                    ? '<img src="' . e($row->thumbnail) . '" class="rounded" style="width:54px;height:42px;object-fit:cover" />'
+                return $row->thumbnail_url
+                    ? '<img src="' . e($row->thumbnail_url) . '" class="rounded" style="width:54px;height:42px;object-fit:cover" />'
                     : '<span class="badge badge-light-secondary">—</span>';
             })
             ->addColumn('rating_badge', function ($row) {
@@ -75,7 +77,11 @@ class DestinasiWisataController extends Controller
 
         try {
             $d = DestinasiWisata::create($this->payload($request));
-            $this->syncGallery($d, $request);
+            if ($request->hasFile('thumbnail_file')) {
+                $d->thumbnail = $request->file('thumbnail_file')->store('destinasi', 'public');
+                $d->save();
+            }
+            $this->addGalleryFiles($d, $request);
             return response()->json(['success' => 'Destinasi wisata berhasil ditambahkan.', 'judul' => 'Berhasil'], 201);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan di aplikasi.', 'judul' => 'Gagal', 'errorMessage' => $e->getMessage()], 500);
@@ -85,13 +91,19 @@ class DestinasiWisataController extends Controller
     public function show($id)
     {
         $d = DestinasiWisata::with('gambar')->findOrFail($id);
-        return response()->json(['data' => $d, 'gambar' => $d->gambar->pluck('gambar')]);
+        return response()->json([
+            'data'   => $d,
+            'gambar' => $d->gambar->map(fn ($g) => ['id' => $g->id, 'url' => $g->gambar_url]),
+        ]);
     }
 
     public function edit($id)
     {
         $d = DestinasiWisata::with('gambar')->findOrFail($id);
-        return response()->json(['data' => $d, 'gambar' => $d->gambar->pluck('gambar')]);
+        return response()->json([
+            'data'   => $d,
+            'gambar' => $d->gambar->map(fn ($g) => ['id' => $g->id, 'url' => $g->gambar_url]),
+        ]);
     }
 
     public function update(Request $request, $id)
@@ -105,7 +117,24 @@ class DestinasiWisataController extends Controller
 
         try {
             $d->update($this->payload($request));
-            $this->syncGallery($d, $request);
+
+            if ($request->hasFile('thumbnail_file')) {
+                $this->deleteFile($d->thumbnail);
+                $d->thumbnail = $request->file('thumbnail_file')->store('destinasi', 'public');
+                $d->save();
+            }
+
+            // Hapus galeri yang dipilih
+            $hapus = (array) $request->input('hapus_gambar', []);
+            if ($hapus) {
+                foreach ($d->gambar()->whereIn('id', $hapus)->get() as $g) {
+                    $this->deleteFile($g->gambar);
+                    $g->delete();
+                }
+            }
+
+            $this->addGalleryFiles($d, $request);
+
             return response()->json(['success' => 'Destinasi wisata berhasil diperbarui.', 'judul' => 'Berhasil']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan di aplikasi.', 'judul' => 'Gagal', 'errorMessage' => $e->getMessage()], 500);
@@ -115,19 +144,37 @@ class DestinasiWisataController extends Controller
     public function destroy($id)
     {
         try {
-            DestinasiWisata::findOrFail($id)->delete(); // galeri ikut terhapus (cascade)
+            $d = DestinasiWisata::with('gambar')->findOrFail($id);
+            $this->deleteFile($d->thumbnail);
+            foreach ($d->gambar as $g) {
+                $this->deleteFile($g->gambar);
+            }
+            $d->delete(); // baris galeri ikut terhapus (cascade)
             return response()->json(['success' => 'Destinasi wisata berhasil dihapus.', 'judul' => 'Berhasil']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Data gagal dihapus.', 'judul' => 'Gagal', 'errorMessage' => $e->getMessage()], 500);
         }
     }
 
-    private function syncGallery(DestinasiWisata $d, Request $request): void
+    private function addGalleryFiles(DestinasiWisata $d, Request $request): void
     {
-        $d->gambar()->delete();
-        $imgs = array_values(array_filter((array) $request->input('gambar', []), fn ($u) => filled($u)));
-        foreach ($imgs as $i => $u) {
-            $d->gambar()->create(['gambar' => $u, 'urut' => $i + 1]);
+        $files = $request->file('gambar_files', []);
+        if (! is_array($files)) {
+            $files = [$files];
+        }
+        $start = (int) $d->gambar()->max('urut');
+        foreach (array_values(array_filter($files)) as $i => $file) {
+            $d->gambar()->create([
+                'gambar' => $file->store('destinasi', 'public'),
+                'urut'   => $start + $i + 1,
+            ]);
+        }
+    }
+
+    private function deleteFile(?string $path): void
+    {
+        if ($path && ! Str::startsWith($path, ['http://', 'https://']) && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
         }
     }
 
@@ -141,23 +188,28 @@ class DestinasiWisataController extends Controller
             'harga_tiket'     => 'nullable|string|max:100',
             'lat'             => 'nullable|numeric|between:-90,90',
             'lng'             => 'nullable|numeric|between:-180,180',
-            'thumbnail'       => 'nullable|url|max:255',
             'maps_url'        => 'nullable|url|max:255',
             'is_lokasi_acara' => 'nullable|boolean',
             'urut'            => 'nullable|integer|min:0',
-            'gambar'          => 'nullable|array',
-            'gambar.*'        => 'nullable|url|max:255',
+            'thumbnail_file'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
+            'gambar_files'    => 'nullable|array',
+            'gambar_files.*'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
+            'hapus_gambar'    => 'nullable|array',
         ];
     }
 
     private function messages(): array
     {
         return [
-            'nama.required'  => 'Nama destinasi wajib diisi.',
-            'rating.max'     => 'Rating maksimal 5.',
-            'thumbnail.url'  => 'Link thumbnail harus berupa URL valid.',
-            'maps_url.url'   => 'Link Google Maps harus berupa URL valid.',
-            'gambar.*.url'   => 'Setiap link galeri harus berupa URL valid.',
+            'nama.required'        => 'Nama destinasi wajib diisi.',
+            'rating.max'           => 'Rating maksimal 5.',
+            'maps_url.url'         => 'Link Google Maps harus berupa URL valid.',
+            'thumbnail_file.image' => 'Thumbnail harus berupa gambar.',
+            'thumbnail_file.mimes' => 'Format thumbnail: jpg, jpeg, png, webp.',
+            'thumbnail_file.max'   => 'Ukuran thumbnail maksimal 3 MB.',
+            'gambar_files.*.image' => 'Setiap galeri harus berupa gambar.',
+            'gambar_files.*.mimes' => 'Format galeri: jpg, jpeg, png, webp.',
+            'gambar_files.*.max'   => 'Ukuran tiap gambar galeri maksimal 3 MB.',
         ];
     }
 
@@ -171,7 +223,6 @@ class DestinasiWisataController extends Controller
             'harga_tiket'     => $request->harga_tiket,
             'lat'             => $request->lat !== null && $request->lat !== '' ? (float) $request->lat : null,
             'lng'             => $request->lng !== null && $request->lng !== '' ? (float) $request->lng : null,
-            'thumbnail'       => $request->thumbnail,
             'maps_url'        => $request->maps_url,
             'is_lokasi_acara' => $request->boolean('is_lokasi_acara'),
             'urut'            => (int) ($request->urut ?? 0),
