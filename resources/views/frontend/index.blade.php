@@ -19,6 +19,125 @@
 @section('content')
 @include('frontend.partials.splash')
 
+{{-- ═══════════ INTRO HERO (single-page cinematic, scroll-jack 3 tahap) ═══════════ --}}
+<style>
+    #intro{position:fixed;inset:0;z-index:9000;overflow:hidden;background:#0a1f15;transform:translateY(0);transition:transform 1s cubic-bezier(.76,0,.24,1);will-change:transform}
+    #intro.is-hidden{transform:translateY(-100%)}
+    .intro-scene{position:absolute;inset:0;overflow:hidden;background:radial-gradient(130% 130% at 50% 26%,#123d28 0%,#0a2417 45%,#06140c 82%);opacity:0;transform:scale(1.06);transition:opacity 1.1s ease,transform 9s ease}
+    .intro-scene.is-active{opacity:1;transform:scale(1)}
+    .blob{position:absolute;border-radius:50%;filter:blur(62px);opacity:.82;mix-blend-mode:screen;will-change:transform;pointer-events:none}
+    .b-red{background:radial-gradient(circle,#ff5043 0%,rgba(255,80,67,0) 70%)}
+    .b-grn{background:radial-gradient(circle,#62d44f 0%,rgba(98,212,79,0) 70%)}
+    .b-org{background:radial-gradient(circle,#ffa620 0%,rgba(255,166,32,0) 70%)}
+    .b-blu{background:radial-gradient(circle,#2ba6ec 0%,rgba(43,166,236,0) 70%)}
+    @keyframes bf1{from{transform:translate(0,0) scale(1)}to{transform:translate(7vw,6vh) scale(1.18)}}
+    @keyframes bf2{from{transform:translate(0,0) scale(1)}to{transform:translate(-8vw,-5vh) scale(1.12)}}
+    @keyframes bf3{from{transform:translate(0,0) scale(1)}to{transform:translate(6vw,-7vh) scale(1.2)}}
+    .bf1{animation:bf1 15s ease-in-out infinite alternate}.bf2{animation:bf2 18s ease-in-out infinite alternate}.bf3{animation:bf3 21s ease-in-out infinite alternate}
+    @media(prefers-reduced-motion:reduce){.blob{animation:none!important}}
+    .intro-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,18,12,.62) 0%,rgba(7,18,12,.34) 38%,rgba(7,18,12,.4) 60%,rgba(7,18,12,.8) 100%)}
+    .intro-leaves{position:absolute;inset:0;overflow:hidden;z-index:2;pointer-events:none}
+    .leaf{position:absolute;top:-16vh;width:var(--sz);height:calc(var(--sz) * 1.4);background:url('{{ asset('assets/apkasi/intro/leaf.svg') }}') center/contain no-repeat;opacity:.68;filter:drop-shadow(0 4px 7px rgba(0,0,0,.25));animation:leafFall var(--dur) linear var(--delay) infinite;will-change:transform}
+    .leaf.gold{filter:sepia(.7) saturate(1.7) hue-rotate(-14deg) drop-shadow(0 4px 7px rgba(0,0,0,.28))}
+    @keyframes leafFall{0%{transform:translateY(-16vh) translateX(0) rotate(0)}25%{transform:translateY(16vh) translateX(var(--sway)) rotate(120deg)}50%{transform:translateY(46vh) translateX(calc(var(--sway) * -1)) rotate(230deg)}75%{transform:translateY(78vh) translateX(var(--sway)) rotate(330deg)}100%{transform:translateY(122vh) translateX(0) rotate(420deg)}}
+    .intro-logos{position:absolute;top:9%;left:50%;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:12px;pointer-events:none}
+    .il-ds{height:clamp(66px,9vw,116px);width:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5))}
+    .il-row{display:flex;align-items:center;gap:clamp(18px,4vw,46px)}
+    .il-hut{height:clamp(54px,6.8vw,88px);width:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.45))}
+    @media(prefers-reduced-motion:reduce){.leaf{display:none}}
+    @media(max-width:640px){.intro-logos{top:6%;gap:10px}}
+    .intro-wrap{position:relative;z-index:3;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif}
+    .intro-cap{position:absolute;top:36%;left:50%;width:min(820px,92vw);padding:0 12px;opacity:0;transform:translate(-50%,34px);transition:opacity .7s ease,transform .8s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+    .intro-cap.is-active{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+    .intro-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(212,175,55,.16);border:1px solid rgba(212,175,55,.5);color:#FFE07D;font-size:clamp(11px,1.4vw,14px);font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:8px 18px;border-radius:99px;margin-bottom:22px}
+    .intro-cap h2{font-family:'Outfit','Plus Jakarta Sans',sans-serif;font-weight:800;font-size:clamp(2.1rem,6.5vw,4.6rem);line-height:1.04;letter-spacing:-.02em;margin:0;text-shadow:0 6px 30px rgba(0,0,0,.45)}
+    .intro-cap .accent{color:#85AB8B}
+    .intro-cap p{margin:18px auto 0;max-width:620px;font-size:clamp(.95rem,1.9vw,1.25rem);line-height:1.6;color:rgba(255,255,255,.82)}
+    .intro-enter{margin-top:32px;display:inline-flex;align-items:center;gap:10px;background:linear-gradient(90deg,#D4AF37,#FFE07D);color:#1f2a1d;font-weight:800;font-size:clamp(.9rem,1.6vw,1.05rem);padding:14px 34px;border-radius:99px;border:0;cursor:pointer;box-shadow:0 12px 34px rgba(212,175,55,.35);transition:transform .25s ease,box-shadow .25s ease}
+    .intro-enter:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(212,175,55,.5)}
+    .intro-dots{position:absolute;left:50%;bottom:104px;transform:translateX(-50%);z-index:4;display:flex;gap:10px}
+    .intro-dot{width:9px;height:9px;border-radius:99px;background:rgba(255,255,255,.32);transition:all .4s ease}
+    .intro-dot.is-active{width:30px;background:#D4AF37}
+    .intro-hint{position:absolute;left:50%;bottom:42px;transform:translateX(-50%);z-index:4;display:flex;flex-direction:column;align-items:center;gap:6px;color:rgba(255,255,255,.7);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+    .intro-hint i{animation:introBounce 1.8s ease-in-out infinite}
+    @keyframes introBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+    .intro-skip{position:absolute;top:24px;right:24px;z-index:4;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:12px;font-weight:600;letter-spacing:.06em;padding:8px 16px;border-radius:99px;cursor:pointer;backdrop-filter:blur(6px);transition:background .25s ease}
+    .intro-skip:hover{background:rgba(255,255,255,.22)}
+    .intro-mark{position:absolute;top:24px;left:28px;z-index:4;display:flex;align-items:center;gap:10px;opacity:.92}
+    .intro-mark img{height:34px;width:auto}
+    @media(max-width:640px){.intro-dots{bottom:92px}.intro-hint{bottom:34px}}
+    @media(prefers-reduced-motion:reduce){.intro-scene{transition:opacity .4s ease}.intro-scene.is-active{transform:none}#intro{transition:transform .5s ease}}
+</style>
+<section id="intro" aria-label="Pembuka">
+    <div class="intro-scene is-active" data-stage="0">
+        <span class="blob b-red bf1" style="width:60vw;height:60vw;left:-10%;top:-14%"></span>
+        <span class="blob b-org bf2" style="width:50vw;height:50vw;right:-8%;top:0"></span>
+        <span class="blob b-grn bf3" style="width:44vw;height:44vw;left:14%;bottom:-16%"></span>
+        <span class="blob b-blu bf2" style="width:36vw;height:36vw;right:16%;bottom:-12%"></span>
+    </div>
+    <div class="intro-scene" data-stage="1">
+        <span class="blob b-blu bf1" style="width:58vw;height:58vw;left:-8%;top:-10%"></span>
+        <span class="blob b-grn bf2" style="width:52vw;height:52vw;right:-10%;top:6%"></span>
+        <span class="blob b-org bf3" style="width:40vw;height:40vw;left:20%;bottom:-14%"></span>
+        <span class="blob b-red bf1" style="width:34vw;height:34vw;right:18%;bottom:-10%"></span>
+    </div>
+    <div class="intro-scene" data-stage="2">
+        <span class="blob b-red bf2" style="width:46vw;height:46vw;left:-6%;top:-10%"></span>
+        <span class="blob b-org bf1" style="width:44vw;height:44vw;right:-4%;top:-6%"></span>
+        <span class="blob b-grn bf3" style="width:48vw;height:48vw;left:8%;bottom:-18%"></span>
+        <span class="blob b-blu bf2" style="width:46vw;height:46vw;right:6%;bottom:-16%"></span>
+        <span class="blob b-org bf3" style="width:30vw;height:30vw;left:42%;top:30%"></span>
+    </div>
+    <div class="intro-veil"></div>
+
+    <div class="intro-leaves" aria-hidden="true">
+        <span class="leaf" style="left:9%;--sz:28px;--dur:15s;--delay:-1s;--sway:30px"></span>
+        <span class="leaf gold" style="left:25%;--sz:22px;--dur:18s;--delay:-7s;--sway:22px"></span>
+        <span class="leaf" style="left:43%;--sz:30px;--dur:14s;--delay:-3s;--sway:32px"></span>
+        <span class="leaf gold" style="left:61%;--sz:24px;--dur:17s;--delay:-10s;--sway:24px"></span>
+        <span class="leaf" style="left:78%;--sz:28px;--dur:15.5s;--delay:-5s;--sway:28px"></span>
+        <span class="leaf gold" style="left:91%;--sz:20px;--dur:19s;--delay:-12s;--sway:18px"></span>
+        <span class="leaf" style="left:35%;--sz:18px;--dur:20s;--delay:-14s;--sway:16px"></span>
+    </div>
+
+    <div class="intro-logos">
+        <img class="il-ds" src="{{ asset('logos/logo_ds.webp') }}" alt="Deli Serdang" />
+        <div class="il-row">
+            <img class="il-hut" src="{{ asset('logos/hutds80.png') }}" alt="HUT Ke-80 Deli Serdang" />
+            <img class="il-hut" src="{{ asset('logos/logo_hut26.webp') }}" alt="HUT Ke-26 APKASI" />
+        </div>
+    </div>
+
+    <button type="button" id="intro-skip" class="intro-skip"><i data-lucide="x" class="w-3.5 h-3.5"></i> Lewati</button>
+
+    <div class="intro-wrap">
+        <div class="intro-cap is-active" data-stage="0">
+            <span class="intro-badge"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Portal Resmi 2026</span>
+            <h2>Selamat Datang</h2>
+            <p>Di rangkaian perayaan <strong>HUT Ke-26 APKASI</strong> &amp; <strong>HUT Ke-80 Kabupaten Deli Serdang</strong>.</p>
+        </div>
+        <div class="intro-cap" data-stage="1">
+            <span class="intro-badge"><i data-lucide="handshake" class="w-3.5 h-3.5"></i> Sinergi Daerah</span>
+            <h2>Bersinergi <span class="accent">Membangun Daerah</span></h2>
+            <p>Memperkuat otonomi Indonesia bersama pemerintah kabupaten se-Nusantara.</p>
+        </div>
+        <div class="intro-cap" data-stage="2">
+            <span class="intro-badge"><i data-lucide="calendar-days" class="w-3.5 h-3.5"></i> 1 – 3 Juli 2026</span>
+            <h2>Kabupaten <span class="accent">Deli Serdang</span></h2>
+            <p>Tuan rumah perayaan akbar di Sumatera Utara. Mari mulai pengalamannya.</p>
+            <button type="button" id="intro-enter" class="intro-enter">Masuk ke Beranda <i data-lucide="arrow-down" class="w-4 h-4"></i></button>
+        </div>
+    </div>
+
+    <div class="intro-dots">
+        <span class="intro-dot is-active" data-stage="0"></span>
+        <span class="intro-dot" data-stage="1"></span>
+        <span class="intro-dot" data-stage="2"></span>
+    </div>
+    <div class="intro-hint" id="intro-hint"><span id="intro-hint-text">Gulir untuk lanjut</span><i data-lucide="chevrons-down" class="w-5 h-5"></i></div>
+</section>
+<noscript><style>#intro{display:none!important}</style></noscript>
+
 <div class="min-h-screen bg-apkasi-cream">
 
     {{-- ═══════════ NAVBAR ═══════════ --}}
@@ -595,5 +714,122 @@
 
     // refresh ikon utk konten yg baru
     if (window.lucide) lucide.createIcons();
+</script>
+@endpush
+
+@push('scripts')
+<script>
+    // ═══════════ INTRO HERO — scroll-jack 3 tahap + re-trigger ═══════════
+    (function () {
+        var overlay = document.getElementById('intro');
+        if (!overlay) return;
+
+        // Jika menuju section tertentu (mis. /#poi), lewati intro (samakan dgn splash)
+        if (window.location.hash && window.location.hash.length > 1) {
+            if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            return;
+        }
+
+        var scenes  = overlay.querySelectorAll('.intro-scene');
+        var caps    = overlay.querySelectorAll('.intro-cap');
+        var dots    = overlay.querySelectorAll('.intro-dot');
+        var hintTxt = document.getElementById('intro-hint-text');
+        var LAST    = scenes.length - 1;
+        var stage = 0, open = true, busy = false, upAccum = 0;
+
+        function lock()   { document.documentElement.style.overflow = 'hidden'; document.body.style.overflow = 'hidden'; }
+        function unlock() { document.documentElement.style.overflow = '';        document.body.style.overflow = ''; }
+
+        function render() {
+            for (var i = 0; i < scenes.length; i++) {
+                scenes[i].classList.toggle('is-active', i === stage);
+                caps[i].classList.toggle('is-active', i === stage);
+                dots[i].classList.toggle('is-active', i === stage);
+            }
+            if (hintTxt) hintTxt.textContent = (stage === LAST) ? 'Gulir lagi untuk masuk' : 'Gulir untuk lanjut';
+        }
+        function cooldown(ms) { busy = true; setTimeout(function () { busy = false; }, ms || 950); }
+
+        function step(dir) {
+            if (busy) return;
+            if (dir > 0) {
+                if (stage < LAST) { stage++; render(); cooldown(); }
+                else { closeIntro(); }
+            } else if (dir < 0) {
+                if (stage > 0) { stage--; render(); cooldown(); }
+            }
+        }
+
+        function closeIntro() {
+            if (!open) return;
+            open = false; busy = true; upAccum = 0;
+            overlay.classList.add('is-hidden');
+            setTimeout(function () {
+                unlock();
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                busy = false;
+            }, 1000);
+        }
+        function reopenIntro() {
+            if (open) return;
+            open = true; upAccum = 0;
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            lock();
+            stage = LAST;            // datang dari atas landing → mulai dari tahap terakhir
+            render();
+            overlay.classList.remove('is-hidden');
+            cooldown(1000);
+        }
+
+        // ── Wheel ──
+        window.addEventListener('wheel', function (e) {
+            if (open) {
+                e.preventDefault();
+                if (Math.abs(e.deltaY) < 8) return;
+                step(e.deltaY > 0 ? 1 : -1);
+            } else if (window.scrollY <= 0 && e.deltaY < 0) {
+                upAccum += -e.deltaY;
+                if (upAccum > 240) reopenIntro();
+            } else {
+                upAccum = 0;
+            }
+        }, { passive: false });
+
+        // ── Touch ──
+        var ty = 0;
+        window.addEventListener('touchstart', function (e) { ty = e.touches[0].clientY; }, { passive: true });
+        window.addEventListener('touchmove', function (e) {
+            var dy = ty - e.touches[0].clientY;     // dy>0 = geser ke atas (≈ scroll down)
+            if (open) {
+                e.preventDefault();
+                if (Math.abs(dy) > 45) { step(dy > 0 ? 1 : -1); ty = e.touches[0].clientY; }
+            } else if (window.scrollY <= 0 && dy < -70) {
+                reopenIntro();
+            }
+        }, { passive: false });
+
+        // ── Keyboard ──
+        window.addEventListener('keydown', function (e) {
+            if (!open) return;
+            if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); step(1); }
+            else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); step(-1); }
+            else if (e.key === 'Escape') { closeIntro(); }
+        });
+
+        // ── Tombol ──
+        var skip = document.getElementById('intro-skip');
+        if (skip) skip.addEventListener('click', closeIntro);
+        var enter = document.getElementById('intro-enter');
+        if (enter) enter.addEventListener('click', closeIntro);
+
+        // ── Aktifkan setelah splash hilang (atau langsung bila tak ada splash) ──
+        function activate() { lock(); stage = 0; render(); }
+        function waitSplash() {
+            if (!document.getElementById('splash')) { activate(); return; }
+            requestAnimationFrame(waitSplash);
+        }
+        lock();        // kunci dari awal (di belakang splash)
+        waitSplash();
+    })();
 </script>
 @endpush
