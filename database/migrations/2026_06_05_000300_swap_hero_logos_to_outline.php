@@ -32,7 +32,7 @@ return new class extends Migration
             // Hanya update bila masih default lama (jangan timpa bila admin sudah mengubah).
             DB::table('settings')->where('key', 'lp_hero_leaders_accent')
                 ->where('value', 'Tuan Rumah HUT Ke-26 APKASI')
-                ->update(['value' => 'para Delegasi dan Pimpinan Kabupaten Se-Nusantara']);
+                ->update(['value' => 'Para Delegasi dan Pimpinan Kabupaten Se-Nusantara']);
             Setting::clearCache();
         }
     }

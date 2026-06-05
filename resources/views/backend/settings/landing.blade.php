@@ -114,22 +114,15 @@
                                             <span class="form-check-label fw-semibold">Tampilkan</span>
                                         </label>
                                     </div>
-                                    <div class="text-muted fs-8 mb-3">Tampil 5 detik di awal (foto + nama &amp; jabatan diambil dari tab <b>Pimpinan</b>), lalu berganti ke carousel logo. Headline di bawah ini khusus scene ini.</div>
+                                    <div class="text-muted fs-8 mb-3">Tampil 5 detik di awal lalu berganti ke carousel logo. Gunakan <b>satu gambar gabungan</b> (foto Bupati &amp; Wakil + nama &amp; jabatan sudah menyatu, latar transparan, teks terang untuk background gelap). Headline di bawah ini tampil sebagai teks terpisah.</div>
                                     <div class="row g-4">
                                         <div class="col-md-6"><label class="fw-semibold fs-7 mb-1">Headline scene leader (baris 1, putih)</label><input type="text" name="lp_hero_leaders_headline" class="form-control" value="{{ $g('lp_hero_leaders_headline') }}"></div>
                                         <div class="col-md-6"><label class="fw-semibold fs-7 mb-1">Headline aksen (baris 2, hijau)</label><input type="text" name="lp_hero_leaders_accent" class="form-control" value="{{ $g('lp_hero_leaders_accent') }}"></div>
-                                        <div class="col-md-6">
-                                            <label class="fw-semibold fs-8 text-muted mb-1">Foto Bupati (samping, transparan, maks 5MB)</label>
-                                            <input type="file" name="lp_hero_leader1_file" accept="image/*" class="form-control form-control-sm">
-                                            @if ($g('lp_hero_leader1_img'))
-                                                <img src="{{ \Illuminate\Support\Str::startsWith($g('lp_hero_leader1_img'), ['http']) ? $g('lp_hero_leader1_img') : asset($g('lp_hero_leader1_img')) }}" class="mt-2 rounded border bg-light" style="height:64px;width:auto;object-fit:contain">
-                                            @endif
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="fw-semibold fs-8 text-muted mb-1">Foto Wakil Bupati (samping, transparan, maks 5MB)</label>
-                                            <input type="file" name="lp_hero_leader2_file" accept="image/*" class="form-control form-control-sm">
-                                            @if ($g('lp_hero_leader2_img'))
-                                                <img src="{{ \Illuminate\Support\Str::startsWith($g('lp_hero_leader2_img'), ['http']) ? $g('lp_hero_leader2_img') : asset($g('lp_hero_leader2_img')) }}" class="mt-2 rounded border bg-light" style="height:64px;width:auto;object-fit:contain">
+                                        <div class="col-md-12">
+                                            <label class="fw-semibold fs-8 text-muted mb-1">Gambar Bupati &amp; Wakil (1 gambar gabungan, png/webp transparan, maks 5MB)</label>
+                                            <input type="file" name="lp_hero_leaders_file" accept="image/*" class="form-control form-control-sm">
+                                            @if ($g('lp_hero_leaders_img'))
+                                                <img src="{{ \Illuminate\Support\Str::startsWith($g('lp_hero_leaders_img'), ['http']) ? $g('lp_hero_leaders_img') : asset($g('lp_hero_leaders_img')) }}" class="mt-2 rounded border bg-dark p-2" style="height:90px;width:auto;object-fit:contain">
                                             @endif
                                         </div>
                                     </div>

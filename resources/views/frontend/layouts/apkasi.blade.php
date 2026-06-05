@@ -70,6 +70,27 @@
     </style>
 
     @stack('head')
+    {{-- Auto-scale untuk TV: browser Smart-TV sering merender di lebar CSS kecil lalu di-upscale ke
+         panel besar → konten terasa "kebesaran". Skrip ini menormalkan ke lebar acuan ~1600px
+         (mirip tampilan laptop). Aktif bila UA TV terdeteksi, atau dipaksa lewat ?tv=1 (disimpan).
+         No-op di laptop/HP/desktop biasa. Matikan: ?tv=0 --}}
+    <script>
+        (function () {
+            try {
+                var p = new URLSearchParams(location.search);
+                if (p.has('tv')) localStorage.setItem('tvScale', p.get('tv') === '0' ? '' : '1');
+                var forced = localStorage.getItem('tvScale') === '1';
+                var TV = /SmartTV|Smart-TV|GoogleTV|AppleTV|HbbTV|NetCast|NETTV|Tizen|Web0S|WebOS|BRAVIA|Viera|AFT[A-Z]|CrKey|SonyCEBrowser|POV_TV/i;
+                var isTV = forced || TV.test(navigator.userAgent);
+                var fit = function () {
+                    var doc = document.documentElement, w = window.innerWidth || 1280;
+                    doc.style.zoom = (isTV && w >= 1024) ? Math.max(0.6, Math.min(1, w / 1600)).toFixed(3) : '';
+                };
+                fit();
+                window.addEventListener('resize', fit);
+            } catch (e) {}
+        })();
+    </script>
 </head>
 <body class="bg-apkasi-cream">
 

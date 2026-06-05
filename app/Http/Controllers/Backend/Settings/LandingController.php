@@ -44,8 +44,7 @@ class LandingController extends Controller
             'lp_bupati_foto_file'    => 'lp_bupati_foto',
             'lp_wabup_foto_file'     => 'lp_wabup_foto',
             'lp_hero_bg_image_file'  => 'lp_hero_bg_image',
-            'lp_hero_leader1_file'   => 'lp_hero_leader1_img',
-            'lp_hero_leader2_file'   => 'lp_hero_leader2_img',
+            'lp_hero_leaders_file'   => 'lp_hero_leaders_img',
         ];
         foreach ($imageFields as $fileKey => $settingKey) {
             if ($request->hasFile($fileKey)) {

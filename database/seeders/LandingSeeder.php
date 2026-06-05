@@ -34,9 +34,8 @@ class LandingSeeder extends Seeder
             // Scene pertama hero: Bupati & Wakil Bupati (foto + headline khusus)
             'lp_hero_leaders_enabled'  => '1',
             'lp_hero_leaders_headline' => 'Selamat Datang di Deli Serdang',
-            'lp_hero_leaders_accent'   => 'para Delegasi dan Pimpinan Kabupaten Se-Nusantara',
-            'lp_hero_leader1_img'      => 'assets/apkasi/bupati-samping.webp',
-            'lp_hero_leader2_img'      => 'assets/apkasi/wabup-samping.webp',
+            'lp_hero_leaders_accent'   => 'Para Delegasi dan Pimpinan Kabupaten Se-Nusantara',
+            'lp_hero_leaders_img'      => 'assets/apkasi/leaders.webp',
             // Kolaborasi
             'lp_partners_title'     => 'Kolaborasi Penyelenggara',
             // Pimpinan

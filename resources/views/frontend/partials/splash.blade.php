@@ -52,8 +52,9 @@
         @keyframes sp-up{to{opacity:1;transform:none}}
         .sp-bottom{display:flex;align-items:flex-end;gap:clamp(14px,3vw,32px);opacity:0;transform:translateY(16px)}
         .sp-go .sp-bottom{animation:sp-up 1s .65s cubic-bezier(.2,.8,.2,1) forwards}
-        .sp-maskot{height:clamp(60px,10vw,100px);width:auto;animation:sp-mascotBounce 2s 1.2s ease-out infinite alternate;transform-origin:bottom center}
-        @keyframes sp-mascotBounce{0%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-8px) rotate(1deg)}100%{transform:translateY(0) rotate(-1deg)}}
+        /* Maskot berlari — WebM transparan (alpha asli) → tampil tanpa kotak. Fallback poster (Safari) = maskot statis. */
+        .sp-maskot{width:clamp(96px,12vw,132px);height:clamp(120px,15vw,168px);object-fit:cover;animation:sp-mascotBounce 2.4s 1.2s ease-out infinite alternate;transform-origin:bottom center;pointer-events:none}
+        @keyframes sp-mascotBounce{0%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-7px) rotate(1deg)}100%{transform:translateY(0) rotate(-1deg)}}
         .sp-partners{display:flex;align-items:center;gap:14px}
         .sp-lbl{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.45);font-weight:600}
         .sp-aoe{height:clamp(28px,4vw,38px);width:auto}
@@ -97,7 +98,9 @@
         </div>
 
         <div class="sp-bottom">
-            <img class="sp-maskot" src="{{ asset('logos/maskot.png') }}" alt="" />
+            <video class="sp-maskot" autoplay muted loop playsinline preload="auto" poster="{{ asset('logos/maskot.png') }}" aria-hidden="true">
+                <source src="{{ asset('assets/apkasi/maskot-run.webm') }}" type="video/webm" />
+            </video>
             <div class="sp-partners">
                 <span class="sp-lbl">Bagian dari</span>
                 <img class="sp-aoe" src="{{ asset('logos/logo_aoe2026.webp') }}" alt="" />

@@ -35,3 +35,13 @@ Thumbs.db
 
 # Sumber logo outline asli (besar, a.l. HUT 80 DS 5.5MB). Yang dipakai & dikomit: logos/*-outline.{png,webp}
 /public/assets/apkasi/outline/
+
+# Sprite sheet maskot asli (3MB) — tak dipakai (tiap frame ada background olive baked-in)
+/public/logos/frame_maskot.png
+
+# Sumber video maskot asli. Yang dipakai & dikomit: assets/apkasi/maskot-run.webm (audio dibuang, alpha utuh)
+/public/assets/apkasi/z_04_LOGO-LOGO APKASI/frame_maskot.mp4
+/public/assets/apkasi/z_04_LOGO-LOGO APKASI/frame_maskot.webm
+
+# Video maskot asli (7.4MB, ada audio). Yang dipakai & dikomit: assets/apkasi/maskot-run.mp4 (compress, no-audio, bg hitam utk screen-blend)
+/public/assets/apkasi/z_04_LOGO-LOGO APKASI/frame_maskot.mp4
