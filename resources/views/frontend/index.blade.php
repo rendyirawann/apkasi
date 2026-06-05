@@ -290,9 +290,11 @@
                 <div class="hero-3d flex items-center justify-center order-2 min-w-0">
                     @if ($hasLogos)
                     <style>
-                        /* perspective() ditaruh DI DALAM transform tiap slide agar 3D-nya kena (bukan di parent/cucu) */
-                        .hero-lslide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: clamp(1rem, 3vw, 3rem); opacity: 0; transform: perspective(820px) rotateY(-25deg) rotateX(7deg) scale(.88); transition: opacity 1s ease, transform 1.1s cubic-bezier(.2,.8,.2,1); pointer-events: none; transform-origin: 60% center; }
-                        .hero-lslide.is-on { opacity: 1; transform: perspective(820px) rotateY(-25deg) rotateX(7deg) scale(1); }
+                        /* Transisi cycle VERTIKAL: logo lama fade TURUN (is-out), logo baru muncul fade dari ATAS (default→is-on).
+                           Tilt 3D (rotateY/rotateX) tetap; perspective() di dalam transform agar 3D-nya kena. */
+                        .hero-lslide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: clamp(1rem, 3vw, 3rem); opacity: 0; transform: perspective(900px) rotateY(-25deg) rotateX(6deg) translateY(-3rem) scale(.92); transition: opacity .7s ease, transform 1.05s cubic-bezier(.3,.7,.2,1); pointer-events: none; will-change: transform, opacity; }
+                        .hero-lslide.is-on  { opacity: 1; transform: perspective(900px) rotateY(-25deg) rotateX(6deg) translateY(0) scale(1); }
+                        .hero-lslide.is-out { opacity: 0; transform: perspective(900px) rotateY(-25deg) rotateX(6deg) translateY(3rem) scale(.92); }
                         .hero-lslide img { max-width: 46vw; filter: drop-shadow(18px 20px 22px rgba(0,0,0,.6)); }
                         @media (min-width:1024px){ .hero-lslide img { max-width: 27vw; } }
                     </style>
@@ -359,14 +361,26 @@
         </div>
 
         <div class="absolute bottom-0 left-0 right-0 z-10 px-5 sm:px-8 md:px-10 pb-5 sm:pb-7 flex items-end justify-between">
-            <div class="max-w-xs hidden sm:block">
-                <div class="flex items-center gap-2 text-white/85 mb-2">
-                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                    <span class="text-xs font-semibold tracking-wide">{{ $g('lp_hero_tagline_title', 'Portal Resmi HUT APKASI 2026') }}</span>
+            <div class="flex flex-col items-start gap-2.5 sm:gap-3">
+                {{-- Badge total pengunjung (unik per IP per hari) — di ATAS tagline --}}
+                <div class="inline-flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-3 py-2 shadow-lg" title="Total pengunjung (dihitung unik per IP setiap hari)">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-apkasi-gold/20 shrink-0">
+                        <i data-lucide="users" class="w-4 h-4 text-apkasi-goldlt"></i>
+                    </span>
+                    <span class="leading-none text-left">
+                        <span class="block text-white font-bold text-base sm:text-lg tabular-nums">{{ number_format($visitsTotal ?? 0, 0, ',', '.') }}</span>
+                        <span class="block text-white/55 text-[9px] font-semibold uppercase tracking-wider mt-0.5">Pengunjung</span>
+                    </span>
                 </div>
-                <p class="text-white/60 text-[11px] leading-relaxed">
-                    {{ $g('lp_hero_tagline_desc', 'Informasi agenda, panduan delegasi, akomodasi, dan peta lokasi selama rangkaian kegiatan di Deli Serdang.') }}
-                </p>
+                <div class="max-w-xs hidden sm:block">
+                    <div class="flex items-center gap-2 text-white/85 mb-2">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                        <span class="text-xs font-semibold tracking-wide">{{ $g('lp_hero_tagline_title', 'Portal Resmi HUT APKASI 2026') }}</span>
+                    </div>
+                    <p class="text-white/60 text-[11px] leading-relaxed">
+                        {{ $g('lp_hero_tagline_desc', 'Informasi agenda, panduan delegasi, akomodasi, dan peta lokasi selama rangkaian kegiatan di Deli Serdang.') }}
+                    </p>
+                </div>
             </div>
             <div class="flex items-center gap-2 text-white/70 text-xs ml-auto">
                 <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
@@ -800,9 +814,12 @@
 
         function stepLogo() {
             if (slides.length < 2) return;
-            slides[li].classList.remove('is-on');
+            var prev = slides[li];
+            prev.classList.remove('is-on');
+            prev.classList.add('is-out');   // logo lama: fade TURUN ke bawah
+            (function (el) { setTimeout(function () { el.classList.remove('is-out'); }, 1100); })(prev); // reset ke posisi atas (siap giliran berikutnya)
             li = (li + 1) % slides.length;
-            slides[li].classList.add('is-on');
+            slides[li].classList.add('is-on'); // logo baru: muncul fade dari ATAS
         }
         function stepHeadline() {
             if (!hlA.length || !hlB.length) return;
@@ -845,7 +862,7 @@
         var dots    = overlay.querySelectorAll('.intro-dot');
         var hintTxt = document.getElementById('intro-hint-text');
         var LAST    = scenes.length - 1;
-        var stage = 0, open = true, busy = false, upAccum = 0;
+        var stage = 0, open = true, busy = false, upAccum = 0, lastUpTime = 0, upFlicks = 0;
 
         function lock()   { document.documentElement.style.overflow = 'hidden'; document.body.style.overflow = 'hidden'; }
         function unlock() { document.documentElement.style.overflow = '';        document.body.style.overflow = ''; }
@@ -905,8 +922,13 @@
                 if (Math.abs(e.deltaY) < 8) return;
                 step(e.deltaY > 0 ? 1 : -1);
             } else if (window.scrollY <= 0 && e.deltaY < 0) {
+                // Re-buka intro HANYA bila scroll ke atas CEPAT & BERUNTUN (cegah ke-trigger tak sengaja
+                // di device/jaringan lambat). Jeda antar-scroll > 280ms → reset; butuh akumulasi besar.
+                var t = e.timeStamp || 0;
+                if (t - lastUpTime > 280) upAccum = 0;
+                lastUpTime = t;
                 upAccum += -e.deltaY;
-                if (upAccum > 240) reopenIntro();
+                if (upAccum > 900) { upAccum = 0; reopenIntro(); }
             } else {
                 upAccum = 0;
             }
@@ -921,7 +943,13 @@
                 e.preventDefault();
                 if (Math.abs(dy) > 45) { step(dy > 0 ? 1 : -1); ty = e.touches[0].clientY; }
             } else if (window.scrollY <= 0 && dy < -70) {
-                reopenIntro();
+                // Sama spt wheel: butuh beberapa swipe-atas CEPAT beruntun (jeda > 600ms → reset).
+                var tt = e.timeStamp || 0;
+                if (tt - lastUpTime > 600) upFlicks = 0;
+                lastUpTime = tt;
+                upFlicks++;
+                ty = e.touches[0].clientY;          // reset titik → tiap ~70px gerak-atas = 1 hitungan
+                if (upFlicks >= 8) { upFlicks = 0; reopenIntro(); }
             }
         }, { passive: false });
 

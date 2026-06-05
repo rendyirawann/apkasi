@@ -20,6 +20,29 @@ class HomeController extends Controller
             \Illuminate\Support\Facades\Cache::put($introKey, true, now()->addHours(2));
         }
 
+        // Pengunjung unik per IP per hari (1 IP = 1x/hari; besok bertambah lagi). IP di-hash utk privasi.
+        // insertOrIgnore = 1 query terindeks (unique ip_hash+visit_on); total di-cache 5 menit.
+        $visitsTotal = 0;
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('daily_visits')) {
+                $ipHash   = hash('sha256', (string) $request->ip() . '|' . config('app.key'));
+                $inserted = \Illuminate\Support\Facades\DB::table('daily_visits')->insertOrIgnore([
+                    'ip_hash'    => $ipHash,
+                    'visit_on'   => now()->toDateString(),
+                    'created_at' => now(),
+                ]);
+                if ($inserted) {
+                    \Illuminate\Support\Facades\Cache::forget('visits_total'); // ada kunjungan unik baru → refresh total
+                }
+                $visitsTotal = \Illuminate\Support\Facades\Cache::remember(
+                    'visits_total', 300,
+                    fn () => \Illuminate\Support\Facades\DB::table('daily_visits')->count()
+                );
+            }
+        } catch (\Throwable $e) {
+            // jangan ganggu render landing bila DB bermasalah
+        }
+
         // Target date for countdown (1 July 2026, 19:00:00)
         $eventTargetDate = "2026-07-01 19:00:00";
 
@@ -104,7 +127,7 @@ class HomeController extends Controller
 
         return view('frontend.index', compact(
             'eventTargetDate', 'rundownHighlights', 'agenda',
-            'navbarLogos', 'heroLogosV1', 'heroLogosV2', 'heroLogosV3', 'partnerLogos', 'footerBrandLogos', 'footerSideLogos',
+            'navbarLogos', 'heroLogosV1', 'heroLogosV2', 'heroLogosV3', 'partnerLogos', 'footerBrandLogos', 'footerSideLogos', 'visitsTotal',
             'faqs', 'countdownTarget', 'eventRangeText', 'showIntro'
         ));
     }
