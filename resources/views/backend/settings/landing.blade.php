@@ -8,6 +8,7 @@
         'navbar'       => 'Logo Navbar',
         'hero_v1'      => 'Logo Hero — Versi 1 (Deli Serdang + APKASI)',
         'hero_v2'      => 'Logo Hero — Versi 2 (HUT Ke-26 APKASI + HUT Ke-80 DS)',
+        'hero_v3'      => 'Logo Hero — Versi 3 (APKASI Expo + Putri Otonomi)',
         'partners'     => 'Logo Kolaborasi Penyelenggara',
         'footer_brand' => 'Logo Footer (Brand)',
         'footer_side'  => 'Logo Footer (Samping Copyright)',
@@ -69,6 +70,37 @@
                                 <div class="col-md-12"><div class="alert alert-light-info py-2 px-3 fs-8 mb-0">Countdown & tanggal di sudut kanan bawah otomatis menyesuaikan dari Tanggal mulai/selesai + jam mulai.</div></div>
                                 <div class="col-md-5"><label class="fw-semibold fs-7 mb-1">Judul tagline (kiri bawah)</label><input type="text" name="lp_hero_tagline_title" class="form-control" value="{{ $g('lp_hero_tagline_title') }}"></div>
                                 <div class="col-md-7"><label class="fw-semibold fs-7 mb-1">Deskripsi tagline (kiri bawah)</label><input type="text" name="lp_hero_tagline_desc" class="form-control" value="{{ $g('lp_hero_tagline_desc') }}"></div>
+
+                                {{-- Latar belakang hero: gambar atau video --}}
+                                <div class="col-md-12">
+                                    <div class="separator separator-dashed my-1"></div>
+                                    <label class="fw-bold fs-6 mb-2 d-block">Latar Belakang Hero</label>
+                                    @php $bgType = $g('lp_hero_bg_type', 'image'); @endphp
+                                    <div class="d-flex flex-wrap gap-6 mb-4">
+                                        <label class="form-check form-check-custom form-check-solid form-check-sm">
+                                            <input class="form-check-input" type="radio" name="lp_hero_bg_type" value="image" {{ $bgType !== 'video' ? 'checked' : '' }}>
+                                            <span class="form-check-label fw-semibold"><i class="ki-outline ki-picture fs-5 me-1"></i> Gambar</span>
+                                        </label>
+                                        <label class="form-check form-check-custom form-check-solid form-check-sm">
+                                            <input class="form-check-input" type="radio" name="lp_hero_bg_type" value="video" {{ $bgType === 'video' ? 'checked' : '' }}>
+                                            <span class="form-check-label fw-semibold"><i class="ki-outline ki-youtube fs-5 me-1"></i> Video</span>
+                                        </label>
+                                    </div>
+                                    <div class="row g-4">
+                                        <div class="col-md-6">
+                                            <label class="fw-semibold fs-8 text-muted mb-1">Ganti gambar latar (jpg/png/webp, maks 5MB)</label>
+                                            <input type="file" name="lp_hero_bg_image_file" accept="image/*" class="form-control form-control-sm">
+                                            @if ($g('lp_hero_bg_image'))
+                                                <img src="{{ \Illuminate\Support\Str::startsWith($g('lp_hero_bg_image'), ['http']) ? $g('lp_hero_bg_image') : asset($g('lp_hero_bg_image')) }}" class="mt-2 rounded border" style="height:60px;width:auto;object-fit:cover">
+                                            @endif
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="fw-semibold fs-8 text-muted mb-1">Ganti video latar (mp4/webm, maks 50MB)</label>
+                                            <input type="file" name="lp_hero_bg_video_file" accept="video/mp4,video/webm" class="form-control form-control-sm">
+                                            <div class="fs-8 text-muted mt-1">Video tampil <b>tanpa suara &amp; berulang</b>. Saat ini: <code>{{ basename($g('lp_hero_bg_video', 'mars-hero.mp4')) }}</code>. Disarankan ringan (≤ ±20MB) agar cepat dimuat.</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="d-flex align-items-center justify-content-end gap-3 mt-6">
                                 <span class="text-muted fs-8">Menyimpan hanya field Hero Section.</span>
@@ -240,7 +272,7 @@
                     <div class="tab-pane fade" id="tab_logo" role="tabpanel">
                         <div class="mb-5">
                             <h3 class="fw-bold fs-4 mb-1">Kelola Logo</h3>
-                            <div class="text-muted fs-7">Unggah / hapus logo per area: navbar, hero, kolaborasi penyelenggara, dan footer. <span class="text-gray-700">Logo <b>Hero Versi 1</b> &amp; <b>Versi 2</b> akan tampil bergantian (carousel) di hero landing.</span></div>
+                            <div class="text-muted fs-7">Unggah / hapus logo per area: navbar, hero, kolaborasi penyelenggara, dan footer. <span class="text-gray-700">Logo <b>Hero Versi 1, 2 &amp; 3</b> akan tampil bergantian (carousel) tiap 3 detik di hero landing.</span></div>
                         </div>
                         @foreach ($logoGroups as $grp => $judul)
                             <div class="mb-6">

@@ -25,3 +25,6 @@ Thumbs.db
 
 # Backup files (mis. splash.blade.php.bak)
 *.bak
+
+# Sumber video hero asli (besar ~67MB). Yang dipakai & dikomit: mars-hero.mp4 (hasil compress)
+/public/assets/apkasi/mars.mp4

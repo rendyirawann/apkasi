@@ -200,8 +200,16 @@
 
     {{-- ═══════════ HERO ═══════════ --}}
     <section id="home" class="relative w-full min-h-[100svh] overflow-hidden flex flex-col">
-        <div class="absolute inset-0 w-full h-full">
-            <img src="{{ asset('logos/hero-bg.png') }}" alt="" class="absolute inset-0 w-full h-full object-cover" style="animation: kenburns 25s ease-in-out infinite alternate" />
+        {{-- Latar belakang hero: gambar (default, kenburns) atau video (mute, loop) — diatur di /admin → Landing → Hero --}}
+        <div class="absolute inset-0 w-full h-full bg-apkasi-dark">
+            @if ($g('lp_hero_bg_type', 'image') === 'video')
+                <video class="absolute inset-0 w-full h-full object-cover" autoplay muted loop playsinline preload="auto"
+                       poster="{{ $img('lp_hero_bg_image', 'logos/hero-bg.png') }}">
+                    <source src="{{ $img('lp_hero_bg_video', 'assets/apkasi/mars-hero.mp4') }}" type="video/mp4" />
+                </video>
+            @else
+                <img src="{{ $img('lp_hero_bg_image', 'logos/hero-bg.png') }}" alt="" class="absolute inset-0 w-full h-full object-cover" style="animation: kenburns 25s ease-in-out infinite alternate" />
+            @endif
         </div>
 
         <div class="absolute inset-0 overflow-hidden pointer-events-none" style="mix-blend-mode: overlay">
@@ -223,16 +231,32 @@
             @keyframes splashFloat4 { 0%{transform:translate(0,0) scale(1);} 100%{transform:translate(-6vw,-8vh) scale(1.1);} }
             @keyframes splashPulse { 0%,100%{opacity:.35;} 50%{opacity:.55;} }
             @keyframes mascotFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+            /* Teks hero: putih + outline hitam tipis (stroke di belakang fill agar huruf tetap penuh) */
+            .hero-title { color:#fff; paint-order: stroke fill; -webkit-text-stroke: 1.6px rgba(0,0,0,.55); text-shadow: 0 2px 12px rgba(0,0,0,.35); }
+            /* Baris aksen: hijau apkasi + outline putih tipis */
+            .hero-accent { color:#85AB8B; paint-order: stroke fill; -webkit-text-stroke: 1.4px rgba(255,255,255,.9); text-shadow: 0 2px 12px rgba(0,0,0,.3); }
+            .hero-subtitle { color:#fff; paint-order: stroke fill; -webkit-text-stroke: .6px rgba(0,0,0,.6); text-shadow: 0 1px 5px rgba(0,0,0,.45); }
+            @media (max-width: 640px){ .hero-title { -webkit-text-stroke-width: 1px; } .hero-accent { -webkit-text-stroke-width: 1px; } }
         </style>
 
         <div class="absolute inset-0 bg-gradient-to-b from-apkasi-dark/40 via-apkasi-dark/15 to-apkasi-dark/70 pointer-events-none"></div>
 
         <div class="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-5 sm:px-8 pt-28 sm:pt-32 pb-32 sm:pb-36">
-            {{-- Logo hero: carousel 2 versi dari CMS (grup hero_v1 ⇄ hero_v2). Kelola di /admin → Landing → tab Logo --}}
-            @if ($heroLogosV1->count() || $heroLogosV2->count())
+            {{-- Logo hero: carousel 3 versi dari CMS (hero_v1 → hero_v2 → hero_v3). Kelola di /admin → Landing → tab Logo --}}
+            @if ($heroLogosV1->count() || $heroLogosV2->count() || $heroLogosV3->count())
             <style>
                 .hero-lslide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: clamp(1.5rem, 5vw, 3.5rem); opacity: 0; transform: scale(.94); transition: opacity 1.2s ease, transform 1.3s ease; pointer-events: none; }
                 .hero-lslide.is-on { opacity: 1; transform: scale(1); }
+                /* Outline putih tipis mengikuti bentuk logo (drop-shadow mengikuti alpha) + bayangan halus */
+                .hero-lslide img {
+                    max-width: 42vw; /* jaga logo lebar (mis. APKASI Expo) tetap muat berdampingan di layar kecil */
+                    filter:
+                        drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff)
+                        drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff)
+                        drop-shadow(.7px .7px 0 #fff) drop-shadow(-.7px -.7px 0 #fff)
+                        drop-shadow(.7px -.7px 0 #fff) drop-shadow(-.7px .7px 0 #fff)
+                        drop-shadow(0 5px 10px rgba(0,0,0,.35));
+                }
             </style>
             <div class="hero-logos relative w-full flex items-center justify-center mb-8 sm:mb-10 min-h-[112px] sm:min-h-[128px] md:min-h-[160px] lg:min-h-[192px]">
                 @if ($heroLogosV1->count())
@@ -249,19 +273,26 @@
                     @endforeach
                 </div>
                 @endif
+                @if ($heroLogosV3->count())
+                <div class="hero-lslide {{ ($heroLogosV1->count() || $heroLogosV2->count()) ? '' : 'is-on' }}" data-ls="2">
+                    @foreach ($heroLogosV3 as $logo)
+                        <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="h-28 sm:h-32 md:h-40 lg:h-48 w-auto object-contain drop-shadow-xl" />
+                    @endforeach
+                </div>
+                @endif
             </div>
             @endif
 
             <div class="max-w-5xl">
-                <h1 class="font-display font-bold text-white text-[1.65rem] sm:text-3xl md:text-[2.75rem] lg:text-[3.5rem] xl:text-[4rem] tracking-tight">
+                <h1 class="font-display font-bold hero-title text-[1.65rem] sm:text-3xl md:text-[2.75rem] lg:text-[3.5rem] xl:text-[4rem] tracking-tight">
                     {{ $g('lp_hero_headline', 'Bersinergi Membangun Daerah') }}
                 </h1>
-                <p class="font-display font-bold text-apkasi-accent text-[1.65rem] sm:text-3xl md:text-[2.75rem] lg:text-[3.5rem] xl:text-[4rem] tracking-tight mt-2 sm:mt-4 md:mt-5">
+                <p class="font-display font-bold hero-accent text-[1.65rem] sm:text-3xl md:text-[2.75rem] lg:text-[3.5rem] xl:text-[4rem] tracking-tight mt-2 sm:mt-4 md:mt-5">
                     {{ $g('lp_hero_accent', 'Memperkuat Otonomi Indonesia') }}
                 </p>
             </div>
 
-            <p class="mt-4 sm:mt-6 text-white/75 text-sm sm:text-base md:text-lg leading-relaxed max-w-lg font-normal">
+            <p class="mt-4 sm:mt-6 hero-subtitle text-sm sm:text-base md:text-lg leading-relaxed max-w-lg font-semibold">
                 {{ $g('lp_hero_subtitle', 'HUT Ke-26 APKASI & HUT Ke-80 Kabupaten Deli Serdang') }}
                 <br class="hidden sm:block" />
                 {{ $eventRangeText }}

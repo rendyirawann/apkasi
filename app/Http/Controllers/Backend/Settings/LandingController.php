@@ -18,6 +18,7 @@ class LandingController extends Controller
             'navbar'       => SiteLogo::where('grup', 'navbar')->orderBy('urut')->get(),
             'hero_v1'      => SiteLogo::where('grup', 'hero_v1')->orderBy('urut')->get(),
             'hero_v2'      => SiteLogo::where('grup', 'hero_v2')->orderBy('urut')->get(),
+            'hero_v3'      => SiteLogo::where('grup', 'hero_v3')->orderBy('urut')->get(),
             'partners'     => SiteLogo::where('grup', 'partners')->orderBy('urut')->get(),
             'footer_brand' => SiteLogo::where('grup', 'footer_brand')->orderBy('urut')->get(),
             'footer_side'  => SiteLogo::where('grup', 'footer_side')->orderBy('urut')->get(),
@@ -36,19 +37,28 @@ class LandingController extends Controller
             }
         }
 
-        // Upload gambar tunggal (about, poi, foto pimpinan)
+        // Upload gambar tunggal (about, poi, foto pimpinan, background hero)
         $imageFields = [
-            'lp_about_image_file'  => 'lp_about_image',
-            'lp_poi_image_file'    => 'lp_poi_image',
-            'lp_bupati_foto_file'  => 'lp_bupati_foto',
-            'lp_wabup_foto_file'   => 'lp_wabup_foto',
+            'lp_about_image_file'    => 'lp_about_image',
+            'lp_poi_image_file'      => 'lp_poi_image',
+            'lp_bupati_foto_file'    => 'lp_bupati_foto',
+            'lp_wabup_foto_file'     => 'lp_wabup_foto',
+            'lp_hero_bg_image_file'  => 'lp_hero_bg_image',
         ];
         foreach ($imageFields as $fileKey => $settingKey) {
             if ($request->hasFile($fileKey)) {
-                $request->validate([$fileKey => 'image|mimes:jpg,jpeg,png,webp|max:3072']);
+                $request->validate([$fileKey => 'image|mimes:jpg,jpeg,png,webp|max:5120']);
                 $this->deleteLanding(Setting::get($settingKey));
                 Setting::set($settingKey, $this->uploadLanding($request->file($fileKey)));
             }
+        }
+
+        // Upload video background hero (mp4/webm) — maks 50MB. Default (mars-hero.mp4) tidak dihapus
+        // karena berada di luar folder upload landing (deleteLanding hanya hapus file di assets/media/landing).
+        if ($request->hasFile('lp_hero_bg_video_file')) {
+            $request->validate(['lp_hero_bg_video_file' => 'mimetypes:video/mp4,video/webm,video/quicktime|max:51200']);
+            $this->deleteLanding(Setting::get('lp_hero_bg_video'));
+            Setting::set('lp_hero_bg_video', $this->uploadLanding($request->file('lp_hero_bg_video_file')));
         }
 
         Setting::clearCache();
@@ -59,7 +69,7 @@ class LandingController extends Controller
     public function logoStore(Request $request)
     {
         $request->validate([
-            'grup'   => 'required|in:navbar,hero,hero_v1,hero_v2,partners,footer_brand,footer_side',
+            'grup'   => 'required|in:navbar,hero,hero_v1,hero_v2,hero_v3,partners,footer_brand,footer_side',
             'gambar' => 'required|image|mimes:jpg,jpeg,png,webp,svg|max:3072',
             'alt'    => 'nullable|string|max:100',
         ]);

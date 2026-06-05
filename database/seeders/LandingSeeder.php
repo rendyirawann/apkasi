@@ -27,6 +27,10 @@ class LandingSeeder extends Seeder
             'lp_hero_tagline_title' => 'Portal Resmi HUT APKASI 2026',
             'lp_hero_tagline_desc'  => 'Informasi agenda, panduan delegasi, akomodasi, dan peta lokasi selama rangkaian kegiatan di Deli Serdang.',
             'lp_hero_footer_place'  => 'Deli Serdang',
+            // Background hero (gambar / video)
+            'lp_hero_bg_type'       => 'image',
+            'lp_hero_bg_image'      => 'logos/hero-bg.png',
+            'lp_hero_bg_video'      => 'assets/apkasi/mars-hero.mp4',
             // Kolaborasi
             'lp_partners_title'     => 'Kolaborasi Penyelenggara',
             // Pimpinan
@@ -86,6 +90,8 @@ class LandingSeeder extends Seeder
                 ['hero_v1', 'logos/apkasi-official.png', 'APKASI'],
                 ['hero_v2', 'logos/logo_hut26.webp', 'HUT Ke-26 APKASI'],
                 ['hero_v2', 'logos/hutds80.png', 'HUT Ke-80 Deli Serdang'],
+                ['hero_v3', 'logos/aoe2026.png', 'APKASI Otonomi Expo'],
+                ['hero_v3', 'logos/poi.png', 'Putri Otonomi Indonesia'],
                 ['partners', 'logos/apkasi-full.png', 'APKASI'],
                 ['partners', 'logos/hut-apkasi.png', 'HUT APKASI 2026'],
                 ['partners', 'logos/aoe2026.png', 'AOE 2026'],
@@ -107,6 +113,8 @@ class LandingSeeder extends Seeder
             ['hero_v1', 'logos/apkasi-official.png', 'APKASI', 2],
             ['hero_v2', 'logos/logo_hut26.webp', 'HUT Ke-26 APKASI', 1],
             ['hero_v2', 'logos/hutds80.png', 'HUT Ke-80 Deli Serdang', 2],
+            ['hero_v3', 'logos/aoe2026.png', 'APKASI Otonomi Expo', 1],
+            ['hero_v3', 'logos/poi.png', 'Putri Otonomi Indonesia', 2],
         ];
         foreach ($heroCarousel as $l) {
             SiteLogo::firstOrCreate(
