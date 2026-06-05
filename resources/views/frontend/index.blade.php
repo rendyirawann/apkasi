@@ -204,6 +204,7 @@
         <div class="absolute inset-0 w-full h-full bg-apkasi-dark">
             @if ($g('lp_hero_bg_type', 'image') === 'video')
                 <video class="absolute inset-0 w-full h-full object-cover" autoplay muted loop playsinline preload="auto"
+                       style="filter: blur(5px); opacity: .55; transform: scale(1.08);"
                        poster="{{ $img('lp_hero_bg_image', 'logos/hero-bg.png') }}">
                     <source src="{{ $img('lp_hero_bg_video', 'assets/apkasi/mars-hero.mp4') }}" type="video/mp4" />
                 </video>
@@ -260,38 +261,36 @@
                 .hero-lslide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: clamp(1.5rem, 5vw, 3.5rem); opacity: 0; transform: scale(.94); transition: opacity 1.2s ease, transform 1.3s ease; pointer-events: none; }
                 .hero-lslide.is-on { opacity: 1; transform: scale(1); }
                 .hero-lslide img { max-width: 42vw; } /* jaga logo/foto lebar tetap muat berdampingan di layar kecil */
-                /* Outline putih tipis mengikuti bentuk LOGO (bukan foto leader) + bayangan halus */
-                .hero-lslide:not(.scene-leaders) img {
-                    filter:
-                        drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff)
-                        drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff)
-                        drop-shadow(.7px .7px 0 #fff) drop-shadow(-.7px -.7px 0 #fff)
-                        drop-shadow(.7px -.7px 0 #fff) drop-shadow(-.7px .7px 0 #fff)
-                        drop-shadow(0 5px 10px rgba(0,0,0,.35));
-                }
-                /* Foto Bupati/Wakil: bayangan halus saja (tanpa outline putih) */
-                .scene-leaders img { filter: drop-shadow(0 10px 18px rgba(0,0,0,.45)); }
-                .scene-leaders figcaption { max-width: 42vw; }
+                /* Logo memakai gambar ber-outline sendiri (folder /outline) → cukup bayangan halus utk kedalaman */
+                .hero-lslide:not(.scene-leaders) img { filter: drop-shadow(0 6px 14px rgba(0,0,0,.4)); }
+                /* Scene Bupati/Wakil: foto rata-atas (agar sejajar walau caption beda tinggi) + bayangan */
+                .scene-leaders { align-items: flex-start; }
+                .scene-leaders img { filter: drop-shadow(0 12px 22px rgba(0,0,0,.5)); }
+                .leader-name { paint-order: stroke fill; -webkit-text-stroke: .5px rgba(0,0,0,.8); }
             </style>
-            <div class="hero-logos relative w-full flex items-center justify-center mb-8 sm:mb-10 min-h-[200px] sm:min-h-[224px] md:min-h-[252px] lg:min-h-[272px]">
+            <div class="hero-logos relative w-full flex items-center justify-center mb-8 sm:mb-10 min-h-[235px] sm:min-h-[285px] md:min-h-[325px] lg:min-h-[350px]">
                 @if ($showLeaders)
                 {{-- Scene 1: Bupati & Wakil Bupati (foto samping + nama & jabatan dari tab Pimpinan) --}}
                 <div class="hero-lslide scene-leaders {{ $firstScene === 'leaders' ? 'is-on' : '' }}" data-hl="leaders" data-dur="5000">
                     @if ($leader1)
                     <figure class="flex flex-col items-center m-0">
-                        <img src="{{ $img('lp_hero_leader1_img') }}" alt="{{ $g('lp_bupati_nama', 'Bupati') }}" class="h-32 sm:h-36 md:h-44 lg:h-48 w-auto object-contain" />
-                        <figcaption class="mt-1 sm:mt-2 leading-tight text-center">
-                            <div class="hero-subtitle font-bold text-[13px] sm:text-base md:text-lg">{{ $g('lp_bupati_nama', 'Bupati Deli Serdang') }}</div>
-                            <div class="text-white/90 font-medium text-[10px] sm:text-xs" style="text-shadow:0 1px 4px rgba(0,0,0,.6)">{{ $g('lp_bupati_jabatan', 'Bupati Deli Serdang') }}</div>
+                        <img src="{{ $img('lp_hero_leader1_img') }}" alt="{{ $g('lp_bupati_nama', 'Bupati') }}" class="h-40 sm:h-48 md:h-56 lg:h-64 w-auto object-contain" />
+                        <figcaption class="mt-1 sm:mt-2">
+                            <div class="bg-white/95 rounded-xl sm:rounded-2xl px-3 sm:px-4 py-1.5 sm:py-2 shadow-lg w-[9rem] sm:w-[12rem] md:w-[13.5rem] mx-auto text-center">
+                                <div class="leader-name font-display font-bold text-apkasi-dark text-[11px] sm:text-[13px] md:text-sm leading-tight">{{ $g('lp_bupati_nama', 'Bupati Deli Serdang') }}</div>
+                                <div class="text-apkasi-cta font-semibold text-[9px] sm:text-[10px] md:text-[11px] mt-0.5 leading-tight">{{ $g('lp_bupati_jabatan', 'Bupati Deli Serdang') }}</div>
+                            </div>
                         </figcaption>
                     </figure>
                     @endif
                     @if ($leader2)
                     <figure class="flex flex-col items-center m-0">
-                        <img src="{{ $img('lp_hero_leader2_img') }}" alt="{{ $g('lp_wabup_nama', 'Wakil Bupati') }}" class="h-32 sm:h-36 md:h-44 lg:h-48 w-auto object-contain" />
-                        <figcaption class="mt-1 sm:mt-2 leading-tight text-center">
-                            <div class="hero-subtitle font-bold text-[13px] sm:text-base md:text-lg">{{ $g('lp_wabup_nama', 'Wakil Bupati Deli Serdang') }}</div>
-                            <div class="text-white/90 font-medium text-[10px] sm:text-xs" style="text-shadow:0 1px 4px rgba(0,0,0,.6)">{{ $g('lp_wabup_jabatan', 'Wakil Bupati Deli Serdang') }}</div>
+                        <img src="{{ $img('lp_hero_leader2_img') }}" alt="{{ $g('lp_wabup_nama', 'Wakil Bupati') }}" class="h-40 sm:h-48 md:h-56 lg:h-64 w-auto object-contain" />
+                        <figcaption class="mt-1 sm:mt-2">
+                            <div class="bg-white/95 rounded-xl sm:rounded-2xl px-3 sm:px-4 py-1.5 sm:py-2 shadow-lg w-[9rem] sm:w-[12rem] md:w-[13.5rem] mx-auto text-center">
+                                <div class="leader-name font-display font-bold text-apkasi-dark text-[11px] sm:text-[13px] md:text-sm leading-tight">{{ $g('lp_wabup_nama', 'Wakil Bupati Deli Serdang') }}</div>
+                                <div class="text-apkasi-cta font-semibold text-[9px] sm:text-[10px] md:text-[11px] mt-0.5 leading-tight">{{ $g('lp_wabup_jabatan', 'Wakil Bupati Deli Serdang') }}</div>
+                            </div>
                         </figcaption>
                     </figure>
                     @endif
@@ -300,21 +299,21 @@
                 @if ($heroLogosV1->count())
                 <div class="hero-lslide {{ $firstScene === 'v1' ? 'is-on' : '' }}" data-hl="default" data-dur="3000">
                     @foreach ($heroLogosV1 as $logo)
-                        <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="h-28 sm:h-32 md:h-40 lg:h-48 w-auto object-contain drop-shadow-xl" />
+                        <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="{{ str_contains($logo->gambar, 'hutds80') ? 'h-36 sm:h-44 md:h-52 lg:h-60' : 'h-28 sm:h-32 md:h-40 lg:h-48' }} w-auto object-contain drop-shadow-xl" />
                     @endforeach
                 </div>
                 @endif
                 @if ($heroLogosV2->count())
                 <div class="hero-lslide {{ $firstScene === 'v2' ? 'is-on' : '' }}" data-hl="default" data-dur="3000">
                     @foreach ($heroLogosV2 as $logo)
-                        <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="h-28 sm:h-32 md:h-40 lg:h-48 w-auto object-contain drop-shadow-xl" />
+                        <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="{{ str_contains($logo->gambar, 'hutds80') ? 'h-36 sm:h-44 md:h-52 lg:h-60' : 'h-28 sm:h-32 md:h-40 lg:h-48' }} w-auto object-contain drop-shadow-xl" />
                     @endforeach
                 </div>
                 @endif
                 @if ($heroLogosV3->count())
                 <div class="hero-lslide {{ $firstScene === 'v3' ? 'is-on' : '' }}" data-hl="default" data-dur="3000">
                     @foreach ($heroLogosV3 as $logo)
-                        <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="h-28 sm:h-32 md:h-40 lg:h-48 w-auto object-contain drop-shadow-xl" />
+                        <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="{{ str_contains($logo->gambar, 'hutds80') ? 'h-36 sm:h-44 md:h-52 lg:h-60' : 'h-28 sm:h-32 md:h-40 lg:h-48' }} w-auto object-contain drop-shadow-xl" />
                     @endforeach
                 </div>
                 @endif
@@ -337,8 +336,8 @@
                     <div class="font-display font-bold hero-title text-[1.65rem] sm:text-3xl md:text-[2.75rem] lg:text-[3.5rem] xl:text-[4rem] tracking-tight">
                         {{ $g('lp_hero_leaders_headline', 'Selamat Datang di Deli Serdang') }}
                     </div>
-                    <p class="font-display font-bold hero-accent text-[1.65rem] sm:text-3xl md:text-[2.75rem] lg:text-[3.5rem] xl:text-[4rem] tracking-tight mt-2 sm:mt-4 md:mt-5">
-                        {{ $g('lp_hero_leaders_accent', 'Tuan Rumah HUT Ke-26 APKASI') }}
+                    <p class="font-display font-bold hero-accent text-base sm:text-xl md:text-2xl lg:text-[1.9rem] leading-snug tracking-tight mt-2 sm:mt-3 max-w-3xl mx-auto">
+                        {{ $g('lp_hero_leaders_accent', 'para Delegasi dan Pimpinan Kabupaten Se-Nusantara') }}
                     </p>
                 </div>
                 @endif
@@ -822,7 +821,7 @@
             if (hlDefault) hlDefault.classList.toggle('is-on', mode !== 'leaders');
         }
         if (scenes.length < 2) return; // satu scene → statis (headline sudah benar dari HTML)
-        var i = 0;
+        var i = 0, started = false;
         function step() {
             scenes[i].classList.remove('is-on');
             i = (i + 1) % scenes.length;
@@ -830,7 +829,16 @@
             setHeadline(scenes[i].dataset.hl || 'default');
             setTimeout(step, parseInt(scenes[i].dataset.dur, 10) || 3000);
         }
-        setTimeout(step, parseInt(scenes[0].dataset.dur, 10) || 3000);
+        function start() {
+            if (started) return; started = true;
+            setTimeout(step, parseInt(scenes[0].dataset.dur, 10) || 3000);
+        }
+        // Mulai HANYA setelah loader & intro selesai → saat pertama melihat landing, Bupati/Wakil masih tampil.
+        var introEl = document.getElementById('intro');
+        var introWillShow = introEl && introEl.dataset.auto === '1' && !introEl.classList.contains('is-hidden');
+        window.addEventListener('apkasi:entered', start, { once: true });
+        // Fallback hanya bila TIDAK ada intro auto (durasi splash terbatas), cegah macet bila sinyal tak terkirim.
+        if (!introWillShow) setTimeout(start, 12000);
     })();
 
     // refresh ikon utk konten yg baru
@@ -881,10 +889,17 @@
             }
         }
 
+        var _entered = false;
+        function enterLanding() {            // sinyal: user mulai melihat landing (hero) → carousel hero boleh jalan
+            if (_entered) return; _entered = true;
+            try { window.dispatchEvent(new Event('apkasi:entered')); } catch (e) {}
+        }
+
         function closeIntro() {
             if (!open) return;
             open = false; busy = true; upAccum = 0;
             overlay.classList.add('is-hidden');
+            enterLanding();
             setTimeout(function () {
                 unlock();
                 window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -956,6 +971,11 @@
             open = false;
             overlay.classList.add('is-hidden');
             render();
+            // Hero tampil di balik splash → kirim sinyal "masuk landing" begitu splash hilang.
+            (function waitSplashThenEnter() {
+                if (!document.getElementById('splash')) { enterLanding(); return; }
+                requestAnimationFrame(waitSplashThenEnter);
+            })();
         } else {
             lock();        // kunci dari awal (di belakang splash)
             waitSplash();

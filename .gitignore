@@ -32,3 +32,6 @@ Thumbs.db
 # Sumber foto leader asli (besar ~10MB). Yang dipakai & dikomit: bupati-samping.webp & wabup-samping.webp
 /public/assets/apkasi/z_04_LOGO-LOGO APKASI/bupati - samping.png
 /public/assets/apkasi/z_04_LOGO-LOGO APKASI/wakil bupati - samping.png
+
+# Sumber logo outline asli (besar, a.l. HUT 80 DS 5.5MB). Yang dipakai & dikomit: logos/*-outline.{png,webp}
+/public/assets/apkasi/outline/

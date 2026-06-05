@@ -34,7 +34,7 @@ class LandingSeeder extends Seeder
             // Scene pertama hero: Bupati & Wakil Bupati (foto + headline khusus)
             'lp_hero_leaders_enabled'  => '1',
             'lp_hero_leaders_headline' => 'Selamat Datang di Deli Serdang',
-            'lp_hero_leaders_accent'   => 'Tuan Rumah HUT Ke-26 APKASI',
+            'lp_hero_leaders_accent'   => 'para Delegasi dan Pimpinan Kabupaten Se-Nusantara',
             'lp_hero_leader1_img'      => 'assets/apkasi/bupati-samping.webp',
             'lp_hero_leader2_img'      => 'assets/apkasi/wabup-samping.webp',
             // Kolaborasi
@@ -94,10 +94,10 @@ class LandingSeeder extends Seeder
                 ['navbar', 'logos/aoe2026.png', 'AOE 2026'],
                 ['hero_v1', 'logos/logo-ds.png', 'Deli Serdang'],
                 ['hero_v1', 'logos/apkasi-official.png', 'APKASI'],
-                ['hero_v2', 'logos/logo_hut26.webp', 'HUT Ke-26 APKASI'],
-                ['hero_v2', 'logos/hutds80.png', 'HUT Ke-80 Deli Serdang'],
+                ['hero_v2', 'logos/hut26-outline.webp', 'HUT Ke-26 APKASI'],
+                ['hero_v2', 'logos/hutds80-outline.webp', 'HUT Ke-80 Deli Serdang'],
                 ['hero_v3', 'logos/aoe2026.png', 'APKASI Otonomi Expo'],
-                ['hero_v3', 'logos/poi.png', 'Putri Otonomi Indonesia'],
+                ['hero_v3', 'logos/poi-outline.webp', 'Putri Otonomi Indonesia'],
                 ['partners', 'logos/apkasi-full.png', 'APKASI'],
                 ['partners', 'logos/hut-apkasi.png', 'HUT APKASI 2026'],
                 ['partners', 'logos/aoe2026.png', 'AOE 2026'],
@@ -117,10 +117,10 @@ class LandingSeeder extends Seeder
         $heroCarousel = [
             ['hero_v1', 'logos/logo-ds.png', 'Deli Serdang', 1],
             ['hero_v1', 'logos/apkasi-official.png', 'APKASI', 2],
-            ['hero_v2', 'logos/logo_hut26.webp', 'HUT Ke-26 APKASI', 1],
-            ['hero_v2', 'logos/hutds80.png', 'HUT Ke-80 Deli Serdang', 2],
+            ['hero_v2', 'logos/hut26-outline.webp', 'HUT Ke-26 APKASI', 1],
+            ['hero_v2', 'logos/hutds80-outline.webp', 'HUT Ke-80 Deli Serdang', 2],
             ['hero_v3', 'logos/aoe2026.png', 'APKASI Otonomi Expo', 1],
-            ['hero_v3', 'logos/poi.png', 'Putri Otonomi Indonesia', 2],
+            ['hero_v3', 'logos/poi-outline.webp', 'Putri Otonomi Indonesia', 2],
         ];
         foreach ($heroCarousel as $l) {
             SiteLogo::firstOrCreate(
