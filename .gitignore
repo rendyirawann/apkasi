@@ -28,3 +28,7 @@ Thumbs.db
 
 # Sumber video hero asli (besar ~67MB). Yang dipakai & dikomit: mars-hero.mp4 (hasil compress)
 /public/assets/apkasi/mars.mp4
+
+# Sumber foto leader asli (besar ~10MB). Yang dipakai & dikomit: bupati-samping.webp & wabup-samping.webp
+/public/assets/apkasi/z_04_LOGO-LOGO APKASI/bupati - samping.png
+/public/assets/apkasi/z_04_LOGO-LOGO APKASI/wakil bupati - samping.png

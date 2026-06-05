@@ -101,6 +101,39 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                {{-- Scene pertama hero: Bupati & Wakil Bupati --}}
+                                <div class="col-md-12">
+                                    <div class="separator separator-dashed my-1"></div>
+                                    @php $ldOn = $g('lp_hero_leaders_enabled', '1'); @endphp
+                                    <div class="d-flex flex-stack mb-2">
+                                        <label class="fw-bold fs-6 mb-0">Scene Pertama: Bupati &amp; Wakil Bupati</label>
+                                        <label class="form-check form-check-custom form-check-solid form-check-sm">
+                                            <input type="hidden" name="lp_hero_leaders_enabled" value="0">
+                                            <input class="form-check-input" type="checkbox" name="lp_hero_leaders_enabled" value="1" {{ $ldOn === '0' ? '' : 'checked' }}>
+                                            <span class="form-check-label fw-semibold">Tampilkan</span>
+                                        </label>
+                                    </div>
+                                    <div class="text-muted fs-8 mb-3">Tampil 5 detik di awal (foto + nama &amp; jabatan diambil dari tab <b>Pimpinan</b>), lalu berganti ke carousel logo. Headline di bawah ini khusus scene ini.</div>
+                                    <div class="row g-4">
+                                        <div class="col-md-6"><label class="fw-semibold fs-7 mb-1">Headline scene leader (baris 1, putih)</label><input type="text" name="lp_hero_leaders_headline" class="form-control" value="{{ $g('lp_hero_leaders_headline') }}"></div>
+                                        <div class="col-md-6"><label class="fw-semibold fs-7 mb-1">Headline aksen (baris 2, hijau)</label><input type="text" name="lp_hero_leaders_accent" class="form-control" value="{{ $g('lp_hero_leaders_accent') }}"></div>
+                                        <div class="col-md-6">
+                                            <label class="fw-semibold fs-8 text-muted mb-1">Foto Bupati (samping, transparan, maks 5MB)</label>
+                                            <input type="file" name="lp_hero_leader1_file" accept="image/*" class="form-control form-control-sm">
+                                            @if ($g('lp_hero_leader1_img'))
+                                                <img src="{{ \Illuminate\Support\Str::startsWith($g('lp_hero_leader1_img'), ['http']) ? $g('lp_hero_leader1_img') : asset($g('lp_hero_leader1_img')) }}" class="mt-2 rounded border bg-light" style="height:64px;width:auto;object-fit:contain">
+                                            @endif
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="fw-semibold fs-8 text-muted mb-1">Foto Wakil Bupati (samping, transparan, maks 5MB)</label>
+                                            <input type="file" name="lp_hero_leader2_file" accept="image/*" class="form-control form-control-sm">
+                                            @if ($g('lp_hero_leader2_img'))
+                                                <img src="{{ \Illuminate\Support\Str::startsWith($g('lp_hero_leader2_img'), ['http']) ? $g('lp_hero_leader2_img') : asset($g('lp_hero_leader2_img')) }}" class="mt-2 rounded border bg-light" style="height:64px;width:auto;object-fit:contain">
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="d-flex align-items-center justify-content-end gap-3 mt-6">
                                 <span class="text-muted fs-8">Menyimpan hanya field Hero Section.</span>
