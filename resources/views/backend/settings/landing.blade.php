@@ -6,7 +6,8 @@
     $g = fn($k, $d = '') => $s[$k] ?? $d;
     $logoGroups = [
         'navbar'       => 'Logo Navbar',
-        'hero'         => 'Logo Hero Section',
+        'hero_v1'      => 'Logo Hero — Versi 1 (Deli Serdang + APKASI)',
+        'hero_v2'      => 'Logo Hero — Versi 2 (HUT Ke-26 APKASI + HUT Ke-80 DS)',
         'partners'     => 'Logo Kolaborasi Penyelenggara',
         'footer_brand' => 'Logo Footer (Brand)',
         'footer_side'  => 'Logo Footer (Samping Copyright)',
@@ -239,7 +240,7 @@
                     <div class="tab-pane fade" id="tab_logo" role="tabpanel">
                         <div class="mb-5">
                             <h3 class="fw-bold fs-4 mb-1">Kelola Logo</h3>
-                            <div class="text-muted fs-7">Unggah / hapus logo per area: navbar, hero, kolaborasi penyelenggara, dan footer.</div>
+                            <div class="text-muted fs-7">Unggah / hapus logo per area: navbar, hero, kolaborasi penyelenggara, dan footer. <span class="text-gray-700">Logo <b>Hero Versi 1</b> &amp; <b>Versi 2</b> akan tampil bergantian (carousel) di hero landing.</span></div>
                         </div>
                         @foreach ($logoGroups as $grp => $judul)
                             <div class="mb-6">

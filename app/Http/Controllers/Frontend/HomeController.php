@@ -75,7 +75,8 @@ class HomeController extends Controller
             ->orderBy('urut')->orderBy('id')->get()->groupBy('grup');
         $emptyLogos       = collect();
         $navbarLogos      = $logosByGrup->get('navbar', $emptyLogos);
-        $heroLogos        = $logosByGrup->get('hero', $emptyLogos);
+        $heroLogosV1      = $logosByGrup->get('hero_v1', $emptyLogos); // carousel versi 1: Deli Serdang + APKASI
+        $heroLogosV2      = $logosByGrup->get('hero_v2', $emptyLogos); // carousel versi 2: HUT Ke-26 + HUT Ke-80
         $partnerLogos     = $logosByGrup->get('partners', $emptyLogos);
         $footerBrandLogos = $logosByGrup->get('footer_brand', $emptyLogos);
         $footerSideLogos  = $logosByGrup->get('footer_side', $emptyLogos);
@@ -102,7 +103,7 @@ class HomeController extends Controller
 
         return view('frontend.index', compact(
             'eventTargetDate', 'rundownHighlights', 'agenda',
-            'navbarLogos', 'heroLogos', 'partnerLogos', 'footerBrandLogos', 'footerSideLogos',
+            'navbarLogos', 'heroLogosV1', 'heroLogosV2', 'partnerLogos', 'footerBrandLogos', 'footerSideLogos',
             'faqs', 'countdownTarget', 'eventRangeText', 'showIntro'
         ));
     }

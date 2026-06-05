@@ -16,7 +16,8 @@ class LandingController extends Controller
         $s = Setting::allCached();
         $logos = [
             'navbar'       => SiteLogo::where('grup', 'navbar')->orderBy('urut')->get(),
-            'hero'         => SiteLogo::where('grup', 'hero')->orderBy('urut')->get(),
+            'hero_v1'      => SiteLogo::where('grup', 'hero_v1')->orderBy('urut')->get(),
+            'hero_v2'      => SiteLogo::where('grup', 'hero_v2')->orderBy('urut')->get(),
             'partners'     => SiteLogo::where('grup', 'partners')->orderBy('urut')->get(),
             'footer_brand' => SiteLogo::where('grup', 'footer_brand')->orderBy('urut')->get(),
             'footer_side'  => SiteLogo::where('grup', 'footer_side')->orderBy('urut')->get(),
@@ -58,7 +59,7 @@ class LandingController extends Controller
     public function logoStore(Request $request)
     {
         $request->validate([
-            'grup'   => 'required|in:navbar,hero,partners,footer_brand,footer_side',
+            'grup'   => 'required|in:navbar,hero,hero_v1,hero_v2,partners,footer_brand,footer_side',
             'gambar' => 'required|image|mimes:jpg,jpeg,png,webp,svg|max:3072',
             'alt'    => 'nullable|string|max:100',
         ]);

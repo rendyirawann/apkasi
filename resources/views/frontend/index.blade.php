@@ -228,11 +228,27 @@
         <div class="absolute inset-0 bg-gradient-to-b from-apkasi-dark/40 via-apkasi-dark/15 to-apkasi-dark/70 pointer-events-none"></div>
 
         <div class="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-5 sm:px-8 pt-28 sm:pt-32 pb-32 sm:pb-36">
-            @if ($heroLogos->count())
-            <div class="flex items-center justify-center gap-6 sm:gap-10 md:gap-14 mb-8 sm:mb-10">
-                @foreach ($heroLogos as $logo)
-                    <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="h-28 sm:h-32 md:h-40 lg:h-48 w-auto object-contain drop-shadow-xl" />
-                @endforeach
+            {{-- Logo hero: carousel 2 versi dari CMS (grup hero_v1 ⇄ hero_v2). Kelola di /admin → Landing → tab Logo --}}
+            @if ($heroLogosV1->count() || $heroLogosV2->count())
+            <style>
+                .hero-lslide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: clamp(1.5rem, 5vw, 3.5rem); opacity: 0; transform: scale(.94); transition: opacity 1.2s ease, transform 1.3s ease; pointer-events: none; }
+                .hero-lslide.is-on { opacity: 1; transform: scale(1); }
+            </style>
+            <div class="hero-logos relative w-full flex items-center justify-center mb-8 sm:mb-10 min-h-[112px] sm:min-h-[128px] md:min-h-[160px] lg:min-h-[192px]">
+                @if ($heroLogosV1->count())
+                <div class="hero-lslide is-on" data-ls="0">
+                    @foreach ($heroLogosV1 as $logo)
+                        <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="h-28 sm:h-32 md:h-40 lg:h-48 w-auto object-contain drop-shadow-xl" />
+                    @endforeach
+                </div>
+                @endif
+                @if ($heroLogosV2->count())
+                <div class="hero-lslide {{ $heroLogosV1->count() ? '' : 'is-on' }}" data-ls="1">
+                    @foreach ($heroLogosV2 as $logo)
+                        <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="h-28 sm:h-32 md:h-40 lg:h-48 w-auto object-contain drop-shadow-xl" />
+                    @endforeach
+                </div>
+                @endif
             </div>
             @endif
 
@@ -711,6 +727,18 @@
             }
         });
     });
+
+    // ── Hero logo carousel: 2 versi (DS+APKASI ⇄ HUT26+HUT80), cross-fade tiap 5 detik ──
+    (function () {
+        var hslides = document.querySelectorAll('.hero-lslide');
+        if (hslides.length < 2) return;
+        var hi = 0;
+        setInterval(function () {
+            hslides[hi].classList.remove('is-on');
+            hi = (hi + 1) % hslides.length;
+            hslides[hi].classList.add('is-on');
+        }, 3000);
+    })();
 
     // refresh ikon utk konten yg baru
     if (window.lucide) lucide.createIcons();

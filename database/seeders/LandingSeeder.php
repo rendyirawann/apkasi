@@ -82,8 +82,10 @@ class LandingSeeder extends Seeder
                 ['navbar', 'logos/logo-ds.png', 'Deli Serdang'],
                 ['navbar', 'logos/apkasi-alt2.png', 'APKASI'],
                 ['navbar', 'logos/aoe2026.png', 'AOE 2026'],
-                ['hero', 'logos/hut-apkasi.png', 'HUT APKASI Ke-26'],
-                ['hero', 'logos/hutds80.png', 'HUT Deli Serdang Ke-80'],
+                ['hero_v1', 'logos/logo-ds.png', 'Deli Serdang'],
+                ['hero_v1', 'logos/apkasi-official.png', 'APKASI'],
+                ['hero_v2', 'logos/logo_hut26.webp', 'HUT Ke-26 APKASI'],
+                ['hero_v2', 'logos/hutds80.png', 'HUT Ke-80 Deli Serdang'],
                 ['partners', 'logos/apkasi-full.png', 'APKASI'],
                 ['partners', 'logos/hut-apkasi.png', 'HUT APKASI 2026'],
                 ['partners', 'logos/aoe2026.png', 'AOE 2026'],
@@ -96,6 +98,21 @@ class LandingSeeder extends Seeder
             foreach ($logos as $i => $l) {
                 SiteLogo::create(['grup' => $l[0], 'gambar' => $l[1], 'alt' => $l[2], 'urut' => $i + 1, 'is_active' => true]);
             }
+        }
+
+        // Logo hero CAROUSEL 2 versi — idempotent (tetap dibuat walau tabel logo sudah terisi
+        // dari seed lama). Versi 1: Deli Serdang + APKASI. Versi 2: HUT Ke-26 + HUT Ke-80.
+        $heroCarousel = [
+            ['hero_v1', 'logos/logo-ds.png', 'Deli Serdang', 1],
+            ['hero_v1', 'logos/apkasi-official.png', 'APKASI', 2],
+            ['hero_v2', 'logos/logo_hut26.webp', 'HUT Ke-26 APKASI', 1],
+            ['hero_v2', 'logos/hutds80.png', 'HUT Ke-80 Deli Serdang', 2],
+        ];
+        foreach ($heroCarousel as $l) {
+            SiteLogo::firstOrCreate(
+                ['grup' => $l[0], 'gambar' => $l[1]],
+                ['alt' => $l[2], 'urut' => $l[3], 'is_active' => true]
+            );
         }
 
         // FAQ (hanya bila kosong)
