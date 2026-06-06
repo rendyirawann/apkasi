@@ -7,6 +7,31 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     {{-- Jangan pulihkan posisi scroll lama & mulai selalu dari atas --}}
     <script>try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}</script>
+    {{-- Auto-scale untuk layar TV: tampilan diskalakan (efek spt zoom browser) agar proporsional spt laptop.
+         • TV terdeteksi via User-Agent → otomatis 0.8.
+         • Manual (mis. laptop/PC via HDMI ke TV): buka sekali dengan ?tv=on (disimpan), matikan dgn ?tv=off, atau ?tv=0.75 utk custom.
+         • Laptop/HP biasa: TIDAK terpengaruh. --}}
+    <script>
+    (function () {
+        try {
+            var KEY = 'apkasi_tvscale', p = new URLSearchParams(location.search), scale = null;
+            if (p.has('tv')) {
+                var v = (p.get('tv') || '').toLowerCase();
+                if (v === 'off' || v === '0' || v === 'false' || v === 'no') { localStorage.removeItem(KEY); }
+                else {
+                    scale = (v === 'on' || v === 'true' || v === '') ? 0.8 : parseFloat(v);
+                    if (!(scale >= 0.5 && scale <= 1.5)) scale = 0.8;
+                    localStorage.setItem(KEY, String(scale));
+                }
+            } else {
+                var saved = parseFloat(localStorage.getItem(KEY));
+                if (saved >= 0.5 && saved <= 1.5) scale = saved;
+                else if (/SmartTV|SMART-TV|Tizen|Web0S|WebOS|NetCast|BRAVIA|GoogleTV|CrKey|AFT|HbbTV|VIDAA|Hisense|AppleTV/i.test(navigator.userAgent)) scale = 0.8;
+            }
+            if (scale && scale !== 1) document.documentElement.style.zoom = scale;
+        } catch (e) {}
+    })();
+    </script>
     <title>@yield('title', 'HUT Ke-26 APKASI & Deli Serdang Ke-80 — 1-3 Juli 2026')</title>
     <meta name="description" content="@yield('description', 'HUT Ke-26 APKASI & HUT Ke-80 Kabupaten Deli Serdang — Bersinergi Membangun Daerah, Memperkuat Otonomi Untuk Indonesia Maju. 1–3 Juli 2026.')" />
     <link rel="icon" type="image/png" href="{{ asset('logos/apkasi-logo.png') }}" />
