@@ -295,7 +295,7 @@
                         .hero-lslide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: clamp(1rem, 3vw, 3rem); opacity: 0; transform: perspective(900px) rotateY(-25deg) rotateX(6deg) translateY(-3rem) scale(.92); transition: opacity .7s ease, transform 1.05s cubic-bezier(.3,.7,.2,1); pointer-events: none; will-change: transform, opacity; }
                         .hero-lslide.is-on  { opacity: 1; transform: perspective(900px) rotateY(-25deg) rotateX(6deg) translateY(0) scale(1); }
                         .hero-lslide.is-out { opacity: 0; transform: perspective(900px) rotateY(-25deg) rotateX(6deg) translateY(3rem) scale(.92); }
-                        .hero-lslide img { max-width: 46vw; filter: drop-shadow(18px 20px 22px rgba(0,0,0,.6)); }
+                        .hero-lslide img { max-width: 46vw; filter: drop-shadow(3px 5px 7px rgba(0,0,0,.22)) drop-shadow(13px 18px 26px rgba(0,0,0,.3)); }
                         @media (min-width:1024px){ .hero-lslide img { max-width: 27vw; } }
                     </style>
                     <div class="hero-logos relative w-full flex items-center justify-center min-h-[200px] sm:min-h-[250px] md:min-h-[300px] lg:min-h-[350px]">
