@@ -277,7 +277,7 @@
             </div>
 
             {{-- ═══ TENGAH: KIRI foto Bupati & Wakil (statis, besar) | KANAN logo carousel 3D (gaya PES) ═══ --}}
-            <div class="w-full max-w-[1400px] mx-auto grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-10 items-center my-4 sm:my-6">
+            <div class="w-full max-w-[1400px] mx-auto grid lg:grid-cols-[43fr_57fr] gap-4 sm:gap-6 lg:gap-10 items-center my-4 sm:my-6">
                 {{-- KIRI: gambar gabungan Bupati & Wakil — statis (tidak berganti), full width --}}
                 <div class="flex items-center justify-center order-1 min-w-0">
                     @if ($showLeaders)
@@ -290,33 +290,46 @@
                 <div class="hero-3d flex items-center justify-center order-2 min-w-0">
                     @if ($hasLogos)
                     <style>
-                        /* Transisi cycle VERTIKAL: logo lama fade TURUN (is-out), logo baru muncul fade dari ATAS (default→is-on).
-                           Tilt 3D (rotateY/rotateX) tetap; perspective() di dalam transform agar 3D-nya kena. */
-                        .hero-lslide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: clamp(1rem, 3vw, 3rem); opacity: 0; transform: perspective(900px) rotateY(-25deg) rotateX(6deg) translateY(-3rem) scale(.92); transition: opacity .7s ease, transform 1.05s cubic-bezier(.3,.7,.2,1); pointer-events: none; will-change: transform, opacity; }
-                        .hero-lslide.is-on  { opacity: 1; transform: perspective(900px) rotateY(-25deg) rotateX(6deg) translateY(0) scale(1); }
-                        .hero-lslide.is-out { opacity: 0; transform: perspective(900px) rotateY(-25deg) rotateX(6deg) translateY(3rem) scale(.92); }
-                        .hero-lslide img { max-width: 46vw; filter: drop-shadow(3px 5px 7px rgba(0,0,0,.22)) drop-shadow(13px 18px 26px rgba(0,0,0,.3)); }
-                        @media (min-width:1024px){ .hero-lslide img { max-width: 27vw; } }
+                        /* Cycle VERTIKAL: logo lama fade TURUN (is-out), logo baru muncul fade dari ATAS (default→is-on). */
+                        .hero-lslide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: clamp(.75rem, 2.5vw, 2.25rem); opacity: 0; transform: translateY(-3rem) scale(.92); transition: opacity .7s ease, transform 1.05s cubic-bezier(.3,.7,.2,1); pointer-events: none; will-change: transform, opacity; }
+                        .hero-lslide.is-on  { opacity: 1; transform: translateY(0) scale(1); }
+                        .hero-lslide.is-out { opacity: 0; transform: translateY(3rem) scale(.92); }
+                        /* Tiap logo dimiringkan 3D ke arah TENGAH: kiri melonjong ke kanan, kanan melonjong ke kiri
+                           (gaya VS / "keluar layar"). Shadow per-logo searah miringnya. perspective() di dlm transform. */
+                        /* Tiap logo menempati SETENGAH slide yg sama (flex 1) + object-contain → posisi simetris & presisi
+                           apa pun rasio aspek logonya, sekaligus cegah logo lebar (Expo) meluber. */
+                        /* Sizing berbasis TINGGI → dua logo dalam satu slide jadi setinggi sama (ukuran tampak sama),
+                           apa pun rasio aspeknya. Tinggi diatur per-slide; logo lebar (Expo) otomatis melebar. */
+                        .hero-lslide img { width: auto; height: clamp(7rem, 17vw, 15.5rem); object-fit: contain; }
+                        .hero-lslide.slide-v2 img { height: clamp(7.5rem, 18.5vw, 17.5rem); }   /* acuan (80 DS) */
+                        .hero-lslide.slide-v3 img { height: clamp(6.5rem, 15vw, 12rem); }
+                        /* Penyesuaian per-logo (rasio aspek beda → ukuran tampak seimbang) */
+                        .hero-lslide.slide-v2 img:first-child { height: clamp(6rem, 14vw, 13.5rem); }    /* 26 APKASI dikecilkan */
+                        .hero-lslide.slide-v3 img:first-child { height: clamp(5rem, 11vw, 9.5rem); }     /* APKASI Expo dikecilkan lagi */
+                        .hero-lslide.slide-v3 img:last-child  { height: clamp(6.5rem, 14vw, 13.5rem); }  /* Putri Otonomi diperbesar */
+                        .hero-lslide img:first-child { transform: perspective(820px) rotateY(28deg) rotateX(5deg);  filter: drop-shadow(-2px 5px 5px rgba(0,0,0,.4)) drop-shadow(-9px 14px 16px rgba(0,0,0,.4)) drop-shadow(-18px 24px 32px rgba(0,0,0,.32)); }
+                        .hero-lslide img:last-child  { transform: perspective(820px) rotateY(-28deg) rotateX(5deg); filter: drop-shadow(2px 5px 5px rgba(0,0,0,.4)) drop-shadow(9px 14px 16px rgba(0,0,0,.4)) drop-shadow(18px 24px 32px rgba(0,0,0,.32)); }
                     </style>
-                    <div class="hero-logos relative w-full flex items-center justify-center min-h-[200px] sm:min-h-[250px] md:min-h-[300px] lg:min-h-[350px]">
+                    <div class="hero-logos relative w-full flex items-center justify-center min-h-[210px] sm:min-h-[270px] md:min-h-[330px] lg:min-h-[390px]">
                         @if ($heroLogosV1->count())
+                        {{-- Versi 1 (DS + APKASI) sedikit lebih besar dari versi lain --}}
                         <div class="hero-lslide {{ $firstLogo === 'v1' ? 'is-on' : '' }}">
                             @foreach ($heroLogosV1 as $logo)
-                                <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="{{ str_contains($logo->gambar, 'hutds80') ? 'h-40 sm:h-48 md:h-60 lg:h-72' : 'h-32 sm:h-40 md:h-48 lg:h-60' }} w-auto object-contain" />
+                                <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" />
                             @endforeach
                         </div>
                         @endif
                         @if ($heroLogosV2->count())
-                        <div class="hero-lslide {{ $firstLogo === 'v2' ? 'is-on' : '' }}">
+                        <div class="hero-lslide slide-v2 {{ $firstLogo === 'v2' ? 'is-on' : '' }}">
                             @foreach ($heroLogosV2 as $logo)
-                                <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="{{ str_contains($logo->gambar, 'hutds80') ? 'h-40 sm:h-48 md:h-60 lg:h-72' : 'h-32 sm:h-40 md:h-48 lg:h-60' }} w-auto object-contain" />
+                                <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" />
                             @endforeach
                         </div>
                         @endif
                         @if ($heroLogosV3->count())
-                        <div class="hero-lslide {{ $firstLogo === 'v3' ? 'is-on' : '' }}">
+                        <div class="hero-lslide slide-v3 {{ $firstLogo === 'v3' ? 'is-on' : '' }}">
                             @foreach ($heroLogosV3 as $logo)
-                                <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" class="{{ str_contains($logo->gambar, 'hutds80') ? 'h-40 sm:h-48 md:h-60 lg:h-72' : 'h-32 sm:h-40 md:h-48 lg:h-60' }} w-auto object-contain" />
+                                <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" />
                             @endforeach
                         </div>
                         @endif
