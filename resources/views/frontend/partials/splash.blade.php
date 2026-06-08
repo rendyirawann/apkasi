@@ -86,8 +86,8 @@
                 <img class="sp-omni-logo" src="{{ asset('logos/logo_hut26.webp') }}" alt="" />
                 <img class="sp-omni-logo" src="{{ asset('logos/hutds80.png') }}" alt="" />
                 <img class="sp-omni-logo" src="{{ asset('logos/logo_aoe2026.webp') }}" alt="" />
-                <img class="sp-omni-logo" src="{{ asset('assets/apkasi/z_04_LOGO-LOGO APKASI/01_APKASI_Official Logo alt.png') }}" alt="" />
-                <img class="sp-omni-logo" src="{{ asset('assets/apkasi/z_04_LOGO-LOGO APKASI/poi_logo_hd.png') }}" alt="" />
+                <img class="sp-omni-logo" src="{{ asset('logos/apkasi-official.png') }}" alt="" />
+                <img class="sp-omni-logo" src="{{ asset('logos/poi.png') }}" alt="" />
             </div>
         </div>
 

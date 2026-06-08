@@ -45,11 +45,11 @@ class LandingSeeder extends Seeder
             'lp_bupati_nama'           => 'dr. H. ASRI LUDIN TAMBUNAN, M.Ked(PD).,Sp.PD',
             'lp_bupati_jabatan'        => 'Bupati Deli Serdang',
             'lp_bupati_periode'        => 'Periode 2024–2029',
-            'lp_bupati_foto'           => 'assets/apkasi/z_04_LOGO-LOGO APKASI/BUPATI.png',
+            'lp_bupati_foto'           => 'logos/bupati.png',
             'lp_wabup_nama'            => 'LOM LOM SUWONDO, S.S.',
             'lp_wabup_jabatan'         => 'Wakil Bupati Deli Serdang',
             'lp_wabup_periode'         => 'Periode 2024–2029',
-            'lp_wabup_foto'            => 'assets/apkasi/z_04_LOGO-LOGO APKASI/WABUPATI.png',
+            'lp_wabup_foto'            => 'logos/wabup.png',
             'lp_pimpinan_quote'        => 'Kami sangat bangga menjadi tuan rumah HUT APKASI Ke-26. Deli Serdang siap menyambut seluruh Bupati dan perwakilan kabupaten se-Indonesia untuk bersinergi membangun daerah.',
             'lp_pimpinan_quote_author' => 'Bupati Deli Serdang',
             // Tentang Event

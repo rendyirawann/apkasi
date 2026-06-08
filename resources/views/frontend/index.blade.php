@@ -6,13 +6,14 @@
     // $agenda dikirim dari HomeController@index (dari tabel rundown).
     $dayIcons = ['star', 'users', 'tree-pine', 'calendar'];
     // Logo bergantian utk ikon header tiap hari di section Agenda.
-    $dayImages = ['assets/apkasi/logo-ds.png', 'assets/apkasi/z_04_LOGO-LOGO APKASI/01_APKASI_Official Logo alt.png'];
+    $dayImages = ['assets/apkasi/logo-ds.png', 'logos/apkasi-official.png'];
     // Helper baca konten landing dari settings ($appSettings di-share global)
     $g = fn($k, $d = '') => ($appSettings[$k] ?? $d);
     // Helper URL gambar: link http(s) dipakai apa adanya, selainnya lewat asset()
     $img = function ($k, $d = '') use ($g) {
         $v = $g($k, $d);
-        return \Illuminate\Support\Str::startsWith($v, ['http://', 'https://']) ? $v : asset($v);
+        if (\Illuminate\Support\Str::startsWith($v, ['http://', 'https://'])) return $v;
+        return asset(str_replace(' ', '%20', $v)); // encode spasi → Safari/iOS tetap memuat aset (URL berspasi melanggar RFC)
     };
 @endphp
 
@@ -433,7 +434,7 @@
                 <div class="group flex flex-col items-center text-center max-w-xs">
                     <div class="relative mb-5">
                         <div class="w-44 h-44 sm:w-52 sm:h-52 md:w-60 md:h-60 rounded-full overflow-hidden border-4 border-apkasi-gold/30 shadow-xl group-hover:border-apkasi-gold transition-colors duration-500">
-                            <img src="{{ asset($g('lp_bupati_foto', 'assets/apkasi/z_04_LOGO-LOGO APKASI/BUPATI.png')) }}" alt="{{ $g('lp_bupati_nama', 'Bupati') }}" loading="lazy" decoding="async" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
+                            <img src="{{ $img('lp_bupati_foto', 'logos/bupati.png') }}" alt="{{ $g('lp_bupati_nama', 'Bupati') }}" loading="lazy" decoding="async" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-apkasi-gold to-[#c5a028] text-apkasi-dark text-[10px] sm:text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full shadow-md whitespace-nowrap">Bupati</div>
                     </div>
@@ -447,7 +448,7 @@
                 <div class="group flex flex-col items-center text-center max-w-xs">
                     <div class="relative mb-5">
                         <div class="w-44 h-44 sm:w-52 sm:h-52 md:w-60 md:h-60 rounded-full overflow-hidden border-4 border-apkasi-gold/30 shadow-xl group-hover:border-apkasi-gold transition-colors duration-500">
-                            <img src="{{ asset($g('lp_wabup_foto', 'assets/apkasi/z_04_LOGO-LOGO APKASI/WABUPATI.png')) }}" alt="{{ $g('lp_wabup_nama', 'Wakil Bupati') }}" loading="lazy" decoding="async" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
+                            <img src="{{ $img('lp_wabup_foto', 'logos/wabup.png') }}" alt="{{ $g('lp_wabup_nama', 'Wakil Bupati') }}" loading="lazy" decoding="async" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-apkasi-gold to-[#c5a028] text-apkasi-dark text-[10px] sm:text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full shadow-md whitespace-nowrap">Wakil Bupati</div>
                     </div>
