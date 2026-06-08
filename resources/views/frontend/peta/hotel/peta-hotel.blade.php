@@ -24,6 +24,19 @@
         .pop-name { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: .95rem; color: #1f2a1d; margin-bottom: 3px; }
         .pop-addr { font-size: .78rem; color: #4b5b47; margin-bottom: 7px; }
         .pop-link { font-size: .78rem; font-weight: 700; color: #336443; text-decoration: none; }
+        /* Popup detail menyeluruh */
+        .pop { width: 234px; max-width: 76vw; }
+        .pop-img { width: 100%; height: 116px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; background: #e8f0ea; display: block; }
+        .pop-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 1px 0 6px; }
+        .pop-rate { display: inline-flex; align-items: center; gap: 3px; font-size: .72rem; font-weight: 800; color: #b9931f; }
+        .pop-rate svg { width: 13px; height: 13px; }
+        .pop-cat { font-size: .58rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #336443; background: #e8f0ea; padding: 2px 7px; border-radius: 99px; }
+        .pop-row { display: flex; align-items: flex-start; gap: 5px; font-size: .74rem; color: #4b5b47; margin-bottom: 4px; line-height: 1.35; }
+        .pop-row svg { width: 13px; height: 13px; flex: none; margin-top: 2px; color: #85AB8B; }
+        .pop-acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+        .pop-acts a { display: inline-flex; align-items: center; gap: 4px; font-size: .72rem; font-weight: 700; text-decoration: none; padding: 5px 9px; border-radius: 8px; border: 1px solid #d7e3d9; color: #336443; }
+        .pop-acts a svg { width: 13px; height: 13px; }
+        .pop-acts a.wa { color: #fff; background: #25a567; border-color: #25a567; }
         .place-scroll::-webkit-scrollbar { width: 8px; } .place-scroll::-webkit-scrollbar-thumb { background: #c4d6c9; border-radius: 99px; }
         .pg-btn { min-width: 34px; height: 34px; padding: 0 10px; border-radius: 10px; border: 1px solid #e8f0ea; background: #fff; color: #336443; font-weight: 700; font-size: .82rem; cursor: pointer; transition: all .15s ease; }
         .pg-btn:hover:not(:disabled):not(.pg-active) { background: #e8f0ea; }
@@ -216,6 +229,26 @@
     }
 
     function gmaps(p) { return p.maps_url || ('https://www.google.com/maps/search/?api=1&query=' + p.lat + ',' + p.lng); }
+    // Popup detail menyeluruh: thumbnail, rating, kategori, alamat, kamar/tiket, + aksi Rute/WA/Email (semua "kalau ada")
+    function popupHTML(p) {
+        var catLbl = { venue: 'Gedung', hotel: 'Hotel', wisata: 'Destinasi' };
+        var h = '<div class="pop">';
+        if (p.image) h += '<img class="pop-img" src="' + p.image + '" alt="" loading="lazy">';
+        h += '<div class="pop-name">' + p.name + '</div>';
+        var meta = '';
+        if (p.rating) meta += '<span class="pop-rate"><i data-lucide="star"></i> ' + p.rating + '</span>';
+        if (catLbl[p.category]) meta += '<span class="pop-cat">' + catLbl[p.category] + '</span>';
+        if (p.is_lokasi_acara) meta += '<span class="pop-cat" style="color:#a8821a;background:#fbf3da">Lokasi Acara</span>';
+        if (meta) h += '<div class="pop-meta">' + meta + '</div>';
+        if (p.address) h += '<div class="pop-row"><i data-lucide="map-pin"></i><span>' + p.address + '</span></div>';
+        if (p.rooms)   h += '<div class="pop-row"><i data-lucide="bed-double"></i><span>' + p.rooms + '</span></div>';
+        if (p.harga)   h += '<div class="pop-row"><i data-lucide="ticket"></i><span>' + p.harga + '</span></div>';
+        var act = '<a href="' + gmaps(p) + '" target="_blank" rel="noopener"><i data-lucide="navigation"></i> Rute</a>';
+        if (p.wa)    act += '<a class="wa" href="' + waLink(p.wa) + '" target="_blank" rel="noopener"><i data-lucide="message-circle"></i> WhatsApp</a>';
+        if (p.email) act += '<a href="mailto:' + p.email + '"><i data-lucide="mail"></i> Email</a>';
+        h += '<div class="pop-acts">' + act + '</div></div>';
+        return h;
+    }
     function waLink(no) { var d = (no || '').replace(/[^0-9]/g, ''); if (d.charAt(0) === '0') d = '62' + d.slice(1); return 'https://wa.me/' + d; }
     function pinClass(cat) { return (CAT[cat] || CAT.venue).pin; }
     var MINI = 'inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border border-apkasi-leaf text-apkasi-heading transition-colors';
@@ -352,11 +385,11 @@
             map.flyTo({ center: ll, zoom: 15, duration: 800 });
             if (map.getSource('sel')) map.getSource('sel').setData(toFC([p]));
             if (currentPopup) currentPopup.remove();
-            currentPopup = new mapboxgl.Popup({ offset: 16, closeButton: false })
+            currentPopup = new mapboxgl.Popup({ offset: 16, closeButton: true, maxWidth: '280px' })
                 .setLngLat(ll)
-                .setHTML('<div class="pop-name">' + p.name + '</div><div class="pop-addr">' + (p.address || '') + '</div>' +
-                    '<a class="pop-link" href="' + gmaps(p) + '" target="_blank" rel="noopener">Buka di Google Maps &rarr;</a>')
+                .setHTML(popupHTML(p))
                 .addTo(map);
+            if (window.lucide) lucide.createIcons();
         }
         highlightActiveCard();
     }

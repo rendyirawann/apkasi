@@ -256,6 +256,8 @@ class HomeController extends Controller
             ->orderBy('urut')
             ->get();
 
-        return view('frontend.guide', compact('venues', 'tourisms', 'hotels', 'rentals', 'pics'));
+        $mapboxToken = config('services.mapbox.token');
+
+        return view('frontend.guide', compact('venues', 'tourisms', 'hotels', 'rentals', 'pics', 'mapboxToken'));
     }
 }

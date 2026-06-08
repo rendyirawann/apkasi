@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Rental extends Model
 {
-    protected $fillable = ['nama', 'alamat', 'telepon', 'kontak_wa', 'deskripsi', 'urut', 'is_active'];
+    protected $fillable = ['nama', 'alamat', 'telepon', 'kontak_wa', 'deskripsi', 'lat', 'lng', 'maps_url', 'urut', 'is_active'];
 
     protected $casts = [
         'is_active' => 'boolean',
         'urut'      => 'integer',
+        'lat'       => 'float',
+        'lng'       => 'float',
     ];
 
     public function mobil()

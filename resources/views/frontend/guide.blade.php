@@ -11,12 +11,20 @@
     };
     $tel = fn($no) => 'tel:' . preg_replace('/[^0-9+]/', '', $no ?? '');
     $picCount = $pics->count();
+    // Data rental utk peta (dibangun di @php agar tak kena salah-parse Blade pada @json + array/fn inline)
+    $rentalGeo = $rentals->map(fn ($r) => [
+        'id' => $r->id, 'nama' => $r->nama, 'alamat' => $r->alamat,
+        'telepon' => $r->telepon, 'kontak_wa' => $r->kontak_wa,
+        'lat' => $r->lat, 'lng' => $r->lng, 'maps_url' => $r->maps_url,
+    ])->values();
 @endphp
 
 @push('head')
     <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/mapbox-gl@3.24.0/dist/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mapbox-gl@3.24.0/dist/mapbox-gl.js"></script>
     <style>
         /* DataTables PIC — compact & estetik */
         .dt-container { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -32,6 +40,16 @@
         .dt-container .dt-paging .dt-paging-button.current { background: #336443 !important; color: #fff !important; }
         .dt-container .dt-paging .dt-paging-button:hover:not(.current) { background: #e8f0ea !important; color: #336443 !important; }
         .dt-container .dt-layout-row { margin-top: .4rem; margin-bottom: .4rem; }
+        /* Mapbox popup rental */
+        .mapboxgl-popup-content { border-radius: 14px; padding: 13px 16px; font-family: 'Plus Jakarta Sans', sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,.18); }
+        .pop { width: 230px; max-width: 76vw; }
+        .pop-name { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: .95rem; color: #1f2a1d; margin-bottom: 4px; }
+        .pop-row { display: flex; align-items: flex-start; gap: 5px; font-size: .74rem; color: #4b5b47; margin-bottom: 4px; line-height: 1.35; }
+        .pop-row svg { width: 13px; height: 13px; flex: none; margin-top: 2px; color: #85AB8B; }
+        .pop-acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+        .pop-acts a { display: inline-flex; align-items: center; gap: 4px; font-size: .72rem; font-weight: 700; text-decoration: none; padding: 5px 9px; border-radius: 8px; border: 1px solid #d7e3d9; color: #336443; }
+        .pop-acts a svg { width: 13px; height: 13px; }
+        .pop-acts a.wa { color: #fff; background: #25a567; border-color: #25a567; }
     </style>
 @endpush
 
@@ -73,6 +91,46 @@
         });
     }
 
+    // ── Peta Rental (Mapbox + GeoJSON, pola sama spt peta-hotel) ──
+    var RENTALS = @json($rentalGeo);
+    var RTOKEN = @json($mapboxToken ?? '');
+    var rentalMap = null, rentalMapInit = false, rentalPopupRef = null;
+    function rentalWa(no) { var d = (no || '').replace(/[^0-9]/g, ''); if (d.charAt(0) === '0') d = '62' + d.slice(1); return 'https://wa.me/' + d; }
+    function rentalGmaps(p) { return p.maps_url || ('https://www.google.com/maps/search/?api=1&query=' + p.lat + ',' + p.lng); }
+    function rentalOpen(p, ll) {
+        var act = '<a href="' + rentalGmaps(p) + '" target="_blank" rel="noopener"><i data-lucide="navigation"></i> Rute</a>';
+        if (p.kontak_wa) act += '<a class="wa" href="' + rentalWa(p.kontak_wa) + '" target="_blank" rel="noopener"><i data-lucide="message-circle"></i> WhatsApp</a>';
+        if (p.telepon)   act += '<a href="tel:' + p.telepon.replace(/[^0-9+]/g, '') + '"><i data-lucide="phone"></i> Telp</a>';
+        var h = '<div class="pop"><div class="pop-name">' + p.nama + '</div>'
+              + (p.alamat ? '<div class="pop-row"><i data-lucide="map-pin"></i><span>' + p.alamat + '</span></div>' : '')
+              + '<div class="pop-acts">' + act + '</div></div>';
+        if (rentalPopupRef) rentalPopupRef.remove();
+        rentalMap.flyTo({ center: ll, zoom: 14, duration: 700 });
+        rentalPopupRef = new mapboxgl.Popup({ offset: 14, maxWidth: '270px' }).setLngLat(ll).setHTML(h).addTo(rentalMap);
+        if (window.lucide) lucide.createIcons();
+    }
+    function initRentalMap() {
+        if (rentalMapInit) { if (rentalMap) setTimeout(function () { rentalMap.resize(); }, 60); return; }
+        var pts = RENTALS.filter(function (r) { return r.lat && r.lng; });
+        if (!RTOKEN || !pts.length || !window.mapboxgl || !document.getElementById('rentalMap')) return;
+        rentalMapInit = true;
+        mapboxgl.accessToken = RTOKEN;
+        var cx = pts.reduce(function (s, p) { return s + Number(p.lng); }, 0) / pts.length;
+        var cy = pts.reduce(function (s, p) { return s + Number(p.lat); }, 0) / pts.length;
+        rentalMap = new mapboxgl.Map({ container: 'rentalMap', style: 'mapbox://styles/mapbox/light-v11', center: [cx, cy], zoom: 10, attributionControl: false });
+        rentalMap.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+        rentalMap.addControl(new mapboxgl.AttributionControl({ compact: true }));
+        var fc = { type: 'FeatureCollection', features: pts.map(function (p) { return { type: 'Feature', properties: { id: p.id }, geometry: { type: 'Point', coordinates: [Number(p.lng), Number(p.lat)] } }; }) };
+        rentalMap.on('load', function () {
+            rentalMap.addSource('rentals', { type: 'geojson', data: fc });
+            rentalMap.addLayer({ id: 'rentals', type: 'circle', source: 'rentals', paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 6, 14, 9], 'circle-color': '#336443', 'circle-stroke-width': 2.5, 'circle-stroke-color': '#ffffff' } });
+            if (pts.length > 1) { var b = new mapboxgl.LngLatBounds(); pts.forEach(function (p) { b.extend([Number(p.lng), Number(p.lat)]); }); rentalMap.fitBounds(b, { padding: 60, maxZoom: 12, duration: 0 }); }
+            rentalMap.on('click', 'rentals', function (e) { var id = e.features[0].properties.id; var p = RENTALS.find(function (x) { return String(x.id) === String(id); }); if (p) rentalOpen(p, [Number(p.lng), Number(p.lat)]); });
+            rentalMap.on('mouseenter', 'rentals', function () { rentalMap.getCanvas().style.cursor = 'pointer'; });
+            rentalMap.on('mouseleave', 'rentals', function () { rentalMap.getCanvas().style.cursor = ''; });
+        });
+    }
+
     // ── Tab switcher ──
     function activateTab(t) {
         document.querySelectorAll('[data-tab]').forEach(function (b) {
@@ -88,6 +146,7 @@
             p.classList.toggle('hidden', p.dataset.panel !== t);
         });
         if (t === 'pic' && picDT) picDT.columns.adjust();
+        if (t === 'rental') initRentalMap();
     }
     document.querySelectorAll('[data-tab]').forEach(function (b) {
         b.addEventListener('click', function () { activateTab(b.dataset.tab); });
@@ -232,6 +291,16 @@
             <h2 class="font-display text-2xl font-bold text-apkasi-dark leading-tight">Rental Kendaraan</h2>
             <p class="text-apkasi-body text-sm mt-1">Kontak penyedia sewa kendaraan untuk delegasi & rombongan.</p>
         </div>
+
+        @php $rentalsGeo = $rentals->filter(fn($r) => $r->lat && $r->lng); @endphp
+        @if (($mapboxToken ?? false) && $rentalsGeo->count())
+        <div class="rounded-2xl overflow-hidden border border-apkasi-leaf mb-6 shadow-sm relative">
+            <div id="rentalMap" class="w-full h-[280px] sm:h-[360px] bg-apkasi-leaf"></div>
+            <div class="absolute bottom-2.5 left-2.5 z-10 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full text-[11px] font-medium text-apkasi-body flex items-center gap-1.5 pointer-events-none">
+                <i data-lucide="map-pin" class="w-3 h-3 text-apkasi-heading"></i> Klik titik untuk detail & rute
+            </div>
+        </div>
+        @endif
 
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             @forelse ($rentals as $r)
