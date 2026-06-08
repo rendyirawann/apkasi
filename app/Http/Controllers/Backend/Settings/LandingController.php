@@ -75,13 +75,22 @@ class LandingController extends Controller
             'alt'    => 'nullable|string|max:100',
         ]);
 
-        SiteLogo::create([
-            'grup'      => $request->grup,
-            'gambar'    => $this->uploadLanding($request->file('gambar')),
-            'alt'       => $request->alt,
-            'urut'      => (int) (SiteLogo::where('grup', $request->grup)->max('urut')) + 1,
-            'is_active' => true,
-        ]);
+        // Pindahkan file dulu (lokal, cepat). Bila penyimpanan DB (host terpisah) gagal/timeout,
+        // hapus file yatim & tampilkan pesan ramah — jangan biarkan jadi 500 mentah.
+        $path = $this->uploadLanding($request->file('gambar'));
+        try {
+            SiteLogo::create([
+                'grup'      => $request->grup,
+                'gambar'    => $path,
+                'alt'       => $request->alt,
+                'urut'      => (int) (SiteLogo::where('grup', $request->grup)->max('urut')) + 1,
+                'is_active' => true,
+            ]);
+        } catch (\Throwable $e) {
+            $this->deleteLanding($path);
+            report($e);
+            return back()->with('error', 'Logo gagal disimpan (koneksi database terputus sesaat). Silakan coba lagi.');
+        }
 
         return back()->with('success', 'Logo berhasil ditambahkan.');
     }

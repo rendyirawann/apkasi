@@ -98,7 +98,12 @@
         </div>
 
         <div class="sp-bottom">
-            <img class="sp-maskot" src="{{ asset('assets/apkasi/maskot-run.png') }}" alt="" aria-hidden="true" />
+            {{-- WebP animasi (transparan, dirender benar oleh Safari 14+ & Chrome) dgn APNG sbg fallback.
+                 Safari punya bug render alpha APNG (latar jadi hitam) → WebP menghindarinya. --}}
+            <picture aria-hidden="true">
+                <source srcset="{{ asset('assets/apkasi/maskot-run.webp') }}" type="image/webp" />
+                <img class="sp-maskot" src="{{ asset('assets/apkasi/maskot-run.png') }}" alt="" aria-hidden="true" />
+            </picture>
             <div class="sp-partners">
                 <span class="sp-lbl">Bagian dari</span>
                 <img class="sp-aoe" src="{{ asset('logos/logo_aoe2026.png') }}" alt="" />
