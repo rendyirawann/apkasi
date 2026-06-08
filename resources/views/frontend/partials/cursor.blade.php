@@ -87,7 +87,7 @@
         trailEls.push(d);
     }
 
-    var isPointer = false, isPressed = false, visible = false, overMap = false;
+    var isPointer = false, isPressed = false, visible = false;
 
     function applyState() {
         var grad = isPressed ? 'gcur-clk' : (isPointer ? 'gcur-hov' : 'gcur-def');
@@ -97,7 +97,7 @@
         arrow.style.transform = 'scale(' + (isPressed ? 0.88 : 1) + ')';
         hand.style.opacity = isPointer ? '1' : '0';
         hand.style.transform = 'scale(' + (isPressed ? 0.85 : 1) + ') translate(-4px, -2px)';
-        root.style.opacity = (visible && !overMap) ? '1' : '0'; // sembunyikan orb di atas peta Mapbox (pakai kursor asli)
+        root.style.opacity = visible ? '1' : '0';
     }
 
     document.addEventListener('mousemove', function (e) {
@@ -112,9 +112,9 @@
         var el = e.target;
         var clickable = el.closest && el.closest('a, button, [role="button"], input, select, textarea, label, [data-cursor="pointer"], [onclick], .cursor-pointer, summary, [tabindex]:not([tabindex="-1"])');
         var cs = el instanceof Element ? window.getComputedStyle(el).cursor : '';
-        var np = !!(clickable || cs === 'pointer');
-        var om = !!(el.closest && el.closest('.mapboxgl-map')); // di atas peta Mapbox → orb disembunyikan
-        if (np !== isPointer || om !== overMap) { isPointer = np; overMap = om; applyState(); }
+        var onMap = !!(el.closest && el.closest('.mapboxgl-map')); // di Mapbox: paksa bentuk PANAH (biru), jangan tangan
+        var np = onMap ? false : !!(clickable || cs === 'pointer');
+        if (np !== isPointer) { isPointer = np; applyState(); }
     });
 
     function animate() {

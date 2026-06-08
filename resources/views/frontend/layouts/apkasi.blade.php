@@ -92,8 +92,6 @@
 
         /* Sembunyikan kursor default (diganti GlassOrbCursor) */
         *, *::before, *::after { cursor: none !important; }
-        /* KECUALI di peta Mapbox: pakai kursor panah asli (lebih presisi utk klik marker, bukan tangan/orb) */
-        .mapboxgl-map, .mapboxgl-map * { cursor: default !important; }
     </style>
 
     @stack('head')
