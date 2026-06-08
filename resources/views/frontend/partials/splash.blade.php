@@ -52,7 +52,7 @@
         @keyframes sp-up{to{opacity:1;transform:none}}
         .sp-bottom{display:flex;align-items:flex-end;gap:clamp(14px,3vw,32px);opacity:0;transform:translateY(16px)}
         .sp-go .sp-bottom{animation:sp-up 1s .65s cubic-bezier(.2,.8,.2,1) forwards}
-        /* Maskot berlari — WebM transparan (alpha asli) → tampil tanpa kotak. Fallback poster (Safari) = maskot statis. */
+        /* Maskot berlari — APNG transparan (animasi jalan di semua browser termasuk Safari, tak seperti WebM). */
         .sp-maskot{width:clamp(96px,12vw,132px);height:clamp(120px,15vw,168px);object-fit:cover;animation:sp-mascotBounce 2.4s 1.2s ease-out infinite alternate;transform-origin:bottom center;pointer-events:none}
         @keyframes sp-mascotBounce{0%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-7px) rotate(1deg)}100%{transform:translateY(0) rotate(-1deg)}}
         .sp-partners{display:flex;align-items:center;gap:14px}
@@ -82,10 +82,10 @@
             <div class="sp-omni-ring"></div>
             <div class="sp-omni-flash"></div>
             <div class="sp-omni-stage">
-                <img class="sp-omni-logo is-on" src="{{ asset('logos/logo_ds.webp') }}" alt="" />
-                <img class="sp-omni-logo" src="{{ asset('logos/logo_hut26.webp') }}" alt="" />
+                <img class="sp-omni-logo is-on" src="{{ asset('logos/logo_ds.png') }}" alt="" />
+                <img class="sp-omni-logo" src="{{ asset('logos/logo_hut26.png') }}" alt="" />
                 <img class="sp-omni-logo" src="{{ asset('logos/hutds80.png') }}" alt="" />
-                <img class="sp-omni-logo" src="{{ asset('logos/logo_aoe2026.webp') }}" alt="" />
+                <img class="sp-omni-logo" src="{{ asset('logos/logo_aoe2026.png') }}" alt="" />
                 <img class="sp-omni-logo" src="{{ asset('logos/apkasi-official.png') }}" alt="" />
                 <img class="sp-omni-logo" src="{{ asset('logos/poi.png') }}" alt="" />
             </div>
@@ -98,13 +98,11 @@
         </div>
 
         <div class="sp-bottom">
-            <video class="sp-maskot" autoplay muted loop playsinline preload="auto" poster="{{ asset('logos/maskot.png') }}" aria-hidden="true">
-                <source src="{{ asset('assets/apkasi/maskot-run.webm') }}" type="video/webm" />
-            </video>
+            <img class="sp-maskot" src="{{ asset('assets/apkasi/maskot-run.png') }}" alt="" aria-hidden="true" />
             <div class="sp-partners">
                 <span class="sp-lbl">Bagian dari</span>
-                <img class="sp-aoe" src="{{ asset('logos/logo_aoe2026.webp') }}" alt="" />
-                <div class="sp-chip"><img src="{{ asset('logos/logo_apkasi.webp') }}" alt="" /></div>
+                <img class="sp-aoe" src="{{ asset('logos/logo_aoe2026.png') }}" alt="" />
+                <div class="sp-chip"><img src="{{ asset('logos/logo_apkasi.png') }}" alt="" /></div>
             </div>
         </div>
 

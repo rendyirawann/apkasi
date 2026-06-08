@@ -102,10 +102,10 @@
     </div>
 
     <div class="intro-logos">
-        <img class="il-ds" src="{{ asset('logos/logo_ds.webp') }}" alt="Deli Serdang" />
+        <img class="il-ds" src="{{ asset('logos/logo_ds.png') }}" alt="Deli Serdang" />
         <div class="il-row">
             <img class="il-hut" src="{{ asset('logos/hutds80.png') }}" alt="HUT Ke-80 Deli Serdang" />
-            <img class="il-hut" src="{{ asset('logos/logo_hut26.webp') }}" alt="HUT Ke-26 APKASI" />
+            <img class="il-hut" src="{{ asset('logos/logo_hut26.png') }}" alt="HUT Ke-26 APKASI" />
         </div>
     </div>
 

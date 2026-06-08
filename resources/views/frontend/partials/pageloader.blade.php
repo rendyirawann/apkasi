@@ -16,7 +16,7 @@
     </style>
     <div class="badge">
         <div class="ring"></div>
-        <img src="{{ asset('logos/logo_hut26.webp') }}" alt="" />
+        <img src="{{ asset('logos/logo_hut26.png') }}" alt="" />
     </div>
     <div class="lbl">Memuat</div>
 </div>
