@@ -52,7 +52,7 @@
         @keyframes sp-up{to{opacity:1;transform:none}}
         .sp-bottom{display:flex;align-items:flex-end;gap:clamp(14px,3vw,32px);opacity:0;transform:translateY(16px)}
         .sp-go .sp-bottom{animation:sp-up 1s .65s cubic-bezier(.2,.8,.2,1) forwards}
-        /* Maskot berlari — bg hijau opaque (nyatu dgn splash, aman di Safari), WebP+APNG. */
+        /* Maskot berlari — WebP transparan (chroma-key, ikut latar) + APNG fallback hijau. */
         .sp-maskot{width:clamp(96px,12vw,132px);height:clamp(120px,15vw,168px);object-fit:cover;animation:sp-mascotBounce 2.4s 1.2s ease-out infinite alternate;transform-origin:bottom center;pointer-events:none}
         @keyframes sp-mascotBounce{0%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-7px) rotate(1deg)}100%{transform:translateY(0) rotate(-1deg)}}
         .sp-partners{display:flex;align-items:center;gap:14px}
@@ -98,8 +98,8 @@
         </div>
 
         <div class="sp-bottom">
-            {{-- Maskot bg HIJAU opaque (#143D28, samakan dgn splash) → nyatu dgn latar, dan
-                 menghindari bug Safari yg merender alpha APNG jadi hitam. WebP (kecil) + APNG fallback. --}}
+            {{-- Maskot: WebP TRANSPARAN (chroma-key dari green screen, ikut latar) utk Safari 14+/Chrome.
+                 APNG fallback dibikin bg hijau #143D28 (anti-hitam di browser non-webp). --}}
             <picture aria-hidden="true">
                 <source srcset="{{ asset('assets/apkasi/maskot-run.webp') }}" type="image/webp" />
                 <img class="sp-maskot" src="{{ asset('assets/apkasi/maskot-run.png') }}" alt="" aria-hidden="true" />

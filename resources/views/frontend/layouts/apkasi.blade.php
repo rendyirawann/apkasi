@@ -92,6 +92,8 @@
 
         /* Sembunyikan kursor default (diganti GlassOrbCursor) */
         *, *::before, *::after { cursor: none !important; }
+        /* KECUALI di peta Mapbox: pakai kursor default sistem (orb disembunyikan via JS) */
+        .mapboxgl-map, .mapboxgl-map * { cursor: default !important; }
     </style>
 
     @stack('head')
