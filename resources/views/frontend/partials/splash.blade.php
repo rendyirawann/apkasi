@@ -1,4 +1,13 @@
 {{-- SplashLoader — port vanilla JS dari frontend/src/SplashLoader.tsx (oncePerSession=false, minDuration=3000) --}}
+@php
+    /* cache-buster: tambah ?v=<mtime> agar Cloudflare/browser ambil file SEGAR saat asset berubah */
+    if (! isset($av)) {
+        $av = function ($p) {
+            $f = public_path($p);
+            return asset($p) . (is_file($f) ? '?v=' . filemtime($f) : '');
+        };
+    }
+@endphp
 <div id="splash" class="sp-root" aria-hidden="true">
     <style>
         .sp-root{position:fixed;inset:0;z-index:99500;font-family:'Inter','Plus Jakarta Sans',sans-serif;overflow:hidden}
@@ -82,12 +91,12 @@
             <div class="sp-omni-ring"></div>
             <div class="sp-omni-flash"></div>
             <div class="sp-omni-stage">
-                <img class="sp-omni-logo is-on" src="{{ asset('logos/logo_ds.png') }}" alt="" />
-                <img class="sp-omni-logo" src="{{ asset('logos/logo_hut26.png') }}" alt="" />
-                <img class="sp-omni-logo" src="{{ asset('logos/hutds80.png') }}" alt="" />
-                <img class="sp-omni-logo" src="{{ asset('logos/logo_aoe2026.png') }}" alt="" />
-                <img class="sp-omni-logo" src="{{ asset('logos/apkasi-official.png') }}" alt="" />
-                <img class="sp-omni-logo" src="{{ asset('logos/poi.png') }}" alt="" />
+                <img class="sp-omni-logo is-on" src="{{ $av('logos/logo_ds.png') }}" alt="" />
+                <img class="sp-omni-logo" src="{{ $av('logos/logo_hut26.png') }}" alt="" />
+                <img class="sp-omni-logo" src="{{ $av('logos/hutds80.png') }}" alt="" />
+                <img class="sp-omni-logo" src="{{ $av('logos/logo_aoe2026.png') }}" alt="" />
+                <img class="sp-omni-logo" src="{{ $av('logos/apkasi-official.png') }}" alt="" />
+                <img class="sp-omni-logo" src="{{ $av('logos/poi.png') }}" alt="" />
             </div>
         </div>
 
@@ -101,13 +110,13 @@
             {{-- Maskot: WebP TRANSPARAN (chroma-key dari green screen, ikut latar) utk Safari 14+/Chrome.
                  APNG fallback dibikin bg hijau #143D28 (anti-hitam di browser non-webp). --}}
             <picture aria-hidden="true">
-                <source srcset="{{ asset('assets/apkasi/maskot-run.webp') }}" type="image/webp" />
-                <img class="sp-maskot" src="{{ asset('assets/apkasi/maskot-run.png') }}" alt="" aria-hidden="true" />
+                <source srcset="{{ $av('assets/apkasi/maskot-run.webp') }}" type="image/webp" />
+                <img class="sp-maskot" src="{{ $av('assets/apkasi/maskot-run.png') }}" alt="" aria-hidden="true" />
             </picture>
             <div class="sp-partners">
                 <span class="sp-lbl">Bagian dari</span>
-                <img class="sp-aoe" src="{{ asset('logos/logo_aoe2026.png') }}" alt="" />
-                <div class="sp-chip"><img src="{{ asset('logos/logo_apkasi.png') }}" alt="" /></div>
+                <img class="sp-aoe" src="{{ $av('logos/logo_aoe2026.png') }}" alt="" />
+                <div class="sp-chip"><img src="{{ $av('logos/logo_apkasi.png') }}" alt="" /></div>
             </div>
         </div>
 
