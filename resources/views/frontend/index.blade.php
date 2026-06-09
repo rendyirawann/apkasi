@@ -67,6 +67,31 @@
     .intro-mark{position:absolute;top:24px;left:28px;z-index:4;display:flex;align-items:center;gap:10px;opacity:.92}
     .intro-mark img{height:34px;width:auto}
     @media(max-width:640px){.intro-dots{bottom:92px}.intro-hint{bottom:34px}}
+    /* Layar PENDEK (laptop/TV 1366x768 dsb): kecilkan & rapatkan berbasis tinggi (vh) agar
+       badge tidak menabrak logo dan headline tidak kegedean / terpotong. */
+    @media(max-height:820px){
+        .intro-logos{top:4%;gap:8px}
+        .il-ds{height:clamp(48px,6vh,84px)}
+        .il-hut{height:clamp(38px,5vh,64px)}
+        .intro-cap{top:31%}
+        .intro-badge{margin-bottom:12px;padding:6px 14px}
+        .intro-cap h2{font-size:clamp(1.9rem,7vh,3.4rem)}
+        .intro-cap p{margin-top:12px;font-size:clamp(.88rem,2.2vh,1.1rem);line-height:1.5}
+        .intro-enter{margin-top:18px;padding:11px 26px}
+        .intro-dots{bottom:60px}
+        .intro-hint{bottom:18px}
+    }
+    @media(max-height:640px){
+        .intro-logos{top:3%}
+        .il-ds{height:46px}.il-hut{height:36px}
+        .intro-cap{top:26%}
+        .intro-badge{margin-bottom:8px}
+        .intro-cap h2{font-size:clamp(1.6rem,7.5vh,2.5rem)}
+        .intro-cap p{margin-top:8px}
+        .intro-enter{margin-top:12px}
+        .intro-dots{bottom:44px}
+        .intro-hint{bottom:12px}
+    }
     @media(prefers-reduced-motion:reduce){.intro-scene{transition:opacity .4s ease}.intro-scene.is-active{transform:none}#intro{transition:transform .5s ease}}
 </style>
 <section id="intro" aria-label="Pembuka" data-auto="{{ ! empty($showIntro) ? '1' : '0' }}" class="{{ ! empty($showIntro) ? '' : 'is-hidden' }}">
