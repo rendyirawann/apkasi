@@ -108,12 +108,14 @@ class DestinasiWisataController extends Controller
 
     public function update(Request $request, $id)
     {
-        \Log::info('DEBUG destinasi update', [
-            'method'   => $request->method(),
-            'hasFile'  => $request->hasFile('thumbnail_file'),
-            'files'    => array_keys($request->allFiles()),
-            'ctype'    => $request->header('Content-Type'),
-            'clen'     => $request->header('Content-Length'),
+        \Log::error('UPLOAD-DEBUG-DESTINASI', [
+            'hasFile'    => $request->hasFile('thumbnail_file'),
+            'allFiles'   => array_keys($request->allFiles()),
+            'thumb_err'  => $request->file('thumbnail_file')?->getError(),
+            'upload_max' => ini_get('upload_max_filesize'),
+            'post_max'   => ini_get('post_max_size'),
+            'clen'       => $request->header('Content-Length'),
+            'ctype'      => $request->header('Content-Type'),
         ]);
 
         $d = DestinasiWisata::findOrFail($id);
