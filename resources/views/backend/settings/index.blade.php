@@ -72,7 +72,7 @@
                                                 </div>
                                                 <div class="flex-grow-1">
                                                     <input type="file" class="form-control form-control-solid" name="site_logo"
-                                                        accept=".png,.jpg,.jpeg,.svg,.webp" onchange="previewLogo(this)" />
+                                                        accept=".png,.jpg,.jpeg,.svg,.webp" data-max-mb="2" onchange="previewLogo(this)" />
                                                     <div class="form-text text-muted mt-2">Accepted: PNG, JPG, SVG, WebP. Max 2MB.</div>
                                                 </div>
                                             </div>

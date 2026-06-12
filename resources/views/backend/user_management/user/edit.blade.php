@@ -30,7 +30,7 @@
             data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Change avatar">
             <i class="bi bi-pencil-fill fs-7"></i>
             <!--begin::Inputs-->
-            <input type="file" name="avatar" id="editavatar" accept=".png, .jpg, .jpeg"
+            <input type="file" name="avatar" id="editavatar" accept=".png,.jpg,.jpeg" data-max-mb="2"
                 value="{{ $user->avatar }}" /> <!--end::Inputs-->
         </label>
         <!--end::Label-->

@@ -219,6 +219,32 @@
             @if(session('warning')) toastr.warning("{{ session('warning') }}"); @endif
             @if(session('info')) toastr.info("{{ session('info') }}"); @endif
 
+            // --- Validasi upload file SAAT FILE DIPILIH (bukan saat submit) ---
+            // Baca `accept` (daftar ekstensi diizinkan) + `data-max-mb` (maks ukuran) di tiap <input type=file>.
+            // Default bila atribut tak diisi: video 50MB, gambar 5MB. Tak valid → toastr + input dikosongkan.
+            document.addEventListener('change', function (e) {
+                var input = e.target;
+                if (!input || input.type !== 'file' || !input.files || !input.files.length) return;
+                var accept = (input.getAttribute('accept') || '').toLowerCase();
+                var exts = accept.split(',').map(function (s) { return s.trim().replace(/^\./, ''); })
+                    .filter(function (s) { return s && s.indexOf('/') === -1; }); // abaikan "image/*", "video/mp4"
+                var isVideo = accept.indexOf('video') !== -1 || exts.indexOf('mp4') !== -1 || exts.indexOf('webm') !== -1;
+                if (!exts.length) exts = isVideo ? ['mp4', 'webm'] : ['jpg', 'jpeg', 'png', 'webp'];
+                var maxMb = parseFloat(input.getAttribute('data-max-mb')) || (isVideo ? 50 : 5);
+                for (var i = 0; i < input.files.length; i++) {
+                    var f = input.files[i];
+                    var ext = (f.name.split('.').pop() || '').toLowerCase();
+                    if (exts.indexOf(ext) === -1) {
+                        if (window.toastr) toastr.error('Format ".' + ext + '" tidak diizinkan. Hanya: ' + exts.join(', ') + '.');
+                        input.value = ''; return;
+                    }
+                    if (f.size > maxMb * 1024 * 1024) {
+                        if (window.toastr) toastr.error('Ukuran "' + f.name + '" (' + (f.size / 1048576).toFixed(1) + ' MB) melebihi maksimal ' + maxMb + ' MB.');
+                        input.value = ''; return;
+                    }
+                }
+            }, true);
+
             // --- Force Logout Listener ---
             @auth
             const userId = "{{ auth()->id() }}";

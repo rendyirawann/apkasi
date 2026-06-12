@@ -103,7 +103,7 @@
                         </div>
                         <div class="col-md-8">
                             <label class="fw-semibold fs-7 mb-1">Gambar Thumbnail <span class="text-muted">(maks 3MB)</span></label>
-                            <input type="file" name="thumbnail_file" id="d_thumbnail_file" accept="image/*" class="form-control form-control-solid" />
+                            <input type="file" name="thumbnail_file" id="d_thumbnail_file" accept=".jpg,.jpeg,.png,.webp" data-max-mb="3" class="form-control form-control-solid" />
                             <div class="text-danger fs-8 mt-1" data-error="thumbnail_file"></div>
                             <div id="d_thumb_preview" class="mt-2"></div>
                         </div>
@@ -121,7 +121,7 @@
                         <div class="col-md-12">
                             <label class="fw-semibold fs-7 mb-1">Galeri Gambar Lain <span class="text-muted">(bisa pilih beberapa file, maks 3MB/gambar)</span></label>
                             <div id="d_gallery_existing" class="d-flex flex-wrap gap-2 mb-2"></div>
-                            <input type="file" name="gambar_files[]" id="d_gambar_files" accept="image/*" multiple class="form-control form-control-solid" />
+                            <input type="file" name="gambar_files[]" id="d_gambar_files" accept=".jpg,.jpeg,.png,.webp" data-max-mb="3" multiple class="form-control form-control-solid" />
                             <div class="text-danger fs-8 mt-1" data-error="gambar_files.0"></div>
                             <div id="d_hapus_gambar" class="d-none"></div>
                         </div>

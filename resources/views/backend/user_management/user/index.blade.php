@@ -209,7 +209,7 @@
                                             title="Change avatar">
                                             <i class="ki-outline ki-pencil fs-7"></i>
                                             <input type="file" name="avatar" id="avatar"
-                                                accept=".png, .jpg, .jpeg" />
+                                                accept=".png,.jpg,.jpeg" data-max-mb="2" />
                                             <input type="hidden" name="avatar_remove" />
                                         </label>
                                         <span

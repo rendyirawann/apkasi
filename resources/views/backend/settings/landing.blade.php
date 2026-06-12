@@ -319,7 +319,7 @@
                                 <form action="{{ route('landing.logo.store') }}" method="POST" enctype="multipart/form-data" class="d-flex flex-wrap gap-2 align-items-end">
                                     @csrf
                                     <input type="hidden" name="grup" value="{{ $grp }}">
-                                    <div><label class="fs-8 text-muted d-block">File logo</label><input type="file" name="gambar" accept="image/*" required class="form-control form-control-sm"></div>
+                                    <div><label class="fs-8 text-muted d-block">File logo</label><input type="file" name="gambar" accept=".jpg,.jpeg,.png,.webp,.svg" data-max-mb="3" required class="form-control form-control-sm"></div>
                                     <div><label class="fs-8 text-muted d-block">Teks alt</label><input type="text" name="alt" class="form-control form-control-sm" placeholder="opsional"></div>
                                     <button type="submit" class="btn btn-sm btn-light-primary"><i class="ki-outline ki-plus fs-5"></i> Tambah Logo</button>
                                 </form>

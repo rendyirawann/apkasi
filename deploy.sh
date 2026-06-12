@@ -23,13 +23,16 @@ git fetch origin
 git checkout "${BRANCH}" 2>/dev/null || git checkout -b "${BRANCH}" "origin/${BRANCH}"
 git reset --hard "origin/${BRANCH}"
 
-echo "▶ 2/4  Bersihkan cache Laravel (container: ${APP})"
+echo "▶ 2/5  Bersihkan cache Laravel (container: ${APP})"
 docker exec "${APP}" php artisan optimize:clear
 
-echo "▶ 3/4  Migrasi database"
+echo "▶ 3/5  Symlink storage (foto upload destinasi/gedung/hotel -> /storage)"
+docker exec "${APP}" php artisan storage:link --relative || docker exec "${APP}" php artisan storage:link
+
+echo "▶ 4/5  Migrasi database"
 docker exec "${APP}" php artisan migrate --force
 
-echo "▶ 4/4  Restart container: ${APP}, ${NGINX}"
+echo "▶ 5/5  Restart container: ${APP}, ${NGINX}"
 docker restart "${APP}" "${NGINX}"
 
 echo ""
