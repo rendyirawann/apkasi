@@ -33,8 +33,7 @@
         #picTable tbody td { font-size: .82rem; color: #2d3a2a; background: #fff; border: 0 !important; border-bottom: 1px solid #f1f5f1 !important; padding: 7px 14px; vertical-align: middle; }
         #picTable tbody tr:last-child td { border-bottom: 0 !important; }
         #picTable tbody tr:hover td { background: #f7faf7; }
-        #picTable td.pic-merged { visibility: hidden; }                              /* baris lanjutan PIC sama -> disembunyikan (merge) */
-        #picTable td.pic-merge-head { border-bottom-color: transparent !important; } /* sambungkan nama PIC ke baris bawahnya */
+        #picTable tbody td { vertical-align: top; }   /* baris PIC bisa multi-provinsi (chip) -> rata atas */
         .dt-container .dt-search input, .dt-container .dt-length select { border: 1px solid #e8f0ea; border-radius: 9999px; padding: .38rem .9rem; font-size: .8rem; outline: none; background: #fff; }
         .dt-container .dt-search input:focus { border-color: #85AB8B; }
         .dt-container .dt-search label, .dt-container .dt-length label, .dt-container .dt-info { font-size: .76rem; color: #6b7c70; }
@@ -71,44 +70,56 @@
         window.addEventListener('scroll', onScroll, { passive: true });
     })();
 
-    // ── DataTables PIC ──
-    var picDT = null;
-    if (window.jQuery) {
-        jQuery(function ($) {
-            picDT = $('#picTable').DataTable({
-                pageLength: 10,
-                lengthMenu: [10, 25, 50, 100],
-                order: [],                                  // pertahankan urutan server (sudah dikelompokkan per PIC)
-                columnDefs: [{ targets: [0, 4], orderable: false }, { targets: [4], searchable: false }],
-                language: {
-                    search: 'Cari:', searchPlaceholder: 'provinsi / nama',
-                    lengthMenu: 'Tampilkan _MENU_ data',
-                    info: 'Menampilkan _START_–_END_ dari _TOTAL_ PIC',
-                    infoEmpty: 'Tidak ada data', infoFiltered: '(disaring dari _MAX_ total)',
-                    zeroRecords: 'PIC tidak ditemukan',
-                    paginate: { first: '«', previous: '‹', next: '›', last: '»' }
-                },
-                // No urut tampilan + GABUNG (merge) sel PIC/No HP/Kontak utk PIC yg sama & berurutan.
-                // Non-destruktif (toggle class + reset tiap draw) supaya sort/filter ulang tetap benar.
-                drawCallback: function () {
-                    var prev = null, prevTd = null, n = 0;
-                    $('#picTable tbody tr').each(function () {
-                        var td = $(this).children('td');
-                        if (td.length < 5) return;                              // lewati baris info/kosong
-                        td.eq(0).text(++n);                                     // nomor urut tampilan
-                        td.eq(2).add(td.eq(3)).add(td.eq(4)).removeClass('pic-merged pic-merge-head');
-                        var key = td.eq(2).text().trim() + '|' + td.eq(3).text().trim();
-                        if (key && key === prev) {                              // PIC sama dgn baris atas -> sembunyikan
-                            td.eq(2).add(td.eq(3)).add(td.eq(4)).addClass('pic-merged');
-                            if (prevTd) prevTd.eq(2).add(prevTd.eq(3)).add(prevTd.eq(4)).addClass('pic-merge-head');
-                        }
-                        prev = key; prevTd = td;
-                    });
-                    if (window.lucide) lucide.createIcons();
+    // ── Kartu PIC: pencarian + pagination dinamis (6 kartu / halaman, tanpa reload) ──
+    (function () {
+        var PER = 6;
+        var grid = document.getElementById('picGrid');
+        if (!grid) return;
+        var all = Array.prototype.slice.call(grid.querySelectorAll('.pic-card'));
+        var search = document.getElementById('picSearch');
+        var info = document.getElementById('picInfo');
+        var btns = document.getElementById('picPageBtns');
+        var empty = document.getElementById('picEmpty');
+        var page = 1, filtered = all;
+
+        function makeBtn(label, target, o) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.innerHTML = label;
+            b.className = 'min-w-[34px] h-[34px] px-2.5 rounded-lg text-sm font-semibold transition-colors '
+                + (o.active ? 'bg-apkasi-heading text-white' : 'bg-white border border-apkasi-leaf text-apkasi-body hover:border-apkasi-accent')
+                + (o.disabled ? ' opacity-40 pointer-events-none' : '');
+            if (!o.disabled && !o.active) b.addEventListener('click', function () { page = target; render(); });
+            return b;
+        }
+        function render() {
+            var total = filtered.length;
+            var pages = Math.max(1, Math.ceil(total / PER));
+            if (page > pages) page = pages;
+            if (page < 1) page = 1;
+            all.forEach(function (c) { c.style.display = 'none'; });
+            var start = (page - 1) * PER;
+            var slice = filtered.slice(start, start + PER);
+            slice.forEach(function (c) { c.style.display = ''; });
+            if (info) info.textContent = total ? ('Menampilkan ' + (start + 1) + '–' + (start + slice.length) + ' dari ' + total + ' PIC') : '';
+            if (empty) empty.classList.toggle('hidden', total > 0);
+            if (btns) {
+                btns.innerHTML = '';
+                if (pages > 1) {
+                    btns.appendChild(makeBtn('‹', page - 1, { disabled: page <= 1 }));
+                    for (var i = 1; i <= pages; i++) btns.appendChild(makeBtn(String(i), i, { active: i === page }));
+                    btns.appendChild(makeBtn('›', page + 1, { disabled: page >= pages }));
                 }
-            });
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+        if (search) search.addEventListener('input', function () {
+            var q = search.value.trim().toLowerCase();
+            filtered = q ? all.filter(function (c) { return (c.getAttribute('data-search') || '').indexOf(q) !== -1; }) : all;
+            page = 1; render();
         });
-    }
+        render();
+    })();
 
     // ── Peta Rental (Mapbox + GeoJSON, pola sama spt peta-hotel) ──
     var RENTALS = @json($rentalGeo);
@@ -124,7 +135,7 @@
               + (p.alamat ? '<div class="pop-row"><i data-lucide="map-pin"></i><span>' + p.alamat + '</span></div>' : '')
               + '<div class="pop-acts">' + act + '</div></div>';
         if (rentalPopupRef) rentalPopupRef.remove();
-        rentalMap.flyTo({ center: ll, zoom: 14, duration: 700 });
+        rentalMap.easeTo({ center: ll, duration: 600 });   // hanya GESER (pan), zoom dipertahankan
         rentalPopupRef = new mapboxgl.Popup({ offset: 14, maxWidth: '270px' }).setLngLat(ll).setHTML(h).addTo(rentalMap);
         if (window.lucide) lucide.createIcons();
     }
@@ -180,9 +191,16 @@
         card.addEventListener('click', function (e) {
             if (e.target.closest('a, button')) return;      // jangan ganggu tombol WA/Telepon/Rute
             initRentalMap();
-            var mapEl = document.getElementById('rentalMap');
-            if (mapEl) { var box = mapEl.getBoundingClientRect(); if (box.top < 0 || box.bottom > window.innerHeight) mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
             var ll = [Number(p.lng), Number(p.lat)];
+            var mapEl = document.getElementById('rentalMap');
+            if (mapEl) {
+                var rect = mapEl.getBoundingClientRect();
+                // JANGAN scroll halaman kalau peta masih terlihat -> cukup geser petanya saja.
+                // Scroll HANYA bila peta benar-benar di luar layar (mis. lagi jauh di bawah).
+                if (rect.bottom < 40 || rect.top > window.innerHeight - 40) {
+                    window.scrollTo({ top: window.pageYOffset + rect.top - 96, behavior: 'smooth' });
+                }
+            }
             if (rentalMap) rentalOpen(p, ll);
             else setTimeout(function () { if (rentalMap) rentalOpen(p, ll); }, 450);
         });
@@ -280,43 +298,66 @@
             <p class="text-apkasi-body text-sm mt-1">Penanggung jawab (PIC) pendampingan delegasi tiap provinsi. Gunakan kolom <em>Cari</em> untuk memfilter.</p>
         </div>
 
-        <div class="bg-white border border-apkasi-leaf rounded-2xl shadow-sm p-3 sm:p-4 overflow-x-auto">
-            <table id="picTable" class="w-full" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Provinsi</th>
-                        <th>PIC</th>
-                        <th>No HP</th>
-                        <th>Kontak</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($pics as $p)
-                        @php $prov = optional($p->provinsi)->nama ?? '-'; @endphp
-                        <tr>
-                            <td>{{ $p->urut }}</td>
-                            <td class="font-semibold text-apkasi-dark">{{ $prov }}</td>
-                            <td>{{ $p->nama }}</td>
-                            <td class="tabular-nums">{{ $p->no_hp ?: '-' }}</td>
-                            <td>
-                                @if ($p->no_hp)
-                                    <div class="flex items-center gap-1.5">
-                                        <a href="{{ $wa($p->no_hp) }}" target="_blank" rel="noopener" title="WhatsApp" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-full bg-apkasi-heading/10 text-apkasi-heading hover:bg-apkasi-heading hover:text-white transition-colors">
-                                            <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WA
-                                        </a>
-                                        <a href="{{ $tel($p->no_hp) }}" title="Telepon" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-apkasi-gold/15 text-[#9a7d16] hover:bg-apkasi-gold hover:text-apkasi-dark transition-colors">
-                                            <i data-lucide="phone" class="w-3.5 h-3.5"></i>
-                                        </a>
-                                    </div>
-                                @else
-                                    <span class="text-apkasi-body/50 text-xs">-</span>
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        {{-- Pencarian --}}
+        <div class="mb-5 relative max-w-md">
+            <i data-lucide="search" class="w-4 h-4 text-apkasi-body/50 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            <input type="text" id="picSearch" placeholder="Cari provinsi atau nama PIC..." autocomplete="off"
+                   class="w-full pl-11 pr-4 py-2.5 rounded-full border border-apkasi-leaf bg-white text-sm text-apkasi-dark focus:outline-none focus:border-apkasi-accent focus:ring-2 focus:ring-apkasi-accent/20 transition">
+        </div>
+
+        {{-- Kartu PIC: 1 kartu = 1 PIC (grup per nomor HP), 6 kartu/halaman via pagination dinamis --}}
+        @php $grouped = $pics->groupBy('no_hp'); @endphp
+        <div id="picGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            @foreach ($grouped as $group)
+                @php
+                    $first = $group->first();
+                    $provNames = $group->map(fn ($p) => optional($p->provinsi)->nama)->filter()->values();
+                @endphp
+                <div class="pic-card bg-white rounded-2xl border border-apkasi-leaf p-5 flex flex-col hover:shadow-lg hover:border-apkasi-accent/50 transition-all duration-300"
+                     data-search="{{ strtolower($first->nama . ' ' . $provNames->implode(' ')) }}">
+                    {{-- Nama PIC --}}
+                    <div class="flex items-start gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-apkasi-heading/10 flex items-center justify-center shrink-0">
+                            <i data-lucide="user-round" class="w-5 h-5 text-apkasi-heading"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <h3 class="font-bold text-apkasi-dark text-[15px] leading-snug">{{ $first->nama }}</h3>
+                            <p class="text-[11px] text-apkasi-body/60 mt-0.5">PIC pendamping &middot; {{ $provNames->count() }} provinsi</p>
+                        </div>
+                    </div>
+                    {{-- List provinsi yang didampingi --}}
+                    <div class="flex flex-wrap gap-1.5 mb-4 flex-1 content-start">
+                        @foreach ($provNames as $prov)
+                            <span class="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-apkasi-leaf/50 text-apkasi-heading">
+                                <i data-lucide="map-pin" class="w-3 h-3"></i> {{ $prov }}
+                            </span>
+                        @endforeach
+                    </div>
+                    {{-- No HP + Kontak --}}
+                    @if ($first->no_hp)
+                        <div class="flex items-center justify-between gap-2 pt-3 border-t border-apkasi-leaf">
+                            <span class="tabular-nums text-sm font-semibold text-apkasi-dark">{{ $first->no_hp }}</span>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <a href="{{ $wa($first->no_hp) }}" target="_blank" rel="noopener"
+                                   class="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full bg-apkasi-heading text-white hover:bg-apkasi-cta transition-colors">
+                                    <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WA
+                                </a>
+                                <a href="{{ $tel($first->no_hp) }}" title="Telepon"
+                                   class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-apkasi-gold/15 text-[#9a7d16] hover:bg-apkasi-gold hover:text-apkasi-dark transition-colors">
+                                    <i data-lucide="phone" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+        <p id="picEmpty" class="hidden text-center text-apkasi-body/60 text-sm py-10">PIC tidak ditemukan.</p>
+
+        {{-- Pagination dinamis (6 kartu / halaman, tanpa reload) --}}
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6">
+            <span id="picInfo" class="text-xs text-apkasi-body/70"></span>
+            <div id="picPageBtns" class="flex items-center gap-1.5 flex-wrap"></div>
         </div>
         <!-- <p class="text-xs text-apkasi-body/60 mt-3">Catatan: DKI Jakarta belum tercantum PIC pada dokumen sumber.</p> -->
     </section>
