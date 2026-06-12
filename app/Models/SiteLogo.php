@@ -17,9 +17,7 @@ class SiteLogo extends Model
 
     public function getGambarUrlAttribute(): ?string
     {
-        $v = $this->gambar;
-        if (! $v) return null;
-        return Str::startsWith($v, ['http://', 'https://']) ? $v : asset(ltrim($v, '/'));
+        return \App\Support\Media::url($this->gambar);
     }
 
     public function scopeGrup($q, string $grup)

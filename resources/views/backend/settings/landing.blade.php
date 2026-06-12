@@ -91,7 +91,7 @@
                                             <label class="fw-semibold fs-8 text-muted mb-1">Ganti gambar latar (jpg/png/webp, maks 5MB)</label>
                                             <input type="file" name="lp_hero_bg_image_file" accept="image/*" class="form-control form-control-sm">
                                             @if ($g('lp_hero_bg_image'))
-                                                <img src="{{ \Illuminate\Support\Str::startsWith($g('lp_hero_bg_image'), ['http']) ? $g('lp_hero_bg_image') : asset($g('lp_hero_bg_image')) }}" class="mt-2 rounded border" style="height:60px;width:auto;object-fit:cover">
+                                                <img src="{{ \App\Support\Media::url($g('lp_hero_bg_image')) }}" class="mt-2 rounded border" style="height:60px;width:auto;object-fit:cover">
                                             @endif
                                         </div>
                                         <div class="col-md-6">
@@ -122,7 +122,7 @@
                                             <label class="fw-semibold fs-8 text-muted mb-1">Gambar Bupati &amp; Wakil (1 gambar gabungan, png/webp transparan, maks 5MB)</label>
                                             <input type="file" name="lp_hero_leaders_file" accept="image/*" class="form-control form-control-sm">
                                             @if ($g('lp_hero_leaders_img'))
-                                                <img src="{{ \Illuminate\Support\Str::startsWith($g('lp_hero_leaders_img'), ['http']) ? $g('lp_hero_leaders_img') : asset($g('lp_hero_leaders_img')) }}" class="mt-2 rounded border bg-dark p-2" style="height:90px;width:auto;object-fit:contain">
+                                                <img src="{{ \App\Support\Media::url($g('lp_hero_leaders_img')) }}" class="mt-2 rounded border bg-dark p-2" style="height:90px;width:auto;object-fit:contain">
                                             @endif
                                         </div>
                                     </div>
@@ -152,7 +152,7 @@
                                     <div class="border border-gray-300 rounded p-3">
                                         <div class="fw-bold text-gray-700 mb-2">Bupati</div>
                                         <div class="d-flex gap-3 align-items-start">
-                                            <img src="{{ asset($g('lp_bupati_foto', 'assets/apkasi/z_04_LOGO-LOGO APKASI/BUPATI.png')) }}" class="rounded-circle border" style="width:64px;height:64px;object-fit:cover">
+                                            <img src="{{ \App\Support\Media::url($g('lp_bupati_foto', 'logos/bupati.png')) }}" class="rounded-circle border" style="width:64px;height:64px;object-fit:cover">
                                             <div class="flex-1 d-flex flex-column gap-2 w-100">
                                                 <input type="text" name="lp_bupati_nama" class="form-control form-control-sm" placeholder="Nama" value="{{ $g('lp_bupati_nama') }}">
                                                 <input type="text" name="lp_bupati_jabatan" class="form-control form-control-sm" placeholder="Jabatan" value="{{ $g('lp_bupati_jabatan') }}">
@@ -166,7 +166,7 @@
                                     <div class="border border-gray-300 rounded p-3">
                                         <div class="fw-bold text-gray-700 mb-2">Wakil Bupati</div>
                                         <div class="d-flex gap-3 align-items-start">
-                                            <img src="{{ asset($g('lp_wabup_foto', 'assets/apkasi/z_04_LOGO-LOGO APKASI/WABUPATI.png')) }}" class="rounded-circle border" style="width:64px;height:64px;object-fit:cover">
+                                            <img src="{{ \App\Support\Media::url($g('lp_wabup_foto', 'logos/wabup.png')) }}" class="rounded-circle border" style="width:64px;height:64px;object-fit:cover">
                                             <div class="flex-1 d-flex flex-column gap-2 w-100">
                                                 <input type="text" name="lp_wabup_nama" class="form-control form-control-sm" placeholder="Nama" value="{{ $g('lp_wabup_nama') }}">
                                                 <input type="text" name="lp_wabup_jabatan" class="form-control form-control-sm" placeholder="Jabatan" value="{{ $g('lp_wabup_jabatan') }}">

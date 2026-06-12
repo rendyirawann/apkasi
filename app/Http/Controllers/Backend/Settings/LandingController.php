@@ -126,19 +126,15 @@ class LandingController extends Controller
 
     private function uploadLanding($file): string
     {
-        $dir = public_path('assets/media/landing');
-        if (! is_dir($dir)) {
-            @mkdir($dir, 0755, true);
-        }
-        $name = 'lp-' . time() . '-' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-        $file->move($dir, $name);
-        return 'assets/media/landing/' . $name;
+        // Semua upload landing ke storage/app/public/landing (seragam dgn data master).
+        return $file->store('landing', 'public');
     }
 
     private function deleteLanding(?string $path): void
     {
-        if ($path && Str::startsWith($path, 'assets/media/landing/') && file_exists(public_path($path))) {
-            @unlink(public_path($path));
+        if ($path && ! Str::startsWith($path, ['http://', 'https://'])
+            && \Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
         }
     }
 }

@@ -10,11 +10,8 @@
     // Helper baca konten landing dari settings ($appSettings di-share global)
     $g = fn($k, $d = '') => ($appSettings[$k] ?? $d);
     // Helper URL gambar: link http(s) dipakai apa adanya, selainnya lewat asset()
-    $img = function ($k, $d = '') use ($g) {
-        $v = $g($k, $d);
-        if (\Illuminate\Support\Str::startsWith($v, ['http://', 'https://'])) return $v;
-        return asset(str_replace(' ', '%20', $v)); // encode spasi → Safari/iOS tetap memuat aset (URL berspasi melanggar RFC)
-    };
+    // http→apa adanya · file di storage→/storage · lainnya→public (spasi di-encode utk Safari)
+    $img = fn($k, $d = '') => \App\Support\Media::url($g($k, $d));
 @endphp
 
 @section('content')
