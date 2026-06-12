@@ -171,6 +171,23 @@
         b.addEventListener('click', function () { activateTab(b.dataset.tab); });
     });
 
+    // ── Klik kartu rental -> arahkan (fly) & zoom ke titiknya di peta ──
+    document.querySelectorAll('[data-rental-id]').forEach(function (card) {
+        var p = RENTALS.find(function (x) { return String(x.id) === String(card.getAttribute('data-rental-id')); });
+        if (!p || !p.lat || !p.lng) return;                 // tanpa koordinat -> tak bisa diarahkan
+        card.classList.add('cursor-pointer');
+        card.title = 'Lihat lokasi di peta';
+        card.addEventListener('click', function (e) {
+            if (e.target.closest('a, button')) return;      // jangan ganggu tombol WA/Telepon/Rute
+            initRentalMap();
+            var mapEl = document.getElementById('rentalMap');
+            if (mapEl) { var box = mapEl.getBoundingClientRect(); if (box.top < 0 || box.bottom > window.innerHeight) mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+            var ll = [Number(p.lng), Number(p.lat)];
+            if (rentalMap) rentalOpen(p, ll);
+            else setTimeout(function () { if (rentalMap) rentalOpen(p, ll); }, 450);
+        });
+    });
+
     if (window.lucide) lucide.createIcons();
 </script>
 @endpush
@@ -330,7 +347,7 @@
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             @forelse ($rentals as $r)
                 @php $totalUnit = $r->mobil->sum('jumlah_unit'); @endphp
-                <div class="bg-white rounded-2xl border border-apkasi-leaf p-5 hover:shadow-lg transition-all duration-300 flex flex-col">
+                <div data-rental-id="{{ $r->id }}" class="bg-white rounded-2xl border border-apkasi-leaf p-5 hover:shadow-lg transition-all duration-300 flex flex-col">
                     <div class="flex items-center gap-3 mb-3">
                         <div class="w-11 h-11 rounded-xl bg-apkasi-heading/10 flex items-center justify-center shrink-0">
                             <i data-lucide="car" class="w-5 h-5 text-apkasi-heading"></i>
