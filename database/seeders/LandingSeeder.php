@@ -78,6 +78,9 @@ class LandingSeeder extends Seeder
             'lp_footer_tagline'     => 'Asosiasi Pemerintah Kabupaten Seluruh Indonesia. Memperkuat otonomi daerah untuk Indonesia Maju.',
             'lp_footer_sekretariat' => 'Dinas Kominfo Kabupaten Deli Serdang, Sumatera Utara',
             'lp_footer_copyright'   => '© 2026 Pemerintah Kabupaten Deli Serdang & APKASI. All rights reserved.',
+
+            // Banner di atas peta tab Rental (halaman Panduan)
+            'panduan_rental_banner' => 'assets/media/landing/pic-rental.jpg',
         ];
 
         foreach ($settings as $key => $value) {

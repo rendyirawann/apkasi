@@ -102,6 +102,16 @@
                                     </div>
                                 </div>
 
+                                {{-- Banner Rental (halaman Panduan › tab Rental) --}}
+                                <div class="col-md-12">
+                                    <div class="separator separator-dashed my-1"></div>
+                                    <label class="fw-semibold fs-7 mb-1 mt-2 d-block">Banner Rental Kendaraan <span class="text-muted">(tampil di atas peta — halaman Panduan › tab Rental; jpg/png/webp, maks 5MB)</span></label>
+                                    <input type="file" name="panduan_rental_banner_file" accept=".jpg,.jpeg,.png,.webp" data-max-mb="5" class="form-control form-control-sm">
+                                    @if ($g('panduan_rental_banner'))
+                                        <img src="{{ \App\Support\Media::url($g('panduan_rental_banner')) }}" class="mt-2 rounded border" style="height:80px;width:auto;object-fit:contain">
+                                    @endif
+                                </div>
+
                                 {{-- Scene pertama hero: Bupati & Wakil Bupati --}}
                                 <div class="col-md-12">
                                     <div class="separator separator-dashed my-1"></div>

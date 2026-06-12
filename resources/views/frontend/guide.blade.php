@@ -33,6 +33,8 @@
         #picTable tbody td { font-size: .82rem; color: #2d3a2a; background: #fff; border: 0 !important; border-bottom: 1px solid #f1f5f1 !important; padding: 7px 14px; vertical-align: middle; }
         #picTable tbody tr:last-child td { border-bottom: 0 !important; }
         #picTable tbody tr:hover td { background: #f7faf7; }
+        #picTable td.pic-merged { visibility: hidden; }                              /* baris lanjutan PIC sama -> disembunyikan (merge) */
+        #picTable td.pic-merge-head { border-bottom-color: transparent !important; } /* sambungkan nama PIC ke baris bawahnya */
         .dt-container .dt-search input, .dt-container .dt-length select { border: 1px solid #e8f0ea; border-radius: 9999px; padding: .38rem .9rem; font-size: .8rem; outline: none; background: #fff; }
         .dt-container .dt-search input:focus { border-color: #85AB8B; }
         .dt-container .dt-search label, .dt-container .dt-length label, .dt-container .dt-info { font-size: .76rem; color: #6b7c70; }
@@ -76,8 +78,8 @@
             picDT = $('#picTable').DataTable({
                 pageLength: 10,
                 lengthMenu: [10, 25, 50, 100],
-                order: [[0, 'asc']],
-                columnDefs: [{ targets: [4], orderable: false, searchable: false }],
+                order: [],                                  // pertahankan urutan server (sudah dikelompokkan per PIC)
+                columnDefs: [{ targets: [0, 4], orderable: false }, { targets: [4], searchable: false }],
                 language: {
                     search: 'Cari:', searchPlaceholder: 'provinsi / nama',
                     lengthMenu: 'Tampilkan _MENU_ data',
@@ -85,9 +87,26 @@
                     infoEmpty: 'Tidak ada data', infoFiltered: '(disaring dari _MAX_ total)',
                     zeroRecords: 'PIC tidak ditemukan',
                     paginate: { first: '«', previous: '‹', next: '›', last: '»' }
+                },
+                // No urut tampilan + GABUNG (merge) sel PIC/No HP/Kontak utk PIC yg sama & berurutan.
+                // Non-destruktif (toggle class + reset tiap draw) supaya sort/filter ulang tetap benar.
+                drawCallback: function () {
+                    var prev = null, prevTd = null, n = 0;
+                    $('#picTable tbody tr').each(function () {
+                        var td = $(this).children('td');
+                        if (td.length < 5) return;                              // lewati baris info/kosong
+                        td.eq(0).text(++n);                                     // nomor urut tampilan
+                        td.eq(2).add(td.eq(3)).add(td.eq(4)).removeClass('pic-merged pic-merge-head');
+                        var key = td.eq(2).text().trim() + '|' + td.eq(3).text().trim();
+                        if (key && key === prev) {                              // PIC sama dgn baris atas -> sembunyikan
+                            td.eq(2).add(td.eq(3)).add(td.eq(4)).addClass('pic-merged');
+                            if (prevTd) prevTd.eq(2).add(prevTd.eq(3)).add(prevTd.eq(4)).addClass('pic-merge-head');
+                        }
+                        prev = key; prevTd = td;
+                    });
+                    if (window.lucide) lucide.createIcons();
                 }
             });
-            picDT.on('draw', function () { if (window.lucide) lucide.createIcons(); });
         });
     }
 
@@ -291,6 +310,12 @@
             <h2 class="font-display text-2xl font-bold text-apkasi-dark leading-tight">Rental Kendaraan</h2>
             <p class="text-apkasi-body text-sm mt-1">Kontak penyedia sewa kendaraan untuk delegasi & rombongan.</p>
         </div>
+
+        @if (!empty($rentalBanner))
+            <div class="rounded-2xl overflow-hidden border border-apkasi-leaf mb-6 shadow-sm">
+                <img src="{{ \App\Support\Media::url($rentalBanner) }}" alt="PIC Kendaraan APKASI 2026 — Partner Transportasi Terpercaya" loading="lazy" class="w-full h-auto block">
+            </div>
+        @endif
 
         @php $rentalsGeo = $rentals->filter(fn($r) => $r->lat && $r->lng); @endphp
         @if (($mapboxToken ?? false) && $rentalsGeo->count())

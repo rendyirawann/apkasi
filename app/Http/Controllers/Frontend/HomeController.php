@@ -253,11 +253,12 @@ class HomeController extends Controller
         // PIC kegiatan APKASI per provinsi (dari master wilayah_provinsi).
         $pics = \App\Models\Pic::with('provinsi')
             ->where('is_active', true)
-            ->orderBy('urut')
+            ->orderBy('nama')->orderBy('no_hp')->orderBy('urut')   // PIC sama berurutan -> utk merge tampilan
             ->get();
 
-        $mapboxToken = config('services.mapbox.token');
+        $mapboxToken  = config('services.mapbox.token');
+        $rentalBanner = \App\Models\Setting::get('panduan_rental_banner') ?: 'assets/media/landing/pic-rental.jpg';
 
-        return view('frontend.guide', compact('venues', 'tourisms', 'hotels', 'rentals', 'pics', 'mapboxToken'));
+        return view('frontend.guide', compact('venues', 'tourisms', 'hotels', 'rentals', 'pics', 'mapboxToken', 'rentalBanner'));
     }
 }
