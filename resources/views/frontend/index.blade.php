@@ -38,12 +38,14 @@
     .leaf{position:absolute;top:-16vh;width:var(--sz);height:calc(var(--sz) * 1.4);background:url('{{ asset('assets/apkasi/intro/leaf.svg') }}') center/contain no-repeat;opacity:.68;filter:drop-shadow(0 4px 7px rgba(0,0,0,.25));animation:leafFall var(--dur) linear var(--delay) infinite;will-change:transform}
     .leaf.gold{filter:sepia(.7) saturate(1.7) hue-rotate(-14deg) drop-shadow(0 4px 7px rgba(0,0,0,.28))}
     @keyframes leafFall{0%{transform:translateY(-16vh) translateX(0) rotate(0)}25%{transform:translateY(16vh) translateX(var(--sway)) rotate(120deg)}50%{transform:translateY(46vh) translateX(calc(var(--sway) * -1)) rotate(230deg)}75%{transform:translateY(78vh) translateX(var(--sway)) rotate(330deg)}100%{transform:translateY(122vh) translateX(0) rotate(420deg)}}
-    .intro-logos{position:absolute;top:9%;left:50%;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:12px;pointer-events:none}
-    .il-ds{height:clamp(66px,9vw,116px);width:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5))}
+    .intro-logos{position:absolute;top:6%;left:50%;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:clamp(10px,1.4vw,14px);pointer-events:none}
+    /* DS crest (paling besar, tengah-atas) + sepasang logo HUT. Ukuran dibatasi min(vw,vh)
+       supaya otomatis mengecil di layar pendek & tak menabrak caption di bawahnya. */
+    .il-ds{height:clamp(84px,min(10.5vw,14.5vh),156px);width:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5))}
     .il-row{display:flex;align-items:center;gap:clamp(18px,4vw,46px)}
-    .il-hut{height:clamp(54px,6.8vw,88px);width:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.45))}
+    .il-hut{height:clamp(62px,min(8vw,10.5vh),104px);width:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.45))}
     @media(prefers-reduced-motion:reduce){.leaf{display:none}}
-    @media(max-width:640px){.intro-logos{top:6%;gap:10px}}
+    @media(max-width:640px){.intro-logos{top:6%}}
     .intro-wrap{position:relative;z-index:3;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif}
     .intro-cap{position:absolute;top:36%;left:50%;width:min(820px,92vw);padding:0 12px;opacity:0;transform:translate(-50%,34px);transition:opacity .7s ease,transform .8s cubic-bezier(.2,.8,.2,1);pointer-events:none}
     .intro-cap.is-active{opacity:1;transform:translate(-50%,0);pointer-events:auto}
@@ -67,9 +69,9 @@
     /* Layar PENDEK (laptop/TV 1366x768 dsb): kecilkan & rapatkan berbasis tinggi (vh) agar
        badge tidak menabrak logo dan headline tidak kegedean / terpotong. */
     @media(max-height:820px){
-        .intro-logos{top:4%;gap:8px}
-        .il-ds{height:clamp(48px,6vh,84px)}
-        .il-hut{height:clamp(38px,5vh,64px)}
+        .intro-logos{top:4%;gap:9px}
+        .il-ds{height:clamp(66px,11vh,110px)}
+        .il-hut{height:clamp(48px,8vh,76px)}
         .intro-cap{top:31%}
         .intro-badge{margin-bottom:12px;padding:6px 14px}
         .intro-cap h2{font-size:clamp(1.9rem,7vh,3.4rem)}
@@ -79,8 +81,8 @@
         .intro-hint{bottom:18px}
     }
     @media(max-height:640px){
-        .intro-logos{top:3%}
-        .il-ds{height:46px}.il-hut{height:36px}
+        .intro-logos{top:1.5%;gap:6px}
+        .il-ds{height:clamp(36px,9.5vh,56px)}.il-hut{height:clamp(28px,7vh,42px)}
         .intro-cap{top:26%}
         .intro-badge{margin-bottom:8px}
         .intro-cap h2{font-size:clamp(1.6rem,7.5vh,2.5rem)}
