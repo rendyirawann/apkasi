@@ -41,13 +41,17 @@
     .intro-logos{position:absolute;top:6%;left:50%;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:clamp(10px,1.4vw,14px);pointer-events:none}
     /* DS crest (paling besar, tengah-atas) + sepasang logo HUT. Ukuran dibatasi min(vw,vh)
        supaya otomatis mengecil di layar pendek & tak menabrak caption di bawahnya. */
-    .il-ds{height:clamp(84px,min(10.5vw,14.5vh),156px);width:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5))}
-    .il-row{display:flex;align-items:center;gap:clamp(18px,4vw,46px)}
-    .il-hut{height:clamp(62px,min(8vw,10.5vh),104px);width:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.45))}
+    .il-ds{height:clamp(90px,min(11.5vw,14.5vh),156px);width:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5))}
+    .il-row{display:flex;align-items:center;gap:clamp(18px,4vw,46px);--hut-h:clamp(82px,min(10.5vw,13.5vh),148px)}
+    /* dua logo HUT: tinggi seragam via --hut-h. Logo "80" (potret 0.8:1) diberi faktor 1.25
+       agar tampak SAMA BESAR dgn "26 APKASI" (lanskap 1.83:1) yang lebih lebar. */
+    .il-hut{width:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.45))}
+    .il-hut--apkasi{height:var(--hut-h)}
+    .il-hut--ds80{height:calc(var(--hut-h) * 1.25)}
     @media(prefers-reduced-motion:reduce){.leaf{display:none}}
     @media(max-width:640px){.intro-logos{top:6%}}
     .intro-wrap{position:relative;z-index:3;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif}
-    .intro-cap{position:absolute;top:36%;left:50%;width:min(820px,92vw);padding:0 12px;opacity:0;transform:translate(-50%,34px);transition:opacity .7s ease,transform .8s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+    .intro-cap{position:absolute;top:43%;left:50%;width:min(820px,92vw);padding:0 12px;opacity:0;transform:translate(-50%,34px);transition:opacity .7s ease,transform .8s cubic-bezier(.2,.8,.2,1);pointer-events:none}
     .intro-cap.is-active{opacity:1;transform:translate(-50%,0);pointer-events:auto}
     .intro-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(212,175,55,.16);border:1px solid rgba(212,175,55,.5);color:#FFE07D;font-size:clamp(11px,1.4vw,14px);font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:8px 18px;border-radius:99px;margin-bottom:22px}
     .intro-cap h2{font-family:'Outfit','Plus Jakarta Sans',sans-serif;font-weight:800;font-size:clamp(2.1rem,6.5vw,4.6rem);line-height:1.04;letter-spacing:-.02em;margin:0;text-shadow:0 6px 30px rgba(0,0,0,.45)}
@@ -71,8 +75,8 @@
     @media(max-height:820px){
         .intro-logos{top:4%;gap:9px}
         .il-ds{height:clamp(66px,11vh,110px)}
-        .il-hut{height:clamp(48px,8vh,76px)}
-        .intro-cap{top:31%}
+        .il-row{--hut-h:clamp(58px,10.5vh,100px)}
+        .intro-cap{top:34%}
         .intro-badge{margin-bottom:12px;padding:6px 14px}
         .intro-cap h2{font-size:clamp(1.9rem,7vh,3.4rem)}
         .intro-cap p{margin-top:12px;font-size:clamp(.88rem,2.2vh,1.1rem);line-height:1.5}
@@ -82,8 +86,8 @@
     }
     @media(max-height:640px){
         .intro-logos{top:1.5%;gap:6px}
-        .il-ds{height:clamp(36px,9.5vh,56px)}.il-hut{height:clamp(28px,7vh,42px)}
-        .intro-cap{top:26%}
+        .il-ds{height:clamp(36px,9.5vh,56px)}.il-row{--hut-h:clamp(32px,8vh,50px)}
+        .intro-cap{top:27%}
         .intro-badge{margin-bottom:8px}
         .intro-cap h2{font-size:clamp(1.6rem,7.5vh,2.5rem)}
         .intro-cap p{margin-top:8px}
@@ -128,8 +132,8 @@
     <div class="intro-logos">
         <img class="il-ds" src="{{ asset('logos/logo_ds.png') }}" alt="Deli Serdang" />
         <div class="il-row">
-            <img class="il-hut" src="{{ asset('logos/hutds80.png') }}" alt="HUT Ke-80 Deli Serdang" />
-            <img class="il-hut" src="{{ asset('logos/logo_hut26.png') }}" alt="HUT Ke-26 APKASI" />
+            <img class="il-hut il-hut--ds80" src="{{ asset('logos/hutds80-outline.webp') }}" alt="HUT Ke-80 Deli Serdang" />
+            <img class="il-hut il-hut--apkasi" src="{{ asset('logos/hut26-outline.webp') }}" alt="HUT Ke-26 APKASI" />
         </div>
     </div>
 
