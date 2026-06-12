@@ -108,6 +108,14 @@ class DestinasiWisataController extends Controller
 
     public function update(Request $request, $id)
     {
+        \Log::info('DEBUG destinasi update', [
+            'method'   => $request->method(),
+            'hasFile'  => $request->hasFile('thumbnail_file'),
+            'files'    => array_keys($request->allFiles()),
+            'ctype'    => $request->header('Content-Type'),
+            'clen'     => $request->header('Content-Length'),
+        ]);
+
         $d = DestinasiWisata::findOrFail($id);
 
         $validator = Validator::make($request->all(), $this->rules(), $this->messages());

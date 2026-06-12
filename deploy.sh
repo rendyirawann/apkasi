@@ -26,8 +26,11 @@ git reset --hard "origin/${BRANCH}"
 echo "▶ 2/5  Bersihkan cache Laravel (container: ${APP})"
 docker exec "${APP}" php artisan optimize:clear
 
-echo "▶ 3/5  Symlink storage (foto upload destinasi/gedung/hotel -> /storage)"
+echo "▶ 3/5  Symlink storage + izin tulis folder upload (storage & public/assets/media)"
 docker exec "${APP}" php artisan storage:link --relative --force || docker exec "${APP}" php artisan storage:link --force
+docker exec "${APP}" sh -c 'mkdir -p public/assets/media/landing public/assets/media/logos storage/app/public'
+docker exec "${APP}" chown -R www-data:www-data storage bootstrap/cache public/assets/media
+docker exec "${APP}" chmod -R 775 storage bootstrap/cache public/assets/media
 
 echo "▶ 4/5  Migrasi database"
 docker exec "${APP}" php artisan migrate --force
