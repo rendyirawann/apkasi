@@ -27,7 +27,7 @@ echo "▶ 2/5  Bersihkan cache Laravel (container: ${APP})"
 docker exec "${APP}" php artisan optimize:clear
 
 echo "▶ 3/5  Symlink storage (foto upload destinasi/gedung/hotel -> /storage)"
-docker exec "${APP}" php artisan storage:link --relative || docker exec "${APP}" php artisan storage:link
+docker exec "${APP}" php artisan storage:link --relative --force || docker exec "${APP}" php artisan storage:link --force
 
 echo "▶ 4/5  Migrasi database"
 docker exec "${APP}" php artisan migrate --force
