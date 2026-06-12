@@ -503,13 +503,13 @@
                 <div>
                     <span class="inline-flex items-center gap-1.5 bg-apkasi-heading/8 text-apkasi-heading text-xs sm:text-sm font-semibold tracking-wide uppercase px-4 py-1.5 rounded-full mb-4">{{ $g('lp_about_badge', 'Tentang Event') }}</span>
                     <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-apkasi-dark leading-tight mb-5">{{ $g('lp_about_heading', 'Dua Hari Jadi Besar, Satu Tekad Bersinergi') }}</h2>
-                    <p class="text-apkasi-body text-sm sm:text-base leading-relaxed mb-4">
+                    <p class="text-apkasi-body text-sm sm:text-base leading-relaxed mb-4 text-justify">
                         {{ $g('lp_about_p1', 'Rangkaian ini memperingati HUT APKASI (Asosiasi Pemerintah Kabupaten Seluruh Indonesia) Ke-26 sekaligus HUT Kabupaten Deli Serdang Ke-80, dengan tema besar:') }}
                     </p>
                     <blockquote class="border-l-4 border-apkasi-gold pl-4 sm:pl-5 my-5 sm:my-6">
                         <p class="text-apkasi-heading font-semibold text-base sm:text-lg italic leading-relaxed">{{ $g('lp_about_quote', '"Penguatan Sinergi Antar Pemerintah Kabupaten Dalam Mendukung Pembangunan Daerah dan Otonomi Daerah."') }}</p>
                     </blockquote>
-                    <p class="text-apkasi-body text-sm sm:text-base leading-relaxed mb-6">
+                    <p class="text-apkasi-body text-sm sm:text-base leading-relaxed mb-6 text-justify">
                         {{ $g('lp_about_p2', 'Pemerintah Kabupaten Deli Serdang, Sumatera Utara, menyambut perwakilan dari seluruh pemerintah kabupaten di Indonesia untuk membahas strategi pembiayaan alternatif, kemandirian ekonomi lokal, dan peran perempuan dalam pemberantasan stunting.') }}
                     </p>
 
@@ -625,7 +625,7 @@
                             {{ $g('lp_poi_heading1', 'Malam Grand Final') }}<br />
                             <span class="text-apkasi-accent">{{ $g('lp_poi_heading2', 'Putri Otonomi Indonesia') }}</span> {{ $g('lp_poi_heading3', '2026') }}
                         </h2>
-                        <p class="text-white/75 text-sm sm:text-base leading-relaxed mb-6 max-w-lg">
+                        <p class="text-white/75 text-sm sm:text-base leading-relaxed mb-6 max-w-lg text-justify">
                             {{ $g('lp_poi_desc', 'Ajang bergengsi pemilihan duta otonomi daerah dari seluruh kabupaten di Indonesia. Malam penobatan puncak dilaksanakan Kamis, 2 Juli 2026 di Graha Bhineka.') }}
                         </p>
                         @php
