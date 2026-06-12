@@ -191,9 +191,9 @@ class DestinasiWisataController extends Controller
             'maps_url'        => 'nullable|url|max:255',
             'is_lokasi_acara' => 'nullable|boolean',
             'urut'            => 'nullable|integer|min:0',
-            'thumbnail_file'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
+            'thumbnail_file'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',
             'gambar_files'    => 'nullable|array',
-            'gambar_files.*'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
+            'gambar_files.*'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',
             'hapus_gambar'    => 'nullable|array',
         ];
     }
@@ -206,10 +206,10 @@ class DestinasiWisataController extends Controller
             'maps_url.url'         => 'Link Google Maps harus berupa URL valid.',
             'thumbnail_file.image' => 'Thumbnail harus berupa gambar.',
             'thumbnail_file.mimes' => 'Format thumbnail: jpg, jpeg, png, webp.',
-            'thumbnail_file.max'   => 'Ukuran thumbnail maksimal 3 MB.',
+            'thumbnail_file.max'   => 'Ukuran thumbnail maksimal 10 MB.',
             'gambar_files.*.image' => 'Setiap galeri harus berupa gambar.',
             'gambar_files.*.mimes' => 'Format galeri: jpg, jpeg, png, webp.',
-            'gambar_files.*.max'   => 'Ukuran tiap gambar galeri maksimal 3 MB.',
+            'gambar_files.*.max'   => 'Ukuran tiap gambar galeri maksimal 10 MB.',
         ];
     }
 

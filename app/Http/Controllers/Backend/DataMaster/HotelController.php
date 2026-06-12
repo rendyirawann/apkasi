@@ -154,7 +154,7 @@ class HotelController extends Controller
             'lat'                => 'nullable|numeric|between:-90,90',
             'lng'                => 'nullable|numeric|between:-180,180',
             'maps_url'           => 'nullable|url|max:255',
-            'image_file'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
+            'image_file'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',
             'urut'               => 'nullable|integer|min:0',
             'is_lokasi_acara'    => 'nullable|boolean',
         ];

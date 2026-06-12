@@ -99,8 +99,8 @@
                             <div class="text-danger fs-8 mt-1" data-error="maps_url"></div>
                         </div>
                         <div class="col-md-12">
-                            <label class="fw-semibold fs-7 mb-1">Foto Gedung <span class="text-muted">(opsional, maks 3MB — jpg/png/webp)</span></label>
-                            <input type="file" name="image_file" id="g_image_file" accept=".jpg,.jpeg,.png,.webp" data-max-mb="3" class="form-control form-control-solid" />
+                            <label class="fw-semibold fs-7 mb-1">Foto Gedung <span class="text-muted">(opsional, maks 10MB — jpg/png/webp)</span></label>
+                            <input type="file" name="image_file" id="g_image_file" accept=".jpg,.jpeg,.png,.webp" data-max-mb="10" class="form-control form-control-solid" />
                             <div class="text-danger fs-8 mt-1" data-error="image_file"></div>
                             <div id="g_image_preview" class="mt-2"></div>
                         </div>
