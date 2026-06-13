@@ -138,6 +138,15 @@
                     <h2 class="font-display text-xl font-bold text-apkasi-dark">Daftar Tempat</h2>
                     <span id="listCount" class="text-xs font-semibold text-apkasi-body">Memuat…</span>
                 </div>
+                {{-- Sub-tab kota — muncul HANYA saat kategori Hotel aktif (di "Semua" hotel digabung) --}}
+                <div id="hotelSubtabs" class="hidden flex-wrap gap-2 mb-4">
+                    @foreach ([['all', 'Semua', 'hotel'], ['deli_serdang', 'Deli Serdang', 'hotel_ds'], ['medan', 'Kota Medan', 'hotel_medan']] as $st)
+                        <button type="button" data-kota="{{ $st[0] }}"
+                            class="hotel-subtab text-xs font-semibold px-3.5 py-2 rounded-full border transition-colors {{ $loop->first ? 'bg-apkasi-gold/20 border-apkasi-gold text-[#8a6d12]' : 'bg-white border-apkasi-leaf text-apkasi-body hover:border-apkasi-gold' }}">
+                            {{ $st[1] }} <span class="opacity-60 font-medium" data-cnt="{{ $st[2] }}">{{ $counts[$st[2]] ?? 0 }}</span>
+                        </button>
+                    @endforeach
+                </div>
                 <div id="placeList" class="flex flex-col gap-3.5 min-h-[200px]"></div>
                 <div id="placePagination" class="flex flex-wrap items-center justify-center gap-1.5 mt-5"></div>
             </div>
@@ -212,7 +221,7 @@
         wisata: { label: 'Destinasi', chip: 'bg-[#3a86b5]/10 text-[#2f6e95]', accent: 'bg-[#3a86b5]', icon: 'palmtree', pin: 'pin-wisata' },
     };
 
-    var activeCat = 'all', query = '', page = 1, lastPage = 1;
+    var activeCat = 'all', query = '', page = 1, lastPage = 1, kotaFilter = 'all';
     var map = null, selectedId = null, currentPopup = null;
     // GeoJSON: koordinat [lng, lat] sebagai angka — dirender layer GL agar PERSIS di titik (anti geser saat zoom).
     function toFC(list) {
@@ -241,6 +250,9 @@
         if (p.is_lokasi_acara) meta += '<span class="pop-cat" style="color:#a8821a;background:#fbf3da">Lokasi Acara</span>';
         if (meta) h += '<div class="pop-meta">' + meta + '</div>';
         if (p.address) h += '<div class="pop-row"><i data-lucide="map-pin"></i><span>' + p.address + '</span></div>';
+        if (p.harga_mulai) h += '<div class="pop-row"><i data-lucide="tag"></i><span>Mulai ' + formatRp(p.harga_mulai) + ' / malam</span></div>';
+        if (p.jarak)   h += '<div class="pop-row"><i data-lucide="route"></i><span>' + p.jarak + ' ke lokasi acara</span></div>';
+        if (p.cp)      h += '<div class="pop-row"><i data-lucide="user-round"></i><span>CP: ' + p.cp + '</span></div>';
         if (p.rooms)   h += '<div class="pop-row"><i data-lucide="bed-double"></i><span>' + p.rooms + '</span></div>';
         if (p.harga)   h += '<div class="pop-row"><i data-lucide="ticket"></i><span>' + p.harga + '</span></div>';
         var act = '<a href="' + gmaps(p) + '" target="_blank" rel="noopener"><i data-lucide="navigation"></i> Rute</a>';
@@ -250,6 +262,7 @@
         return h;
     }
     function waLink(no) { var d = (no || '').replace(/[^0-9]/g, ''); if (d.charAt(0) === '0') d = '62' + d.slice(1); return 'https://wa.me/' + d; }
+    function formatRp(n) { return 'Rp ' + (Number(n) || 0).toLocaleString('id-ID'); }
     function pinClass(cat) { return (CAT[cat] || CAT.venue).pin; }
     var MINI = 'inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border border-apkasi-leaf text-apkasi-heading transition-colors';
 
@@ -261,10 +274,15 @@
             : '<div class="w-24 h-24 rounded-xl bg-apkasi-leaf flex items-center justify-center shrink-0 text-apkasi-accent"><i data-lucide="' + m.icon + '" class="w-7 h-7"></i></div>';
         var lokasi = p.is_lokasi_acara
             ? '<span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full mb-1.5 ms-1 bg-apkasi-gold text-apkasi-dark"><i data-lucide="map-pin" class="inline w-2.5 h-2.5 -mt-0.5"></i> Lokasi Acara</span>' : '';
+        var kotaChip = (p.category === 'hotel' && p.kota)
+            ? '<span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full mb-1.5 ms-1 bg-apkasi-leaf text-apkasi-heading">' + (p.kota === 'medan' ? 'Kota Medan' : 'Deli Serdang') + '</span>' : '';
         var meta = '';
         if (p.rating) meta += '<span class="flex items-center gap-1 font-bold text-[#b9931f]"><i data-lucide="star" class="w-3.5 h-3.5"></i> ' + p.rating + '</span>';
+        if (p.harga_mulai) meta += '<span class="inline-flex items-center gap-1 font-semibold text-apkasi-heading"><i data-lucide="tag" class="w-3.5 h-3.5"></i> mulai ' + formatRp(p.harga_mulai) + '</span>';
+        if (p.jarak) meta += '<span class="inline-flex items-center gap-1 font-semibold"><i data-lucide="route" class="w-3.5 h-3.5"></i> ' + p.jarak + '</span>';
         if (p.rooms) meta += '<span class="inline-flex items-center gap-1 font-semibold"><i data-lucide="bed-double" class="w-3.5 h-3.5"></i> ' + p.rooms + ' kamar</span>';
         if (p.harga) meta += '<span class="inline-flex items-center gap-1 font-semibold"><i data-lucide="ticket" class="w-3.5 h-3.5"></i> ' + p.harga + '</span>';
+        if (p.cp) meta += '<span class="inline-flex items-center gap-1"><i data-lucide="user-round" class="w-3.5 h-3.5"></i> ' + p.cp + '</span>';
         var btns = '<button type="button" data-focus="' + p.id + '" class="' + MINI + ' hover:bg-apkasi-heading hover:text-white hover:border-apkasi-heading"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Lihat di Peta</button>'
             + '<a href="' + gmaps(p) + '" target="_blank" rel="noopener" class="' + MINI + ' hover:bg-apkasi-gold hover:text-apkasi-dark hover:border-apkasi-gold"><i data-lucide="navigation" class="w-3.5 h-3.5"></i> Rute</a>';
         if (p.category === 'hotel' && p.wa) btns += '<a href="' + waLink(p.wa) + '" target="_blank" rel="noopener" class="' + MINI + ' hover:bg-apkasi-accent hover:text-white hover:border-apkasi-accent"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp</a>';
@@ -273,7 +291,7 @@
         return '<div data-card data-id="' + p.id + '" class="pcard group flex gap-3.5 p-3.5 rounded-2xl border border-apkasi-leaf bg-white cursor-pointer transition-all duration-300 hover:border-apkasi-accent/50 hover:-translate-y-0.5 hover:shadow-lg">'
             + '<span class="accent ' + m.accent + '"></span>' + img
             + '<div class="flex-1 min-w-0">'
-            + '<span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full mb-1.5 ' + m.chip + '">' + m.label + '</span>' + lokasi
+            + '<span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full mb-1.5 ' + m.chip + '">' + m.label + '</span>' + kotaChip + lokasi
             + '<h3 class="font-bold text-apkasi-dark text-[15px] leading-snug">' + p.name + '</h3>'
             + (p.address ? '<p class="flex items-start gap-1.5 text-xs text-apkasi-body mt-1 leading-relaxed"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-apkasi-body/50 mt-0.5 shrink-0"></i> ' + p.address + '</p>' : '')
             + (p.description ? '<p class="text-xs text-apkasi-body/80 mt-1.5 leading-relaxed">' + p.description + '</p>' : '')
@@ -293,7 +311,7 @@
 
     function fetchList() {
         document.getElementById('listCount').textContent = 'Memuat…';
-        var url = LIST_URL + '?cat=' + encodeURIComponent(activeCat) + '&q=' + encodeURIComponent(query) + '&page=' + page;
+        var url = LIST_URL + '?cat=' + encodeURIComponent(activeCat) + '&kota=' + encodeURIComponent(kotaFilter) + '&q=' + encodeURIComponent(query) + '&page=' + page;
         fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(function (r) { return r.json(); })
             .then(function (res) {
@@ -343,7 +361,26 @@
             });
             btn.classList.add('bg-apkasi-heading', 'border-apkasi-heading', 'text-white');
             btn.classList.remove('bg-white', 'border-apkasi-leaf', 'text-apkasi-body', 'hover:border-apkasi-accent');
-            activeCat = btn.dataset.cat; page = 1; fetchList(); applyMarkers(true);
+            activeCat = btn.dataset.cat;
+            // Sub-tab kota hanya utk kategori Hotel; kategori lain -> reset & sembunyikan
+            var sub = document.getElementById('hotelSubtabs');
+            if (activeCat === 'hotel') { sub.classList.remove('hidden'); sub.classList.add('flex'); }
+            else { sub.classList.add('hidden'); sub.classList.remove('flex'); kotaFilter = 'all'; setSubtabActive(); }
+            page = 1; fetchList(); applyMarkers(true);
+        });
+    });
+    // Sub-tab kota (Deli Serdang / Medan)
+    function setSubtabActive() {
+        document.querySelectorAll('.hotel-subtab').forEach(function (b) {
+            var on = b.dataset.kota === kotaFilter;
+            b.classList.toggle('bg-apkasi-gold/20', on); b.classList.toggle('border-apkasi-gold', on); b.classList.toggle('text-[#8a6d12]', on);
+            b.classList.toggle('bg-white', !on); b.classList.toggle('border-apkasi-leaf', !on); b.classList.toggle('text-apkasi-body', !on);
+        });
+    }
+    document.querySelectorAll('.hotel-subtab').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            kotaFilter = btn.dataset.kota; setSubtabActive();
+            page = 1; fetchList(); applyMarkers(true);
         });
     });
     var searchT;
@@ -359,8 +396,9 @@
             || (activeCat === 'lokasi' && p.is_lokasi_acara)
             || (activeCat === 'gedung' && p.category === 'venue')
             || (activeCat === p.category);
+        var kotaOk = kotaFilter === 'all' || (p.kota === kotaFilter);
         var qOk = !query || p.name.toLowerCase().indexOf(query) >= 0 || (p.address || '').toLowerCase().indexOf(query) >= 0;
-        return catOk && qOk;
+        return catOk && kotaOk && qOk;
     }
     function applyMarkers(fit) {
         if (!map || !map.getSource('places')) return;
