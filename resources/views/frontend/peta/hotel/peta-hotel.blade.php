@@ -420,7 +420,7 @@
         var p = MARKERS.find(function (x) { return String(x.id) === String(id); });
         if (p && map) {
             var ll = [Number(p.lng), Number(p.lat)];
-            map.flyTo({ center: ll, zoom: 15, duration: 800 });
+            map.easeTo({ center: ll, duration: 600 });   // hanya GESER (pan) ke titik, zoom dipertahankan
             if (map.getSource('sel')) map.getSource('sel').setData(toFC([p]));
             if (currentPopup) currentPopup.remove();
             currentPopup = new mapboxgl.Popup({ offset: 16, closeButton: true, maxWidth: '280px' })

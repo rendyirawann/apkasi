@@ -405,10 +405,12 @@
                         @if ($r->mobil->count())
                             <div class="flex flex-wrap gap-1.5 mb-2">
                                 @foreach ($r->mobil as $m)
-                                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold bg-apkasi-leaf/60 text-apkasi-heading px-2.5 py-1 rounded-full">{{ $m->nama_mobil }} <span class="text-apkasi-body/70">×{{ $m->jumlah_unit }}</span></span>
+                                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold bg-apkasi-leaf/60 text-apkasi-heading px-2.5 py-1 rounded-full">{{ $m->nama_mobil }}@if (! is_null($m->jumlah_unit)) <span class="text-apkasi-body/70">×{{ $m->jumlah_unit }}</span>@endif</span>
                                 @endforeach
                             </div>
-                            <div class="text-xs font-semibold text-apkasi-heading"><i data-lucide="car" class="w-3.5 h-3.5 inline"></i> Total {{ $totalUnit }} unit tersedia</div>
+                            @if ($totalUnit > 0)
+                                <div class="text-xs font-semibold text-apkasi-heading"><i data-lucide="car" class="w-3.5 h-3.5 inline"></i> Total {{ $totalUnit }} unit tersedia</div>
+                            @endif
                         @endif
                     </div>
                     @if ($r->kontak_wa || $r->telepon)
