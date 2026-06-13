@@ -16,6 +16,7 @@
         'id' => $r->id, 'nama' => $r->nama, 'alamat' => $r->alamat,
         'telepon' => $r->telepon, 'kontak_wa' => $r->kontak_wa,
         'lat' => $r->lat, 'lng' => $r->lng, 'maps_url' => $r->maps_url,
+        'mobil' => $r->mobil->map(fn ($m) => ['nama' => $m->nama_mobil, 'unit' => $m->jumlah_unit])->values(),
     ])->values();
 @endphp
 
@@ -204,6 +205,40 @@
             if (rentalMap) rentalOpen(p, ll);
             else setTimeout(function () { if (rentalMap) rentalOpen(p, ll); }, 450);
         });
+    });
+
+    // ── Modal Detail Rental (daftar mobil + kontak) ──
+    function rentalDetailHTML(r) {
+        var h = '<div class="flex items-center gap-3 mb-3"><div class="w-11 h-11 rounded-xl bg-apkasi-heading/10 flex items-center justify-center shrink-0"><i data-lucide="car" class="w-5 h-5 text-apkasi-heading"></i></div><h3 class="font-bold text-apkasi-dark text-lg leading-snug">' + r.nama + '</h3></div>';
+        if (r.alamat) h += '<p class="flex items-start gap-2 text-sm text-apkasi-body leading-relaxed mb-4"><i data-lucide="map-pin" class="w-4 h-4 text-apkasi-body/50 mt-0.5 shrink-0"></i> ' + r.alamat + '</p>';
+        if (r.mobil && r.mobil.length) {
+            h += '<div class="text-xs font-bold uppercase tracking-wider text-apkasi-body/70 mb-2">Armada Mobil (' + r.mobil.length + ' jenis)</div><div class="flex flex-col gap-1.5 mb-4">';
+            r.mobil.forEach(function (m) {
+                var u = (m.unit != null && m.unit !== '') ? '<span class="font-bold text-apkasi-dark">' + m.unit + ' unit</span>' : '<span class="text-[11px] font-semibold text-apkasi-heading bg-apkasi-leaf/60 px-2 py-0.5 rounded-full">tersedia</span>';
+                h += '<div class="flex items-center justify-between text-sm border-b border-apkasi-leaf/60 pb-1.5"><span class="text-apkasi-body">' + m.nama + '</span>' + u + '</div>';
+            });
+            h += '</div>';
+        }
+        h += '<div class="flex gap-2 mt-2">';
+        if (r.kontak_wa) h += '<a href="' + rentalWa(r.kontak_wa) + '" target="_blank" rel="noopener" class="flex-1 inline-flex items-center justify-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-full bg-apkasi-heading text-white hover:bg-apkasi-cta transition"><i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp</a>';
+        if (r.maps_url || (r.lat && r.lng)) h += '<a href="' + rentalGmaps(r) + '" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-full border border-apkasi-leaf text-apkasi-heading hover:bg-apkasi-leaf/50 transition"><i data-lucide="navigation" class="w-4 h-4"></i> Rute</a>';
+        h += '</div>';
+        return h;
+    }
+    var rdModalEl = document.getElementById('rentalDetailModal');
+    function openRentalDetail(id) {
+        var r = RENTALS.find(function (x) { return String(x.id) === String(id); });
+        if (!r || !rdModalEl) return;
+        document.getElementById('rentalDetailBody').innerHTML = rentalDetailHTML(r);
+        rdModalEl.classList.remove('hidden'); rdModalEl.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+        if (window.lucide) lucide.createIcons();
+    }
+    function closeRentalDetail() { if (rdModalEl) { rdModalEl.classList.add('hidden'); rdModalEl.classList.remove('flex'); document.body.style.overflow = ''; } }
+    if (rdModalEl) rdModalEl.querySelectorAll('[data-rd-close]').forEach(function (el) { el.addEventListener('click', closeRentalDetail); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && rdModalEl && !rdModalEl.classList.contains('hidden')) closeRentalDetail(); });
+    document.querySelectorAll('[data-rental-detail]').forEach(function (b) {
+        b.addEventListener('click', function (e) { e.stopPropagation(); openRentalDetail(b.getAttribute('data-rental-detail')); });
     });
 
     if (window.lucide) lucide.createIcons();
@@ -413,26 +448,36 @@
                             @endif
                         @endif
                     </div>
-                    @if ($r->kontak_wa || $r->telepon)
-                        <div class="flex items-center gap-2 mt-4">
-                            @if ($r->kontak_wa)
-                                <a href="{{ $wa($r->kontak_wa) }}" target="_blank" rel="noopener" class="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full bg-apkasi-heading text-white hover:bg-apkasi-cta transition-colors">
-                                    <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
-                                </a>
-                            @endif
-                            @if ($r->telepon)
-                                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $r->telepon) }}" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full border border-apkasi-leaf text-apkasi-heading hover:bg-apkasi-leaf/50 transition-colors">
-                                    <i data-lucide="phone" class="w-4 h-4"></i> {{ $r->telepon }}
-                                </a>
-                            @endif
-                        </div>
-                    @endif
+                    <div class="flex items-center gap-2 mt-4">
+                        <button type="button" data-rental-detail="{{ $r->id }}" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full border border-apkasi-leaf text-apkasi-heading hover:bg-apkasi-leaf/50 transition-colors">
+                            <i data-lucide="list" class="w-4 h-4"></i> Detail
+                        </button>
+                        @if ($r->kontak_wa)
+                            <a href="{{ $wa($r->kontak_wa) }}" target="_blank" rel="noopener" class="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full bg-apkasi-heading text-white hover:bg-apkasi-cta transition-colors">
+                                <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
+                            </a>
+                        @endif
+                        @if ($r->telepon)
+                            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $r->telepon) }}" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full border border-apkasi-leaf text-apkasi-heading hover:bg-apkasi-leaf/50 transition-colors">
+                                <i data-lucide="phone" class="w-4 h-4"></i> {{ $r->telepon }}
+                            </a>
+                        @endif
+                    </div>
                 </div>
             @empty
                 <div class="col-span-full text-center py-10 text-sm text-apkasi-body/70">Belum ada data rental.</div>
             @endforelse
         </div>
     </section>
+
+    {{-- ═══════════ MODAL DETAIL RENTAL ═══════════ --}}
+    <div id="rentalDetailModal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-apkasi-dark/55 backdrop-blur-sm" data-rd-close></div>
+        <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[88vh] overflow-y-auto">
+            <button type="button" data-rd-close class="absolute top-3.5 right-3.5 z-10 w-9 h-9 inline-flex items-center justify-center rounded-full bg-white/90 border border-apkasi-leaf text-apkasi-body hover:bg-apkasi-heading hover:text-white shadow transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+            <div id="rentalDetailBody" class="p-6"></div>
+        </div>
+    </div>
 
     {{-- ═══════════ CTA: PETA ═══════════ --}}
     <section class="max-w-[1400px] mx-auto px-5 sm:px-8 pb-16 sm:pb-20">

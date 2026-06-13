@@ -189,6 +189,17 @@
         </div>
     </section>
 
+    {{-- ═══════════ MODAL DETAIL ═══════════ --}}
+    <div id="detailModal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-apkasi-dark/55 backdrop-blur-sm" data-detail-close></div>
+        <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[88vh] overflow-y-auto place-scroll">
+            <button type="button" data-detail-close class="absolute top-3.5 right-3.5 z-10 w-9 h-9 inline-flex items-center justify-center rounded-full bg-white/90 border border-apkasi-leaf text-apkasi-body hover:bg-apkasi-heading hover:text-white shadow transition-colors">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+            <div id="detailBody"></div>
+        </div>
+    </div>
+
     {{-- ═══════════ FOOTER ═══════════ --}}
     @include('frontend.partials.footer')
 </div>
@@ -283,7 +294,8 @@
         if (p.rooms) meta += '<span class="inline-flex items-center gap-1 font-semibold"><i data-lucide="bed-double" class="w-3.5 h-3.5"></i> ' + p.rooms + ' kamar</span>';
         if (p.harga) meta += '<span class="inline-flex items-center gap-1 font-semibold"><i data-lucide="ticket" class="w-3.5 h-3.5"></i> ' + p.harga + '</span>';
         if (p.cp) meta += '<span class="inline-flex items-center gap-1"><i data-lucide="user-round" class="w-3.5 h-3.5"></i> ' + p.cp + '</span>';
-        var btns = '<button type="button" data-focus="' + p.id + '" class="' + MINI + ' hover:bg-apkasi-heading hover:text-white hover:border-apkasi-heading"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Lihat di Peta</button>'
+        var btns = '<button type="button" data-detail="' + p.id + '" class="' + MINI + ' hover:bg-apkasi-heading hover:text-white hover:border-apkasi-heading"><i data-lucide="info" class="w-3.5 h-3.5"></i> Detail</button>'
+            + '<button type="button" data-focus="' + p.id + '" class="' + MINI + ' hover:bg-apkasi-heading hover:text-white hover:border-apkasi-heading"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Lihat di Peta</button>'
             + '<a href="' + gmaps(p) + '" target="_blank" rel="noopener" class="' + MINI + ' hover:bg-apkasi-gold hover:text-apkasi-dark hover:border-apkasi-gold"><i data-lucide="navigation" class="w-3.5 h-3.5"></i> Rute</a>';
         if (p.category === 'hotel' && p.wa) btns += '<a href="' + waLink(p.wa) + '" target="_blank" rel="noopener" class="' + MINI + ' hover:bg-apkasi-accent hover:text-white hover:border-apkasi-accent"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp</a>';
         if (p.category === 'hotel' && p.email) btns += '<a href="mailto:' + p.email + '" class="' + MINI + ' hover:bg-apkasi-heading hover:text-white hover:border-apkasi-heading"><i data-lucide="mail" class="w-3.5 h-3.5"></i> Email</a>';
@@ -346,6 +358,8 @@
     });
     // delegated: card click + Lihat di Peta
     document.getElementById('placeList').addEventListener('click', function (e) {
+        var dt = e.target.closest('[data-detail]');
+        if (dt) { e.stopPropagation(); openDetail(dt.dataset.detail); return; }
         var f = e.target.closest('[data-focus]');
         if (f) { e.stopPropagation(); focusPlace(f.dataset.focus); return; }
         if (e.target.closest('a')) return;
@@ -467,6 +481,60 @@
             applyMarkers(true);
         });
     }
+
+    // ── Modal Detail (info lengkap) ──
+    function infoRow(icon, label, val) {
+        return '<div class="flex items-start gap-2 text-sm"><i data-lucide="' + icon + '" class="w-4 h-4 text-apkasi-accent mt-0.5 shrink-0"></i><span><span class="text-apkasi-body/60">' + label + ':</span> <span class="font-semibold text-apkasi-dark">' + val + '</span></span></div>';
+    }
+    function detailHTML(p) {
+        var m = CAT[p.category] || CAT.venue;
+        var catLbl = { venue: 'Gedung / Venue', hotel: 'Hotel', wisata: 'Destinasi Wisata' };
+        var h = '';
+        if (p.image) h += '<img src="' + p.image + '" alt="" class="w-full h-44 object-cover">';
+        else h += '<div class="w-full h-24 bg-apkasi-leaf flex items-center justify-center text-apkasi-accent"><i data-lucide="' + m.icon + '" class="w-10 h-10"></i></div>';
+        h += '<div class="p-6"><div class="flex flex-wrap items-center gap-2 mb-2">';
+        h += '<span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ' + m.chip + '">' + (catLbl[p.category] || '') + '</span>';
+        if (p.category === 'hotel' && p.kota) h += '<span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-apkasi-leaf text-apkasi-heading">' + (p.kota === 'medan' ? 'Kota Medan' : 'Deli Serdang') + '</span>';
+        if (p.is_lokasi_acara) h += '<span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-apkasi-gold text-apkasi-dark">Lokasi Acara</span>';
+        if (p.rating) h += '<span class="inline-flex items-center gap-1 text-xs font-bold text-[#b9931f]"><i data-lucide="star" class="w-3.5 h-3.5"></i> ' + p.rating + '</span>';
+        h += '</div><h3 class="font-display text-xl font-bold text-apkasi-dark leading-tight mb-2">' + p.name + '</h3>';
+        if (p.address) h += '<p class="flex items-start gap-2 text-sm text-apkasi-body leading-relaxed mb-3"><i data-lucide="map-pin" class="w-4 h-4 text-apkasi-body/50 mt-0.5 shrink-0"></i> ' + p.address + '</p>';
+        if (p.description) h += '<p class="text-sm text-apkasi-body/80 leading-relaxed mb-3">' + p.description + '</p>';
+        var rows = '';
+        if (p.jarak) rows += infoRow('route', 'Jarak ke lokasi acara', p.jarak);
+        if (p.cp) rows += infoRow('user-round', 'Contact Person', p.cp);
+        if (p.wa) rows += infoRow('phone', 'Kontak', p.wa);
+        if (p.email) rows += infoRow('mail', 'Email', p.email);
+        if (p.rooms) rows += infoRow('bed-double', 'Ketersediaan kamar', p.rooms + ' kamar');
+        if (p.harga) rows += infoRow('ticket', 'Tiket', p.harga);
+        if (rows) h += '<div class="flex flex-col gap-1.5 mb-1">' + rows + '</div>';
+        if (p.kamar && p.kamar.length) {
+            h += '<div class="mt-4 pt-3 border-t border-apkasi-leaf"><div class="text-xs font-bold uppercase tracking-wider text-apkasi-body/70 mb-2">Tipe Kamar &amp; Harga / malam</div><div class="flex flex-col gap-1.5">';
+            p.kamar.forEach(function (k) { h += '<div class="flex items-center justify-between text-sm border-b border-apkasi-leaf/50 pb-1"><span class="text-apkasi-body">' + k.tipe + '</span><span class="font-bold text-apkasi-dark">' + (k.harga != null ? formatRp(k.harga) : '-') + '</span></div>'; });
+            h += '</div></div>';
+        }
+        h += '<div class="flex flex-wrap gap-2 mt-5">';
+        h += '<a href="' + gmaps(p) + '" target="_blank" rel="noopener" class="flex-1 inline-flex items-center justify-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-full bg-apkasi-heading text-white hover:bg-apkasi-cta transition-colors"><i data-lucide="navigation" class="w-4 h-4"></i> Rute</a>';
+        if (p.wa) h += '<a href="' + waLink(p.wa) + '" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-full bg-[#25a567] text-white hover:opacity-90 transition"><i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp</a>';
+        h += '<button type="button" data-focus-detail="' + p.id + '" class="inline-flex items-center justify-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-full border border-apkasi-leaf text-apkasi-heading hover:bg-apkasi-leaf/50 transition"><i data-lucide="map-pin" class="w-4 h-4"></i> Lihat di Peta</button>';
+        h += '</div></div>';
+        return h;
+    }
+    var detailModalEl = document.getElementById('detailModal');
+    function openDetail(id) {
+        var p = MARKERS.find(function (x) { return String(x.id) === String(id); });
+        if (!p) return;
+        document.getElementById('detailBody').innerHTML = detailHTML(p);
+        detailModalEl.classList.remove('hidden'); detailModalEl.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+        if (window.lucide) lucide.createIcons();
+    }
+    function closeDetail() { detailModalEl.classList.add('hidden'); detailModalEl.classList.remove('flex'); document.body.style.overflow = ''; }
+    detailModalEl.querySelectorAll('[data-detail-close]').forEach(function (el) { el.addEventListener('click', closeDetail); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !detailModalEl.classList.contains('hidden')) closeDetail(); });
+    document.getElementById('detailBody').addEventListener('click', function (e) {
+        var b = e.target.closest('[data-focus-detail]'); if (b) { closeDetail(); focusPlace(b.getAttribute('data-focus-detail')); }
+    });
 
     // initial list
     fetchList();
