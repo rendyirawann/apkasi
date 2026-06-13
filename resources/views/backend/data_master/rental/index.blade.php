@@ -98,7 +98,7 @@
                         {{-- Armada mobil (child) --}}
                         <div class="col-md-12">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label class="fw-semibold fs-7 mb-0">Mobil Tersedia & Jumlah Unit</label>
+                                <label class="fw-semibold fs-7 mb-0">Mobil Tersedia <span class="text-muted">(jumlah unit opsional)</span></label>
                                 <button type="button" class="btn btn-sm btn-light-primary py-1 px-3" id="btnAddMobil"><i class="ki-outline ki-plus fs-5"></i> Tambah Mobil</button>
                             </div>
                             <div id="r_mobil" class="d-flex flex-column gap-2"></div>
@@ -175,7 +175,7 @@
         const w = document.createElement('div');
         w.className = 'input-group input-group-sm';
         w.innerHTML = '<input type="text" name="mobil_nama[]" class="form-control form-control-solid" placeholder="Nama mobil (cth: Toyota Innova Reborn)" value="' + (n ? n.replace(/"/g, '&quot;') : '') + '" />' +
-            '<input type="number" name="mobil_unit[]" class="form-control form-control-solid" style="max-width:120px" placeholder="Unit" min="0" value="' + (u !== undefined && u !== null ? u : '') + '" />' +
+            '<input type="number" name="mobil_unit[]" class="form-control form-control-solid" style="max-width:130px" placeholder="Unit (ops.)" min="0" value="' + (u !== undefined && u !== null ? u : '') + '" />' +
             '<button type="button" class="btn btn-light-danger btn-rm-mobil"><i class="ki-outline ki-trash fs-6"></i></button>';
         return w;
     }
@@ -219,10 +219,10 @@
             const d = res.data;
             const row = (l, v) => '<div class="d-flex justify-content-between py-2 border-bottom border-gray-200"><span class="text-muted">' + l + '</span><span class="fw-bold text-end ms-4">' + (v ?? '-') + '</span></div>';
             let total = 0;
-            let mobil = (res.mobil || []).map(function (m) { total += parseInt(m.jumlah_unit || 0, 10); return '<div class="d-flex justify-content-between py-1"><span>' + m.nama_mobil + '</span><span class="badge badge-light-primary">' + m.jumlah_unit + ' unit</span></div>'; }).join('');
+            let mobil = (res.mobil || []).map(function (m) { total += parseInt(m.jumlah_unit || 0, 10); var u = (m.jumlah_unit != null && m.jumlah_unit !== '') ? '<span class="badge badge-light-primary">' + m.jumlah_unit + ' unit</span>' : '<span class="badge badge-light-success">tersedia</span>'; return '<div class="d-flex justify-content-between py-1"><span>' + m.nama_mobil + '</span>' + u + '</div>'; }).join('');
             document.getElementById('rentalViewBody').innerHTML =
                 row('Nama', d.nama) + row('Alamat', d.alamat) + row('WhatsApp', d.kontak_wa) + row('Telepon', d.telepon) + row('Keterangan', d.deskripsi) +
-                '<div class="pt-3"><div class="text-muted mb-2 d-flex justify-content-between">Armada Mobil <span class="fw-bold text-gray-800">Total ' + total + ' unit</span></div>' + (mobil || '<span class="text-muted">-</span>') + '</div>';
+                '<div class="pt-3"><div class="text-muted mb-2 d-flex justify-content-between">Armada Mobil' + (total > 0 ? ' <span class="fw-bold text-gray-800">Total ' + total + ' unit</span>' : '') + '</div>' + (mobil || '<span class="text-muted">-</span>') + '</div>';
             viewModal().show();
         }).fail(() => Swal.fire('Gagal', 'Tidak dapat memuat data.', 'error'));
     });

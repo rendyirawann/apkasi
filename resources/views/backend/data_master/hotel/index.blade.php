@@ -27,7 +27,7 @@
         <div class="card card-flush">
             <div class="card-header align-items-center py-5 gap-2 gap-md-5">
                 <div class="card-title">
-                    <span class="fs-5 fw-bold">Daftar Hotel di Kabupaten Deli Serdang</span>
+                    <span class="fs-5 fw-bold">Daftar Hotel (Deli Serdang &amp; Kota Medan)</span>
                 </div>
                 <div class="card-toolbar">
                     <div class="position-relative my-1 me-3">
@@ -74,10 +74,18 @@
                 <div class="modal-body py-6 px-lg-10">
                     <input type="hidden" name="id" id="h_id" />
                     <div class="row g-4">
-                        <div class="col-md-12">
+                        <div class="col-md-8">
                             <label class="required fw-semibold fs-7 mb-1">Nama Hotel</label>
                             <input type="text" name="nama" id="h_nama" class="form-control form-control-solid" placeholder="Nama hotel" />
                             <div class="text-danger fs-8 mt-1" data-error="nama"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="required fw-semibold fs-7 mb-1">Kategori</label>
+                            <select name="kategori" id="h_kategori" class="form-select form-select-solid">
+                                <option value="deli_serdang">Kab. Deli Serdang</option>
+                                <option value="medan">Kota Medan</option>
+                            </select>
+                            <div class="text-danger fs-8 mt-1" data-error="kategori"></div>
                         </div>
                         <div class="col-md-12">
                             <label class="fw-semibold fs-7 mb-1">Alamat</label>
@@ -110,6 +118,16 @@
                             <div class="text-danger fs-8 mt-1" data-error="contact_email"></div>
                         </div>
                         <div class="col-md-6">
+                            <label class="fw-semibold fs-7 mb-1">Contact Person <span class="text-muted">(opsional)</span></label>
+                            <input type="text" name="contact_person" id="h_contact_person" class="form-control form-control-solid" placeholder="cth: Irwan" />
+                            <div class="text-danger fs-8 mt-1" data-error="contact_person"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fw-semibold fs-7 mb-1">Jarak ke Lokasi Acara <span class="text-muted">(opsional)</span></label>
+                            <input type="text" name="jarak" id="h_jarak" class="form-control form-control-solid" placeholder="cth: 11 Km (13 Menit)" />
+                            <div class="text-danger fs-8 mt-1" data-error="jarak"></div>
+                        </div>
+                        <div class="col-md-6">
                             <label class="fw-semibold fs-7 mb-1">Latitude</label>
                             <input type="text" name="lat" id="h_lat" class="form-control form-control-solid" placeholder="cth: 3.599515" />
                             <div class="text-danger fs-8 mt-1" data-error="lat"></div>
@@ -130,6 +148,16 @@
                             <div class="text-danger fs-8 mt-1" data-error="image_file"></div>
                             <div id="h_image_preview" class="mt-2"></div>
                         </div>
+
+                        {{-- Tipe kamar + harga (child berulang) --}}
+                        <div class="col-md-12">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="fw-semibold fs-7 mb-0">Tipe Kamar &amp; Harga <span class="text-muted">(per malam)</span></label>
+                                <button type="button" class="btn btn-sm btn-light-primary py-1 px-3" id="btnAddKamar"><i class="ki-outline ki-plus fs-5"></i> Tambah Tipe</button>
+                            </div>
+                            <div id="h_kamar" class="d-flex flex-column gap-2"></div>
+                        </div>
+
                         <div class="col-md-12">
                             <label class="form-check form-switch form-check-custom form-check-solid">
                                 <input class="form-check-input" type="checkbox" name="is_lokasi_acara" id="h_is_lokasi_acara" value="1" />
@@ -182,7 +210,7 @@
         store: "{{ route('hotels.store') }}",
         base:  "{{ url('admin/hotels') }}",
     };
-    const FIELDS = ['nama','alamat','ketersediaan_kamar','rating','urut','contact_wa','contact_email','lat','lng','maps_url'];
+    const FIELDS = ['nama','kategori','alamat','ketersediaan_kamar','rating','urut','contact_wa','contact_person','contact_email','jarak','lat','lng','maps_url'];
     let mode = 'create';
 
     const table = $('#hotelTable').DataTable({
@@ -223,6 +251,26 @@
     const formModal = () => bootstrap.Modal.getOrCreateInstance(document.getElementById('hotelFormModal'));
     const viewModal = () => bootstrap.Modal.getOrCreateInstance(document.getElementById('hotelViewModal'));
 
+    // Tipe kamar + harga (child berulang)
+    function kamarRow(t, h) {
+        const w = document.createElement('div');
+        w.className = 'input-group input-group-sm';
+        w.innerHTML = '<input type="text" name="kamar_tipe[]" class="form-control form-control-solid" placeholder="Tipe kamar (cth: Deluxe King)" value="' + (t ? String(t).replace(/"/g, '&quot;') : '') + '" />' +
+            '<span class="input-group-text">Rp</span>' +
+            '<input type="number" name="kamar_harga[]" class="form-control form-control-solid" style="max-width:150px" placeholder="Harga/malam" min="0" value="' + (h !== undefined && h !== null ? h : '') + '" />' +
+            '<button type="button" class="btn btn-light-danger btn-rm-kamar"><i class="ki-outline ki-trash fs-6"></i></button>';
+        return w;
+    }
+    function resetKamar(items) {
+        const c = document.getElementById('h_kamar'); c.innerHTML = '';
+        if (items && items.length) items.forEach(k => c.appendChild(kamarRow(k.tipe, k.harga)));
+        else c.appendChild(kamarRow('', ''));
+    }
+    document.getElementById('btnAddKamar').addEventListener('click', () => document.getElementById('h_kamar').appendChild(kamarRow('', '')));
+    document.getElementById('h_kamar').addEventListener('click', function (e) {
+        const b = e.target.closest('.btn-rm-kamar'); if (b) b.closest('.input-group').remove();
+    });
+
     // Tambah
     $('#btnAddHotel').on('click', function () {
         mode = 'create';
@@ -231,6 +279,8 @@
         document.getElementById('h_is_active').checked = true;
         document.getElementById('h_is_lokasi_acara').checked = false;
         document.getElementById('h_image_preview').innerHTML = '';
+        document.getElementById('h_kategori').value = 'deli_serdang';
+        resetKamar([]);
         clearErrors();
         document.getElementById('hotelFormTitle').textContent = 'Tambah Hotel';
         formModal().show();
@@ -249,6 +299,7 @@
             document.getElementById('h_is_lokasi_acara').checked = !!d.is_lokasi_acara;
             document.getElementById('h_image_file').value = '';
             document.getElementById('h_image_preview').innerHTML = d.image_url ? '<img src="' + d.image_url + '" class="rounded mt-1" style="height:90px" /> <div class="text-muted fs-8 mt-1">Biarkan kosong jika tidak ingin mengganti foto.</div>' : '<span class="text-muted fs-8">Belum ada foto.</span>';
+            resetKamar(res.kamar || []);
             document.getElementById('hotelFormTitle').textContent = 'Edit Hotel';
             formModal().show();
         }).fail(() => Swal.fire('Gagal', 'Tidak dapat memuat data.', 'error'));
@@ -260,14 +311,20 @@
         $.get(URLS.base + '/' + id, function (res) {
             const d = res.data;
             const row = (l, v) => '<div class="d-flex justify-content-between py-2 border-bottom border-gray-200"><span class="text-muted">' + l + '</span><span class="fw-bold text-end ms-4">' + (v ?? '-') + '</span></div>';
+            let kamar = (res.kamar || []).map(function (k) {
+                return '<div class="d-flex justify-content-between py-1"><span>' + k.tipe + '</span><span class="fw-bold text-gray-800">' + (k.harga != null ? 'Rp ' + Number(k.harga).toLocaleString('id-ID') : '-') + '</span></div>';
+            }).join('');
             document.getElementById('hotelViewBody').innerHTML =
                 (d.image_url ? '<img src="' + d.image_url + '" class="rounded w-100 mb-4" style="height:170px;object-fit:cover" />' : '') +
-                row('Nama', d.nama) + row('Alamat', d.alamat) +
+                row('Nama', d.nama) + row('Kategori', d.kategori === 'medan' ? 'Kota Medan' : 'Kab. Deli Serdang') + row('Alamat', d.alamat) +
+                row('Contact Person', d.contact_person) + row('WhatsApp', d.contact_wa) + row('Email', d.contact_email) +
+                row('Jarak ke Lokasi', d.jarak) +
                 row('Ketersediaan Kamar', d.ketersediaan_kamar != null ? d.ketersediaan_kamar + ' kamar' : '-') +
-                row('Rating', d.rating ?? '-') + row('WhatsApp', d.contact_wa) + row('Email', d.contact_email) +
+                row('Rating', d.rating ?? '-') +
                 row('Koordinat', (d.lat && d.lng) ? (d.lat + ', ' + d.lng) : '-') +
                 row('Lokasi Acara', d.is_lokasi_acara ? 'Ya' : 'Tidak') +
                 row('Status', d.is_active ? 'Aktif' : 'Nonaktif') +
+                (kamar ? '<div class="pt-3"><div class="text-muted mb-2">Tipe Kamar &amp; Harga</div>' + kamar + '</div>' : '') +
                 (d.maps_url ? '<div class="pt-3"><a href="' + d.maps_url + '" target="_blank" class="btn btn-sm btn-light-primary w-100"><i class="ki-outline ki-geolocation fs-5"></i> Buka di Google Maps</a></div>' : '');
             viewModal().show();
         }).fail(() => Swal.fire('Gagal', 'Tidak dapat memuat data.', 'error'));

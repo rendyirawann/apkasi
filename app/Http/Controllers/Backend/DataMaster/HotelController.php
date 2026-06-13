@@ -83,6 +83,7 @@ class HotelController extends Controller
                 $hotel->image = $request->file('image_file')->store('hotel', 'public');
                 $hotel->save();
             }
+            $this->syncKamar($hotel, $request);
             return response()->json(['success' => 'Data hotel berhasil ditambahkan.', 'judul' => 'Berhasil'], 201);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan di aplikasi.', 'judul' => 'Gagal', 'errorMessage' => $e->getMessage()], 500);
@@ -91,14 +92,14 @@ class HotelController extends Controller
 
     public function show($id)
     {
-        $data = Hotel::findOrFail($id);
-        return response()->json(['data' => $data]);
+        $data = Hotel::with('kamar')->findOrFail($id);
+        return response()->json(['data' => $data, 'kamar' => $data->kamar]);
     }
 
     public function edit($id)
     {
-        $data = Hotel::findOrFail($id);
-        return response()->json(['data' => $data]);
+        $data = Hotel::with('kamar')->findOrFail($id);
+        return response()->json(['data' => $data, 'kamar' => $data->kamar]);
     }
 
     public function update(Request $request, $id)
@@ -117,6 +118,7 @@ class HotelController extends Controller
                 $hotel->image = $request->file('image_file')->store('hotel', 'public');
                 $hotel->save();
             }
+            $this->syncKamar($hotel, $request);
             return response()->json(['success' => 'Data hotel berhasil diperbarui.', 'judul' => 'Berhasil']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan di aplikasi.', 'judul' => 'Gagal', 'errorMessage' => $e->getMessage()], 500);
@@ -142,21 +144,46 @@ class HotelController extends Controller
         }
     }
 
+    /** Sinkron tipe kamar + harga (tabel anak hotel_kamar) dari input form berulang. */
+    private function syncKamar(Hotel $hotel, Request $request): void
+    {
+        $hotel->kamar()->delete();
+        $tipes  = (array) $request->input('kamar_tipe', []);
+        $hargas = (array) $request->input('kamar_harga', []);
+        $i = 0;
+        foreach ($tipes as $idx => $tipe) {
+            if (! filled($tipe)) continue;
+            $h = $hargas[$idx] ?? null;
+            $hotel->kamar()->create([
+                'tipe'  => $tipe,
+                'harga' => ($h === '' || $h === null) ? null : (int) $h,
+                'urut'  => ++$i,
+            ]);
+        }
+    }
+
     private function rules(): array
     {
         return [
             'nama'               => 'required|string|max:255',
+            'kategori'           => 'required|in:deli_serdang,medan',
             'alamat'             => 'nullable|string|max:255',
             'ketersediaan_kamar' => 'nullable|integer|min:0|max:100000',
             'rating'             => 'nullable|numeric|min:0|max:5',
             'contact_wa'         => 'nullable|string|max:30',
+            'contact_person'     => 'nullable|string|max:255',
             'contact_email'      => 'nullable|email|max:255',
+            'jarak'              => 'nullable|string|max:255',
             'lat'                => 'nullable|numeric|between:-90,90',
             'lng'                => 'nullable|numeric|between:-180,180',
             'maps_url'           => 'nullable|url|max:255',
             'image_file'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',
             'urut'               => 'nullable|integer|min:0',
             'is_lokasi_acara'    => 'nullable|boolean',
+            'kamar_tipe'         => 'nullable|array',
+            'kamar_tipe.*'       => 'nullable|string|max:255',
+            'kamar_harga'        => 'nullable|array',
+            'kamar_harga.*'      => 'nullable|integer|min:0',
         ];
     }
 
@@ -181,11 +208,14 @@ class HotelController extends Controller
     {
         return [
             'nama'               => $request->nama,
+            'kategori'           => $request->kategori ?: 'deli_serdang',
             'alamat'             => $request->alamat,
             'ketersediaan_kamar' => $request->ketersediaan_kamar !== null && $request->ketersediaan_kamar !== '' ? (int) $request->ketersediaan_kamar : null,
             'rating'             => $request->rating !== null && $request->rating !== '' ? (float) $request->rating : null,
             'contact_wa'         => $request->contact_wa,
+            'contact_person'     => $request->contact_person,
             'contact_email'      => $request->contact_email,
+            'jarak'              => $request->jarak,
             'lat'                => $request->lat !== null && $request->lat !== '' ? (float) $request->lat : null,
             'lng'                => $request->lng !== null && $request->lng !== '' ? (float) $request->lng : null,
             'maps_url'           => $request->maps_url,

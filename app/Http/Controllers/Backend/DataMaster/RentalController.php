@@ -33,8 +33,9 @@ class RentalController extends Controller
             })
             ->addColumn('armada', function ($row) {
                 $jenis = $row->mobil->count();
-                $unit  = $row->mobil->sum('jumlah_unit');
-                return '<span class="fw-bold">' . $jenis . '</span> jenis · <span class="fw-bold">' . $unit . '</span> unit';
+                $unit  = (int) $row->mobil->sum('jumlah_unit');
+                $u = $unit > 0 ? ' · <span class="fw-bold">' . $unit . '</span> unit' : '';
+                return '<span class="fw-bold">' . $jenis . '</span> jenis' . $u;
             })
             ->addColumn('status', function ($row) {
                 return $row->is_active
@@ -123,9 +124,10 @@ class RentalController extends Controller
         $i = 0;
         foreach ($namas as $idx => $nama) {
             if (! filled($nama)) continue;
+            $unit = $units[$idx] ?? '';
             $rental->mobil()->create([
                 'nama_mobil'  => $nama,
-                'jumlah_unit' => (int) ($units[$idx] ?? 0),
+                'jumlah_unit' => ($unit === '' || $unit === null) ? null : (int) $unit,
                 'urut'        => ++$i,
             ]);
         }
