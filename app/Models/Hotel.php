@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Hotel extends Model
 {
     protected $fillable = [
-        'nama', 'alamat', 'lat', 'lng', 'ketersediaan_kamar',
-        'contact_wa', 'contact_email', 'rating', 'image', 'maps_url',
+        'nama', 'kategori', 'alamat', 'lat', 'lng', 'ketersediaan_kamar',
+        'contact_wa', 'contact_person', 'contact_email', 'jarak', 'rating', 'image', 'maps_url',
         'is_lokasi_acara', 'urut', 'is_active',
     ];
 
@@ -35,5 +35,19 @@ class Hotel extends Model
     public function scopeActive($q)
     {
         return $q->where('is_active', true);
+    }
+
+    /** Daftar tipe kamar + harga. */
+    public function kamar()
+    {
+        return $this->hasMany(HotelKamar::class, 'hotel_id')->orderBy('urut');
+    }
+
+    /** Harga termurah (Rp) dari tipe kamar yang sudah dimuat, atau null. */
+    public function getHargaMulaiAttribute(): ?int
+    {
+        if (! $this->relationLoaded('kamar')) return null;
+        $min = $this->kamar->whereNotNull('harga')->min('harga');
+        return $min !== null ? (int) $min : null;
     }
 }
