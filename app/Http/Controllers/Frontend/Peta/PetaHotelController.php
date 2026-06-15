@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend\Peta;
 use App\Http\Controllers\Controller;
 use App\Models\Gedung;
 use App\Models\Hotel;
+use App\Models\Kuliner;
 use App\Models\DestinasiWisata;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -38,7 +39,7 @@ class PetaHotelController extends Controller
         // - kategori dibatasi whitelist, default 'all'
         // - query pencarian dipangkas & dibatasi panjangnya
         $cat = (string) $request->get('cat', 'all');
-        if (! in_array($cat, ['all', 'lokasi', 'gedung', 'hotel', 'wisata'], true)) {
+        if (! in_array($cat, ['all', 'lokasi', 'gedung', 'hotel', 'wisata', 'kuliner'], true)) {
             $cat = 'all';
         }
         $q = mb_substr(strtolower(trim((string) $request->get('q', ''))), 0, 100);
@@ -90,6 +91,7 @@ class PetaHotelController extends Controller
             'hotel_ds'    => $items->where('category', 'hotel')->where('kota', 'deli_serdang')->count(),
             'hotel_medan' => $items->where('category', 'hotel')->where('kota', 'medan')->count(),
             'wisata'      => $items->where('category', 'wisata')->count(),
+            'kuliner'     => $items->where('category', 'kuliner')->count(),
         ];
     }
 
@@ -100,7 +102,8 @@ class PetaHotelController extends Controller
                 || ($cat === 'lokasi' && $p->is_lokasi_acara)
                 || ($cat === 'gedung' && $p->category === 'venue')
                 || ($cat === 'hotel'  && $p->category === 'hotel')
-                || ($cat === 'wisata' && $p->category === 'wisata');
+                || ($cat === 'wisata' && $p->category === 'wisata')
+                || ($cat === 'kuliner' && $p->category === 'kuliner');
 
             // Sub-filter kota khusus tab Hotel (Deli Serdang / Medan); 'all' = gabung.
             $kotaOk = $kota === 'all' || (($p->kota ?? null) === $kota);
@@ -148,7 +151,7 @@ class PetaHotelController extends Controller
                     'kota' => $h->kategori, 'name' => $h->nama, 'address' => $h->alamat, 'description' => null,
                     'rating' => $h->rating, 'image' => $h->image_url, 'lat' => (float) $h->lat, 'lng' => (float) $h->lng,
                     'maps_url' => $h->maps_url, 'rooms' => $h->ketersediaan_kamar, 'wa' => $h->contact_wa, 'email' => $h->contact_email, 'harga' => null,
-                    'cp' => $h->contact_person, 'jarak' => $h->jarak, 'harga_mulai' => $h->harga_mulai,
+                    'cp' => $h->contact_person, 'jarak' => $h->jarak, 'harga_mulai' => $h->harga_mulai, 'bintang' => $h->bintang,
                     'kamar' => $h->kamar->map(fn ($k) => ['tipe' => $k->tipe, 'harga' => $k->harga])->values(),
                 ]));
         }
@@ -161,6 +164,17 @@ class PetaHotelController extends Controller
                     'rating' => $d->rating, 'image' => $d->thumbnail_url, 'lat' => (float) $d->lat, 'lng' => (float) $d->lng,
                     'maps_url' => $d->maps_url, 'rooms' => null, 'wa' => null, 'email' => null, 'harga' => $d->harga_tiket,
                     'cp' => null, 'jarak' => null, 'harga_mulai' => null, 'kamar' => null,
+                ]));
+        }
+
+        if (Schema::hasTable('kuliner')) {
+            Kuliner::query()->where('is_active', true)->whereNotNull('lat')->whereNotNull('lng')->orderBy('urut')->get()
+                ->each(fn ($k) => $out->push((object) [
+                    'id' => 'k' . $k->id, 'category' => 'kuliner', 'is_lokasi_acara' => false,
+                    'kota' => null, 'name' => $k->nama, 'address' => $k->alamat, 'description' => null,
+                    'rating' => $k->rating, 'image' => $k->image_url, 'lat' => (float) $k->lat, 'lng' => (float) $k->lng,
+                    'maps_url' => $k->maps_url, 'rooms' => null, 'wa' => null, 'email' => null, 'harga' => null,
+                    'cp' => null, 'jarak' => null, 'harga_mulai' => null, 'kamar' => null, 'jenis' => $k->jenis_kuliner, 'halal' => (bool) $k->halal,
                 ]));
         }
 

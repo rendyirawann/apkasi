@@ -8,7 +8,7 @@ class Hotel extends Model
 {
     protected $fillable = [
         'nama', 'kategori', 'alamat', 'lat', 'lng', 'ketersediaan_kamar',
-        'contact_wa', 'contact_person', 'contact_email', 'jarak', 'rating', 'image', 'maps_url',
+        'contact_wa', 'contact_person', 'contact_email', 'jarak', 'rating', 'bintang', 'image', 'maps_url',
         'is_lokasi_acara', 'urut', 'is_active',
     ];
 
@@ -16,6 +16,7 @@ class Hotel extends Model
         'lat'                => 'float',
         'lng'                => 'float',
         'rating'             => 'float',
+        'bintang'            => 'integer',
         'ketersediaan_kamar' => 'integer',
         'urut'               => 'integer',
         'is_lokasi_acara'    => 'boolean',

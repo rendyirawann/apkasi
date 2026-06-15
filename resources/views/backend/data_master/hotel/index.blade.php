@@ -103,6 +103,11 @@
                             <div class="text-danger fs-8 mt-1" data-error="rating"></div>
                         </div>
                         <div class="col-md-4">
+                            <label class="fw-semibold fs-7 mb-1">Bintang Hotel (1-5)</label>
+                            <input type="number" name="bintang" id="h_bintang" class="form-control form-control-solid" placeholder="cth: 4" min="1" max="5" step="1" />
+                            <div class="text-danger fs-8 mt-1" data-error="bintang"></div>
+                        </div>
+                        <div class="col-md-4">
                             <label class="fw-semibold fs-7 mb-1">Urutan</label>
                             <input type="number" name="urut" id="h_urut" class="form-control form-control-solid" placeholder="0" min="0" />
                             <div class="text-danger fs-8 mt-1" data-error="urut"></div>
@@ -210,7 +215,7 @@
         store: "{{ route('hotels.store') }}",
         base:  "{{ url('admin/hotels') }}",
     };
-    const FIELDS = ['nama','kategori','alamat','ketersediaan_kamar','rating','urut','contact_wa','contact_person','contact_email','jarak','lat','lng','maps_url'];
+    const FIELDS = ['nama','kategori','alamat','ketersediaan_kamar','rating','bintang','urut','contact_wa','contact_person','contact_email','jarak','lat','lng','maps_url'];
     let mode = 'create';
 
     const table = $('#hotelTable').DataTable({
@@ -321,6 +326,7 @@
                 row('Jarak ke Lokasi', d.jarak) +
                 row('Ketersediaan Kamar', d.ketersediaan_kamar != null ? d.ketersediaan_kamar + ' kamar' : '-') +
                 row('Rating', d.rating ?? '-') +
+                row('Bintang', d.bintang ? d.bintang + ' ★' : '-') +
                 row('Koordinat', (d.lat && d.lng) ? (d.lat + ', ' + d.lng) : '-') +
                 row('Lokasi Acara', d.is_lokasi_acara ? 'Ya' : 'Tidak') +
                 row('Status', d.is_active ? 'Aktif' : 'Nonaktif') +

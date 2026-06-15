@@ -1,7 +1,7 @@
 @extends('frontend.layouts.apkasi')
 
-@section('title', 'Peta Lokasi, Hotel & Wisata — HUT Ke-26 APKASI & Deli Serdang Ke-80')
-@section('description', 'Peta lokasi venue acara, rekomendasi hotel, dan destinasi wisata untuk delegasi HUT Ke-26 APKASI & HUT Ke-80 Kabupaten Deli Serdang.')
+@section('title', 'Peta Lokasi, Venue, Kuliner, Hotel & Wisata — HUT Ke-26 APKASI & Deli Serdang Ke-80')
+@section('description', 'Peta lokasi venue acara, kuliner, rekomendasi hotel, dan destinasi wisata untuk delegasi HUT Ke-26 APKASI & HUT Ke-80 Kabupaten Deli Serdang.')
 
 @push('head')
     <link href="https://cdn.jsdelivr.net/npm/mapbox-gl@3.24.0/dist/mapbox-gl.css" rel="stylesheet" />
@@ -16,7 +16,7 @@
         /* Bentuk teardrop di elemen ANAK: rotate-nya tidak ditimpa Mapbox (tidak miring) & tidak ikut beranimasi saat drag */
         .mk-pin { position: absolute; left: 50%; bottom: 1px; width: 24px; height: 24px; margin-left: -12px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 2.5px solid #fff; box-shadow: 0 3px 8px rgba(0,0,0,.3); transition: transform .2s ease; }
         .mk-pin::after { content: ''; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: #fff; }
-        .pin-venue { background: #336443; } .pin-hotel { background: #D4AF37; } .pin-wisata { background: #3a86b5; }
+        .pin-venue { background: #336443; } .pin-hotel { background: #D4AF37; } .pin-wisata { background: #3a86b5; } .pin-kuliner { background: #e0793f; }
         .mk.active { z-index: 3; }
         .mk.active .mk-pin { transform: rotate(-45deg) scale(1.32); }
         .mk:hover .mk-pin { transform: rotate(-45deg) scale(1.12); }
@@ -82,20 +82,20 @@
         <div class="relative max-w-[1400px] mx-auto px-5 sm:px-8">
             <div class="text-xs text-white/55 mb-4">
                 <a href="{{ route('home') }}" class="hover:text-apkasi-goldlt transition-colors">Beranda</a>
-                <span class="mx-2">/</span> Peta Lokasi, Hotel & Wisata
+                <span class="mx-2">/</span> Peta Lokasi, Venue, Kuliner, Hotel & Wisata
             </div>
             <span class="inline-flex items-center gap-2 bg-white/10 border border-white/15 text-white text-xs font-semibold px-4 py-1.5 rounded-full backdrop-blur-sm mb-4">
                 <i data-lucide="map-pin" class="w-3.5 h-3.5 text-apkasi-goldlt"></i> Kabupaten Deli Serdang, Sumatera Utara
             </span>
             <h1 class="font-display font-bold text-white text-3xl sm:text-4xl md:text-[3rem] leading-tight tracking-tight">
-                Peta Lokasi, Hotel <span class="text-apkasi-accent">& Wisata</span>
+                Peta Lokasi, Venue, Kuliner, Hotel <span class="text-apkasi-accent">& Wisata</span>
             </h1>
             <p class="mt-3 text-white/75 text-sm sm:text-base leading-relaxed max-w-2xl">
-                Venue rangkaian acara, rekomendasi penginapan, dan destinasi wisata Deli Serdang dalam satu peta interaktif.
+                Venue rangkaian acara, rekomendasi kuliner, penginapan, dan destinasi wisata Deli Serdang dalam satu peta interaktif.
                 Pilih tab kategori, klik kartu untuk menyorot titik, atau buka langsung ke Google Maps.
             </p>
             <div class="mt-7 flex flex-wrap gap-3">
-                @foreach ([['landmark', $counts['gedung'] ?: '—', 'Gedung / Venue'], ['map-pin', $counts['lokasi'] ?: '—', 'Lokasi Acara'], ['building-2', $counts['hotel'] ?: '—', 'Hotel'], ['palmtree', $counts['wisata'] ?: '—', 'Destinasi Wisata']] as $st)
+                @foreach ([['landmark', $counts['gedung'] ?: '—', 'Gedung / Venue'], ['map-pin', $counts['lokasi'] ?: '—', 'Lokasi Acara'], ['building-2', $counts['hotel'] ?: '—', 'Hotel'], ['utensils', $counts['kuliner'] ?: '—', 'Kuliner'], ['palmtree', $counts['wisata'] ?: '—', 'Destinasi Wisata']] as $st)
                     <div class="flex items-center gap-3 bg-white/8 border border-white/15 rounded-2xl px-4 py-3 backdrop-blur-sm">
                         <div class="w-10 h-10 rounded-xl bg-apkasi-gold/15 flex items-center justify-center shrink-0">
                             <i data-lucide="{{ $st[0] }}" class="w-5 h-5 text-apkasi-gold"></i>
@@ -119,7 +119,7 @@
                     class="w-full bg-apkasi-leaf/30 border border-apkasi-leaf rounded-full pl-11 pr-4 py-2.5 text-sm text-apkasi-dark placeholder:text-apkasi-body/50 focus:outline-none focus:border-apkasi-accent focus:bg-white transition-colors" />
             </div>
             <div class="flex gap-2 flex-wrap" id="filterTabs">
-                @foreach ([['all', 'Semua', $counts['all']], ['lokasi', 'Lokasi Acara', $counts['lokasi']], ['gedung', 'Gedung', $counts['gedung']], ['hotel', 'Hotel', $counts['hotel']], ['wisata', 'Destinasi', $counts['wisata']]] as $tab)
+                @foreach ([['all', 'Semua', $counts['all']], ['lokasi', 'Lokasi Acara', $counts['lokasi']], ['gedung', 'Gedung', $counts['gedung']], ['hotel', 'Hotel', $counts['hotel']], ['kuliner', 'Kuliner', $counts['kuliner']], ['wisata', 'Destinasi', $counts['wisata']]] as $tab)
                     <button type="button" data-cat="{{ $tab[0] }}"
                         class="filter-tab text-sm font-semibold px-4 py-2.5 rounded-full border transition-colors {{ $loop->first ? 'bg-apkasi-heading border-apkasi-heading text-white' : 'bg-white border-apkasi-leaf text-apkasi-body hover:border-apkasi-accent' }}">
                         {{ $tab[1] }} <span class="cnt opacity-60 font-medium ml-0.5" data-cnt="{{ $tab[0] }}">{{ $tab[2] }}</span>
@@ -169,6 +169,7 @@
                         <div class="flex items-center gap-2 font-semibold text-apkasi-body my-0.5"><span class="w-3 h-3 rounded-full bg-apkasi-heading inline-block"></span> Gedung / Venue</div>
                         <div class="flex items-center gap-2 font-semibold text-apkasi-body my-0.5"><span class="w-3 h-3 rounded-full bg-apkasi-gold inline-block"></span> Hotel & Penginapan</div>
                         <div class="flex items-center gap-2 font-semibold text-apkasi-body my-0.5"><span class="w-3 h-3 rounded-full inline-block" style="background:#3a86b5"></span> Destinasi Wisata</div>
+                        <div class="flex items-center gap-2 font-semibold text-apkasi-body my-0.5"><span class="w-3 h-3 rounded-full inline-block" style="background:#e0793f"></span> Kuliner</div>
                     </div>
                 </div>
             </div>
@@ -230,6 +231,7 @@
         venue:  { label: 'Gedung', chip: 'bg-apkasi-heading/10 text-apkasi-heading', accent: 'bg-apkasi-heading', icon: 'landmark', pin: 'pin-venue' },
         hotel:  { label: 'Hotel', chip: 'bg-apkasi-gold/15 text-[#9a7d16]', accent: 'bg-apkasi-gold', icon: 'building-2', pin: 'pin-hotel' },
         wisata: { label: 'Destinasi', chip: 'bg-[#3a86b5]/10 text-[#2f6e95]', accent: 'bg-[#3a86b5]', icon: 'palmtree', pin: 'pin-wisata' },
+        kuliner: { label: 'Kuliner', chip: 'bg-[#e0793f]/15 text-[#b85e28]', accent: 'bg-[#e0793f]', icon: 'utensils', pin: 'pin-kuliner' },
     };
 
     var activeCat = 'all', query = '', page = 1, lastPage = 1, kotaFilter = 'all';
@@ -254,13 +256,14 @@
         var catLbl = { venue: 'Gedung', hotel: 'Hotel', wisata: 'Destinasi' };
         var h = '<div class="pop">';
         if (p.image) h += '<img class="pop-img" src="' + p.image + '" alt="" loading="lazy">';
-        h += '<div class="pop-name">' + p.name + '</div>';
+        h += '<div class="pop-name">' + p.name + stars(p.bintang) + halalBadge(p) + '</div>';
         var meta = '';
         if (p.rating) meta += '<span class="pop-rate"><i data-lucide="star"></i> ' + p.rating + '</span>';
         if (catLbl[p.category]) meta += '<span class="pop-cat">' + catLbl[p.category] + '</span>';
         if (p.is_lokasi_acara) meta += '<span class="pop-cat" style="color:#a8821a;background:#fbf3da">Lokasi Acara</span>';
         if (meta) h += '<div class="pop-meta">' + meta + '</div>';
         if (p.address) h += '<div class="pop-row"><i data-lucide="map-pin"></i><span>' + p.address + '</span></div>';
+        if (p.jenis)   h += '<div class="pop-row"><i data-lucide="utensils"></i><span>' + p.jenis + (p.halal ? ' · Halal' : '') + '</span></div>';
         if (p.harga_mulai) h += '<div class="pop-row"><i data-lucide="tag"></i><span>Mulai ' + formatRp(p.harga_mulai) + ' / malam</span></div>';
         if (p.jarak)   h += '<div class="pop-row"><i data-lucide="route"></i><span>' + p.jarak + ' ke lokasi acara</span></div>';
         if (p.cp)      h += '<div class="pop-row"><i data-lucide="user-round"></i><span>CP: ' + p.cp + '</span></div>';
@@ -274,6 +277,11 @@
     }
     function waLink(no) { var d = (no || '').replace(/[^0-9]/g, ''); if (d.charAt(0) === '0') d = '62' + d.slice(1); return 'https://wa.me/' + d; }
     function formatRp(n) { return 'Rp ' + (Number(n) || 0).toLocaleString('id-ID'); }
+    var HALAL_LOGO = "{{ \App\Support\Media::url(\App\Models\Setting::get('kuliner_halal_logo') ?: 'logos/logo_halal.png') }}";
+    // Ikon bintang hotel (klasifikasi 1-5)
+    function stars(n) { n = parseInt(n, 10) || 0; if (n < 1) return ''; var s = ''; for (var i = 0; i < n; i++) s += '<i data-lucide="star" class="w-3 h-3 fill-current"></i>'; return ' <span class="inline-flex items-center gap-px text-apkasi-gold align-middle">' + s + '</span>'; }
+    // Logo halal utk kuliner yang ditandai halal
+    function halalBadge(p, big) { return (p.category === 'kuliner' && p.halal) ? ' <img src="' + HALAL_LOGO + '" alt="Halal" title="Halal" class="inline-block ' + (big ? 'h-6' : 'h-4') + ' w-auto align-middle">' : ''; }
     function pinClass(cat) { return (CAT[cat] || CAT.venue).pin; }
     var MINI = 'inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border border-apkasi-leaf text-apkasi-heading transition-colors';
 
@@ -294,6 +302,7 @@
         if (p.rooms) meta += '<span class="inline-flex items-center gap-1 font-semibold"><i data-lucide="bed-double" class="w-3.5 h-3.5"></i> ' + p.rooms + ' kamar</span>';
         if (p.harga) meta += '<span class="inline-flex items-center gap-1 font-semibold"><i data-lucide="ticket" class="w-3.5 h-3.5"></i> ' + p.harga + '</span>';
         if (p.cp) meta += '<span class="inline-flex items-center gap-1"><i data-lucide="user-round" class="w-3.5 h-3.5"></i> ' + p.cp + '</span>';
+        if (p.jenis) meta += '<span class="inline-flex items-center gap-1 font-semibold"><i data-lucide="utensils" class="w-3.5 h-3.5"></i> ' + p.jenis + '</span>';
         var btns = '<button type="button" data-detail="' + p.id + '" class="' + MINI + ' hover:bg-apkasi-heading hover:text-white hover:border-apkasi-heading"><i data-lucide="info" class="w-3.5 h-3.5"></i> Detail</button>'
             + '<button type="button" data-focus="' + p.id + '" class="' + MINI + ' hover:bg-apkasi-heading hover:text-white hover:border-apkasi-heading"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Lihat di Peta</button>'
             + '<a href="' + gmaps(p) + '" target="_blank" rel="noopener" class="' + MINI + ' hover:bg-apkasi-gold hover:text-apkasi-dark hover:border-apkasi-gold"><i data-lucide="navigation" class="w-3.5 h-3.5"></i> Rute</a>';
@@ -304,7 +313,7 @@
             + '<span class="accent ' + m.accent + '"></span>' + img
             + '<div class="flex-1 min-w-0">'
             + '<span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full mb-1.5 ' + m.chip + '">' + m.label + '</span>' + kotaChip + lokasi
-            + '<h3 class="font-bold text-apkasi-dark text-[15px] leading-snug">' + p.name + '</h3>'
+            + '<h3 class="font-bold text-apkasi-dark text-[15px] leading-snug">' + p.name + stars(p.bintang) + halalBadge(p) + '</h3>'
             + (p.address ? '<p class="flex items-start gap-1.5 text-xs text-apkasi-body mt-1 leading-relaxed"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-apkasi-body/50 mt-0.5 shrink-0"></i> ' + p.address + '</p>' : '')
             + (p.description ? '<p class="text-xs text-apkasi-body/80 mt-1.5 leading-relaxed">' + p.description + '</p>' : '')
             + (meta ? '<div class="flex items-center gap-3 mt-2 text-xs text-apkasi-body flex-wrap">' + meta + '</div>' : '')
@@ -468,7 +477,7 @@
                 id: 'places', type: 'circle', source: 'places',
                 paint: {
                     'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 6, 14, 9],
-                    'circle-color': ['match', ['get', 'category'], 'venue', '#336443', 'hotel', '#D4AF37', 'wisata', '#3a86b5', '#336443'],
+                    'circle-color': ['match', ['get', 'category'], 'venue', '#336443', 'hotel', '#D4AF37', 'wisata', '#3a86b5', 'kuliner', '#e0793f', '#336443'],
                     'circle-stroke-width': 2.5,
                     'circle-stroke-color': '#ffffff'
                 }
@@ -497,10 +506,11 @@
         if (p.category === 'hotel' && p.kota) h += '<span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-apkasi-leaf text-apkasi-heading">' + (p.kota === 'medan' ? 'Kota Medan' : 'Deli Serdang') + '</span>';
         if (p.is_lokasi_acara) h += '<span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-apkasi-gold text-apkasi-dark">Lokasi Acara</span>';
         if (p.rating) h += '<span class="inline-flex items-center gap-1 text-xs font-bold text-[#b9931f]"><i data-lucide="star" class="w-3.5 h-3.5"></i> ' + p.rating + '</span>';
-        h += '</div><h3 class="font-display text-xl font-bold text-apkasi-dark leading-tight mb-2">' + p.name + '</h3>';
+        h += '</div><h3 class="font-display text-xl font-bold text-apkasi-dark leading-tight mb-2">' + p.name + stars(p.bintang) + halalBadge(p, true) + '</h3>';
         if (p.address) h += '<p class="flex items-start gap-2 text-sm text-apkasi-body leading-relaxed mb-3"><i data-lucide="map-pin" class="w-4 h-4 text-apkasi-body/50 mt-0.5 shrink-0"></i> ' + p.address + '</p>';
         if (p.description) h += '<p class="text-sm text-apkasi-body/80 leading-relaxed mb-3">' + p.description + '</p>';
         var rows = '';
+        if (p.jenis) rows += infoRow('utensils', 'Jenis kuliner', p.jenis + (p.halal ? ' (Halal)' : ''));
         if (p.jarak) rows += infoRow('route', 'Jarak ke lokasi acara', p.jarak);
         if (p.cp) rows += infoRow('user-round', 'Contact Person', p.cp);
         if (p.wa) rows += infoRow('phone', 'Kontak', p.wa);
