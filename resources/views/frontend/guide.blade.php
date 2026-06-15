@@ -44,8 +44,19 @@
         .dt-container .dt-layout-row { margin-top: .4rem; margin-bottom: .4rem; }
         /* Mapbox popup rental */
         .mapboxgl-popup-content { border-radius: 14px; padding: 13px 16px; font-family: 'Plus Jakarta Sans', sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,.18); }
+        /* Tombol close popup — bulat, rapi, sejajar brand */
+        .mapboxgl-popup-close-button {
+            top: 8px; right: 8px; width: 24px; height: 24px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0; border: 0; border-radius: 50%;
+            background: #f1f5f1; color: #5b6b56;
+            font-size: 16px; line-height: 1; font-weight: 600;
+            transition: background .15s ease, color .15s ease, transform .15s ease;
+        }
+        .mapboxgl-popup-close-button:hover { background: #2B543A; color: #fff; transform: scale(1.06); }
+        .mapboxgl-popup-close-button:focus { outline: none; box-shadow: 0 0 0 3px rgba(43,84,58,.18); }
         .pop { width: 230px; max-width: 76vw; }
-        .pop-name { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: .95rem; color: #1f2a1d; margin-bottom: 4px; }
+        .pop-name { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: .95rem; color: #1f2a1d; margin-bottom: 4px; padding-right: 22px; }
         .pop-row { display: flex; align-items: flex-start; gap: 5px; font-size: .74rem; color: #4b5b47; margin-bottom: 4px; line-height: 1.35; }
         .pop-row svg { width: 13px; height: 13px; flex: none; margin-top: 2px; color: #85AB8B; }
         .pop-acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
