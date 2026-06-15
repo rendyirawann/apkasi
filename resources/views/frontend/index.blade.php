@@ -590,10 +590,12 @@
                                             <p class="text-xs sm:text-sm text-apkasi-body leading-relaxed">{{ $ev->rincian }}</p>
                                         @endif
                                         @if ($ev->lokasi)
-                                            <div class="flex items-center gap-1.5 mt-2 text-apkasi-heading">
+                                            <button type="button" data-loc="{{ $ev->lokasi }}"
+                                                class="agenda-loc inline-flex items-center gap-1.5 mt-2 text-apkasi-heading hover:text-apkasi-cta transition-colors group/loc">
                                                 <i data-lucide="map-pin" class="w-3 h-3"></i>
-                                                <span class="text-xs font-semibold">{{ $ev->lokasi }}</span>
-                                            </div>
+                                                <span class="text-xs font-semibold underline decoration-dotted underline-offset-2">{{ $ev->lokasi }}</span>
+                                                <i data-lucide="external-link" class="w-3 h-3 opacity-60 group-hover/loc:opacity-100 transition-opacity"></i>
+                                            </button>
                                         @endif
                                     </div>
                                 </div>
@@ -614,6 +616,25 @@
             </div>
         </div>
     </section>
+
+    {{-- Modal lokasi agenda -> Google Maps --}}
+    <div id="agendaLocModal" class="fixed inset-0 z-[80] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-apkasi-dark/55 backdrop-blur-sm" data-loc-close></div>
+        <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden">
+            <button type="button" data-loc-close class="absolute top-3 right-3 z-10 w-8 h-8 inline-flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+            <div class="bg-gradient-to-br from-apkasi-dark to-apkasi-cta p-6 text-center">
+                <div class="w-14 h-14 mx-auto rounded-2xl bg-white/10 flex items-center justify-center mb-3"><i data-lucide="map-pin" class="w-7 h-7 text-apkasi-gold"></i></div>
+                <p class="text-[11px] font-bold uppercase tracking-wider text-apkasi-gold mb-1">Lokasi Kegiatan</p>
+                <h3 id="agendaLocName" class="font-display text-xl font-bold text-white leading-snug"></h3>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-apkasi-body text-center mb-4">Buka rute menuju lokasi ini di Google Maps.</p>
+                <a id="agendaLocBtn" href="#" target="_blank" rel="noopener" class="w-full inline-flex items-center justify-center gap-2 bg-apkasi-heading hover:bg-apkasi-cta text-white text-sm font-bold px-5 py-3 rounded-full transition-colors">
+                    <i data-lucide="navigation" class="w-4 h-4"></i> Menuju ke Lokasi
+                </a>
+            </div>
+        </div>
+    </div>
 
     {{-- ═══════════ POI ═══════════ --}}
     <section id="poi" class="py-16 sm:py-20 md:py-28 bg-white">
@@ -1031,6 +1052,27 @@
             lock();        // kunci dari awal (di belakang splash)
             waitSplash();
         }
+    })();
+
+    // ── Modal lokasi agenda -> Google Maps ──
+    (function () {
+        var modal = document.getElementById('agendaLocModal');
+        if (!modal) return;
+        var nameEl = document.getElementById('agendaLocName');
+        var btnEl = document.getElementById('agendaLocBtn');
+        function openLoc(loc) {
+            nameEl.textContent = loc;
+            btnEl.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(loc + ', Deli Serdang, Sumatera Utara');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+            if (window.lucide) lucide.createIcons();
+        }
+        function closeLoc() { modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.style.overflow = ''; }
+        document.querySelectorAll('.agenda-loc').forEach(function (b) {
+            b.addEventListener('click', function () { openLoc(b.getAttribute('data-loc')); });
+        });
+        modal.querySelectorAll('[data-loc-close]').forEach(function (el) { el.addEventListener('click', closeLoc); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeLoc(); });
     })();
 </script>
 @endpush
