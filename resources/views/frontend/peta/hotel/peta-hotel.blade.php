@@ -251,7 +251,7 @@
     function toFC(list) {
         return {
             type: 'FeatureCollection',
-            features: list.map(function (p) {
+            features: list.filter(hasCoords).map(function (p) {
                 return {
                     type: 'Feature',
                     properties: { id: p.id, category: p.category, name: p.name, address: p.address || '', maps_url: p.maps_url || '', is_lokasi_acara: !!p.is_lokasi_acara },
@@ -261,7 +261,10 @@
         };
     }
 
-    function gmaps(p) { return p.maps_url || ('https://www.google.com/maps/search/?api=1&query=' + p.lat + ',' + p.lng); }
+    // Deteksi koordinat valid — item tanpa koordinat tetap tampil di list, tapi tidak dipetakan.
+    function hasCoords(p) { return p.lat !== null && p.lat !== undefined && p.lng !== null && p.lng !== undefined && !isNaN(Number(p.lat)) && !isNaN(Number(p.lng)); }
+    function hasRoute(p) { return !!p.maps_url || hasCoords(p); }
+    function gmaps(p) { return p.maps_url || (hasCoords(p) ? ('https://www.google.com/maps/search/?api=1&query=' + p.lat + ',' + p.lng) : '#'); }
     // Popup detail menyeluruh: thumbnail, rating, kategori, alamat, kamar/tiket, + aksi Rute/WA/Email (semua "kalau ada")
     function popupHTML(p) {
         var catLbl = { venue: 'Gedung', hotel: 'Hotel', wisata: 'Destinasi' };
@@ -314,9 +317,10 @@
         if (p.harga) meta += '<span class="inline-flex items-center gap-1 font-semibold"><i data-lucide="ticket" class="w-3.5 h-3.5"></i> ' + p.harga + '</span>';
         if (p.cp) meta += '<span class="inline-flex items-center gap-1"><i data-lucide="user-round" class="w-3.5 h-3.5"></i> ' + p.cp + '</span>';
         if (p.jenis) meta += '<span class="inline-flex items-center gap-1 font-semibold"><i data-lucide="utensils" class="w-3.5 h-3.5"></i> ' + p.jenis + '</span>';
-        var btns = '<button type="button" data-detail="' + p.id + '" class="' + MINI + ' hover:bg-apkasi-heading hover:text-white hover:border-apkasi-heading"><i data-lucide="info" class="w-3.5 h-3.5"></i> Detail</button>'
-            + '<button type="button" data-focus="' + p.id + '" class="' + MINI + ' hover:bg-apkasi-heading hover:text-white hover:border-apkasi-heading"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Lihat di Peta</button>'
-            + '<a href="' + gmaps(p) + '" target="_blank" rel="noopener" class="' + MINI + ' hover:bg-apkasi-gold hover:text-apkasi-dark hover:border-apkasi-gold"><i data-lucide="navigation" class="w-3.5 h-3.5"></i> Rute</a>';
+        var btns = '<button type="button" data-detail="' + p.id + '" class="' + MINI + ' hover:bg-apkasi-heading hover:text-white hover:border-apkasi-heading"><i data-lucide="info" class="w-3.5 h-3.5"></i> Detail</button>';
+        if (hasCoords(p)) btns += '<button type="button" data-focus="' + p.id + '" class="' + MINI + ' hover:bg-apkasi-heading hover:text-white hover:border-apkasi-heading"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Lihat di Peta</button>';
+        if (hasRoute(p)) btns += '<a href="' + gmaps(p) + '" target="_blank" rel="noopener" class="' + MINI + ' hover:bg-apkasi-gold hover:text-apkasi-dark hover:border-apkasi-gold"><i data-lucide="navigation" class="w-3.5 h-3.5"></i> Rute</a>';
+        var noGeo = !hasCoords(p) ? '<div class="inline-flex items-center gap-1 text-[11px] text-apkasi-body/60 mt-2"><i data-lucide="map-pin-off" class="w-3.5 h-3.5"></i> Lokasi belum dipetakan</div>' : '';
         if (p.category === 'hotel' && p.wa) btns += '<a href="' + waLink(p.wa) + '" target="_blank" rel="noopener" class="' + MINI + ' hover:bg-apkasi-accent hover:text-white hover:border-apkasi-accent"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp</a>';
         if (p.category === 'hotel' && p.email) btns += '<a href="mailto:' + p.email + '" class="' + MINI + ' hover:bg-apkasi-heading hover:text-white hover:border-apkasi-heading"><i data-lucide="mail" class="w-3.5 h-3.5"></i> Email</a>';
 
@@ -328,6 +332,7 @@
             + (p.address ? '<p class="flex items-start gap-1.5 text-xs text-apkasi-body mt-1 leading-relaxed"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-apkasi-body/50 mt-0.5 shrink-0"></i> ' + p.address + '</p>' : '')
             + (p.description ? '<p class="text-xs text-apkasi-body/80 mt-1.5 leading-relaxed">' + p.description + '</p>' : '')
             + (meta ? '<div class="flex items-center gap-3 mt-2 text-xs text-apkasi-body flex-wrap">' + meta + '</div>' : '')
+            + noGeo
             + '<div class="flex items-center gap-2 mt-3 flex-wrap">' + btns + '</div>'
             + '</div></div>';
     }
@@ -436,7 +441,7 @@
     }
     function applyMarkers(fit) {
         if (!map || !map.getSource('places')) return;
-        var pts = MARKERS.filter(markerVisible);
+        var pts = MARKERS.filter(markerVisible).filter(hasCoords);
         map.getSource('places').setData(toFC(pts));
         // bila titik terpilih tak lagi tampil, bersihkan highlight + popup
         if (selectedId && !pts.some(function (p) { return String(p.id) === String(selectedId); })) {
@@ -452,7 +457,7 @@
     function focusPlace(id) {
         selectedId = id;
         var p = MARKERS.find(function (x) { return String(x.id) === String(id); });
-        if (p && map) {
+        if (p && map && hasCoords(p)) {
             var ll = [Number(p.lng), Number(p.lat)];
             map.easeTo({ center: ll, duration: 600 });   // hanya GESER (pan) ke titik, zoom dipertahankan
             if (map.getSource('sel')) map.getSource('sel').setData(toFC([p]));
@@ -462,6 +467,9 @@
                 .setHTML(popupHTML(p))
                 .addTo(map);
             if (window.lucide) lucide.createIcons();
+        } else if (p) {
+            // Tanpa koordinat -> tak bisa dipetakan; buka detail sebagai fallback.
+            openDetail(id);
         }
         highlightActiveCard();
     }
@@ -535,9 +543,10 @@
             h += '</div></div>';
         }
         h += '<div class="flex flex-wrap gap-2 mt-5">';
-        h += '<a href="' + gmaps(p) + '" target="_blank" rel="noopener" class="flex-1 inline-flex items-center justify-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-full bg-apkasi-heading text-white hover:bg-apkasi-cta transition-colors"><i data-lucide="navigation" class="w-4 h-4"></i> Rute</a>';
+        if (hasRoute(p)) h += '<a href="' + gmaps(p) + '" target="_blank" rel="noopener" class="flex-1 inline-flex items-center justify-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-full bg-apkasi-heading text-white hover:bg-apkasi-cta transition-colors"><i data-lucide="navigation" class="w-4 h-4"></i> Rute</a>';
         if (p.wa) h += '<a href="' + waLink(p.wa) + '" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-full bg-[#25a567] text-white hover:opacity-90 transition"><i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp</a>';
-        h += '<button type="button" data-focus-detail="' + p.id + '" class="inline-flex items-center justify-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-full border border-apkasi-leaf text-apkasi-heading hover:bg-apkasi-leaf/50 transition"><i data-lucide="map-pin" class="w-4 h-4"></i> Lihat di Peta</button>';
+        if (hasCoords(p)) h += '<button type="button" data-focus-detail="' + p.id + '" class="inline-flex items-center justify-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-full border border-apkasi-leaf text-apkasi-heading hover:bg-apkasi-leaf/50 transition"><i data-lucide="map-pin" class="w-4 h-4"></i> Lihat di Peta</button>';
+        else h += '<span class="inline-flex items-center gap-1.5 text-sm text-apkasi-body/60 px-2 py-2.5"><i data-lucide="map-pin-off" class="w-4 h-4"></i> Lokasi belum dipetakan</span>';
         h += '</div></div>';
         return h;
     }

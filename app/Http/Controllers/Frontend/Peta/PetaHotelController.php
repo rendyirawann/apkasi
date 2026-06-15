@@ -73,7 +73,8 @@ class PetaHotelController extends Controller
      */
     public function json()
     {
-        $items = $this->resolveItems();
+        // API peta (SPA React): hanya kirim titik yang punya koordinat.
+        $items = $this->resolveItems()->filter(fn ($p) => $p->lat !== null && $p->lng !== null);
 
         return response()->json([
             'places' => $items->values(),
@@ -118,8 +119,10 @@ class PetaHotelController extends Controller
 
     private function center($items): array
     {
-        if ($items->count()) {
-            return [round($items->avg('lng'), 6), round($items->avg('lat'), 6)];
+        // Hanya hitung pusat peta dari item yang punya koordinat (abaikan yang null).
+        $geo = $items->filter(fn ($p) => $p->lat !== null && $p->lng !== null);
+        if ($geo->count()) {
+            return [round($geo->avg('lng'), 6), round($geo->avg('lat'), 6)];
         }
         return [98.8645, 3.5503];
     }
@@ -134,22 +137,22 @@ class PetaHotelController extends Controller
         $out = collect();
 
         if (Schema::hasTable('gedung')) {
-            Gedung::query()->where('is_active', true)->whereNotNull('lat')->whereNotNull('lng')->orderBy('urut')->get()
+            Gedung::query()->where('is_active', true)->orderBy('urut')->orderBy('id')->get()
                 ->each(fn ($g) => $out->push((object) [
                     'id' => 'g' . $g->id, 'category' => 'venue', 'is_lokasi_acara' => (bool) $g->is_lokasi_acara,
                     'kota' => null, 'name' => $g->nama, 'address' => $g->alamat, 'description' => null,
-                    'rating' => null, 'image' => $g->image_url, 'lat' => (float) $g->lat, 'lng' => (float) $g->lng,
+                    'rating' => null, 'image' => $g->image_url, 'lat' => $g->lat !== null ? (float) $g->lat : null, 'lng' => $g->lng !== null ? (float) $g->lng : null,
                     'maps_url' => $g->maps_url, 'rooms' => null, 'wa' => null, 'email' => null, 'harga' => null,
                     'cp' => null, 'jarak' => null, 'harga_mulai' => null, 'kamar' => null,
                 ]));
         }
 
         if (Schema::hasTable('hotels')) {
-            Hotel::query()->with('kamar')->where('is_active', true)->whereNotNull('lat')->whereNotNull('lng')->orderBy('urut')->get()
+            Hotel::query()->with('kamar')->where('is_active', true)->orderBy('urut')->orderBy('id')->get()
                 ->each(fn ($h) => $out->push((object) [
                     'id' => 'h' . $h->id, 'category' => 'hotel', 'is_lokasi_acara' => (bool) $h->is_lokasi_acara,
                     'kota' => $h->kategori, 'name' => $h->nama, 'address' => $h->alamat, 'description' => null,
-                    'rating' => $h->rating, 'image' => $h->image_url, 'lat' => (float) $h->lat, 'lng' => (float) $h->lng,
+                    'rating' => $h->rating, 'image' => $h->image_url, 'lat' => $h->lat !== null ? (float) $h->lat : null, 'lng' => $h->lng !== null ? (float) $h->lng : null,
                     'maps_url' => $h->maps_url, 'rooms' => $h->ketersediaan_kamar, 'wa' => $h->contact_wa, 'email' => $h->contact_email, 'harga' => null,
                     'cp' => $h->contact_person, 'jarak' => $h->jarak, 'harga_mulai' => $h->harga_mulai, 'bintang' => $h->bintang,
                     'kamar' => $h->kamar->map(fn ($k) => ['tipe' => $k->tipe, 'harga' => $k->harga])->values(),
@@ -157,22 +160,22 @@ class PetaHotelController extends Controller
         }
 
         if (Schema::hasTable('destinasi_wisata')) {
-            DestinasiWisata::query()->where('is_active', true)->whereNotNull('lat')->whereNotNull('lng')->orderBy('urut')->get()
+            DestinasiWisata::query()->where('is_active', true)->orderBy('urut')->orderBy('id')->get()
                 ->each(fn ($d) => $out->push((object) [
                     'id' => 'd' . $d->id, 'category' => 'wisata', 'is_lokasi_acara' => (bool) $d->is_lokasi_acara,
                     'kota' => null, 'name' => $d->nama, 'address' => $d->alamat, 'description' => $d->deskripsi,
-                    'rating' => $d->rating, 'image' => $d->thumbnail_url, 'lat' => (float) $d->lat, 'lng' => (float) $d->lng,
+                    'rating' => $d->rating, 'image' => $d->thumbnail_url, 'lat' => $d->lat !== null ? (float) $d->lat : null, 'lng' => $d->lng !== null ? (float) $d->lng : null,
                     'maps_url' => $d->maps_url, 'rooms' => null, 'wa' => null, 'email' => null, 'harga' => $d->harga_tiket,
                     'cp' => null, 'jarak' => null, 'harga_mulai' => null, 'kamar' => null,
                 ]));
         }
 
         if (Schema::hasTable('kuliner')) {
-            Kuliner::query()->where('is_active', true)->whereNotNull('lat')->whereNotNull('lng')->orderBy('urut')->get()
+            Kuliner::query()->where('is_active', true)->orderBy('urut')->orderBy('id')->get()
                 ->each(fn ($k) => $out->push((object) [
                     'id' => 'k' . $k->id, 'category' => 'kuliner', 'is_lokasi_acara' => false,
                     'kota' => null, 'name' => $k->nama, 'address' => $k->alamat, 'description' => null,
-                    'rating' => $k->rating, 'image' => $k->image_url, 'lat' => (float) $k->lat, 'lng' => (float) $k->lng,
+                    'rating' => $k->rating, 'image' => $k->image_url, 'lat' => $k->lat !== null ? (float) $k->lat : null, 'lng' => $k->lng !== null ? (float) $k->lng : null,
                     'maps_url' => $k->maps_url, 'rooms' => null, 'wa' => null, 'email' => null, 'harga' => null,
                     'cp' => null, 'jarak' => null, 'harga_mulai' => null, 'kamar' => null, 'jenis' => $k->jenis_kuliner, 'halal' => (bool) $k->halal,
                 ]));
