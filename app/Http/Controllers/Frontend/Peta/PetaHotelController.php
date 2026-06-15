@@ -18,13 +18,16 @@ class PetaHotelController extends Controller
      */
     public function index()
     {
-        $items = $this->resolveItems();
+        $items  = $this->resolveItems();
+        $counts = $this->counts($items);
 
         return view('frontend.peta.hotel.peta-hotel', [
             'markers'     => $items->values(),
-            'counts'      => $this->counts($items),
+            'counts'      => $counts,
             'center'      => $this->center($items),
             'mapboxToken' => config('services.mapbox.token'),
+            // Halaman pertama daftar dirender dari koleksi yang SUDAH dimuat (tanpa AJAX awal -> load lebih cepat).
+            'initialList' => $this->buildList($items, 'all', '', 'all', 1) + ['counts' => $counts],
         ]);
     }
 
@@ -35,37 +38,41 @@ class PetaHotelController extends Controller
     {
         $items = $this->resolveItems();
 
-        // Sanitasi input (pengamanan sederhana — cegah nilai liar):
-        // - kategori dibatasi whitelist, default 'all'
-        // - query pencarian dipangkas & dibatasi panjangnya
+        // Sanitasi input (cegah nilai liar): kategori whitelist, query dipangkas, kota whitelist.
         $cat = (string) $request->get('cat', 'all');
         if (! in_array($cat, ['all', 'lokasi', 'gedung', 'hotel', 'wisata', 'kuliner'], true)) {
             $cat = 'all';
         }
-        $q = mb_substr(strtolower(trim((string) $request->get('q', ''))), 0, 100);
-
+        $q    = mb_substr(strtolower(trim((string) $request->get('q', ''))), 0, 100);
         $kota = (string) $request->get('kota', 'all');
         if (! in_array($kota, ['all', 'deli_serdang', 'medan'], true)) {
             $kota = 'all';
         }
 
+        $payload = $this->buildList($items, $cat, $q, $kota, (int) $request->get('page', 1));
+        $payload['counts'] = $this->counts($items);
+
+        return response()->json($payload);
+    }
+
+    /** Susun payload daftar paginasi (5/halaman) dari koleksi item yang sudah dimuat. */
+    private function buildList($items, string $cat, string $q, string $kota, int $page): array
+    {
         $filtered = $this->filterItems($items, $cat, $q, $kota);
 
         $perPage  = 5;
         $total    = $filtered->count();
         $lastPage = max(1, (int) ceil($total / $perPage));
-        $page     = min(max(1, (int) $request->get('page', 1)), $lastPage);
-        $data     = $filtered->slice(($page - 1) * $perPage, $perPage)->values();
+        $page     = min(max(1, $page), $lastPage);
 
-        return response()->json([
-            'data'      => $data,
+        return [
+            'data'      => $filtered->slice(($page - 1) * $perPage, $perPage)->values(),
             'page'      => $page,
             'last_page' => $lastPage,
             'total'     => $total,
             'from'      => $total ? ($page - 1) * $perPage + 1 : 0,
             'to'        => min($page * $perPage, $total),
-            'counts'    => $this->counts($items),
-        ]);
+        ];
     }
 
     /**

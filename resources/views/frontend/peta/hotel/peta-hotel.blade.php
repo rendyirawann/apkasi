@@ -53,6 +53,7 @@
         .pg-btn:hover:not(:disabled):not(.pg-active) { background: #e8f0ea; }
         .pg-btn.pg-active { background: #336443; border-color: #336443; color: #fff; }
         .pg-btn:disabled { opacity: .4; cursor: not-allowed; }
+        .pg-gap { min-width: 18px; text-align: center; color: #9ab0a0; font-weight: 700; align-self: center; }
     </style>
 @endpush
 
@@ -237,6 +238,7 @@
     var MAP_CENTER = @json($center);
     var TOKEN = @json($mapboxToken);
     var LIST_URL = "{{ route('peta-hotel.list') }}";
+    var INITIAL_LIST = @json($initialList ?? null);   // halaman 1 (semua kategori) dari server -> tanpa AJAX awal
 
     var CAT = {
         venue:  { label: 'Gedung', chip: 'bg-apkasi-heading/10 text-apkasi-heading', accent: 'bg-apkasi-heading', icon: 'landmark', pin: 'pin-venue' },
@@ -340,35 +342,59 @@
     function renderPagination() {
         var el = document.getElementById('placePagination');
         if (lastPage <= 1) { el.innerHTML = ''; return; }
-        var h = '<button class="pg-btn" data-pg="' + (page - 1) + '"' + (page <= 1 ? ' disabled' : '') + '>‹</button>';
-        for (var i = 1; i <= lastPage; i++) h += '<button class="pg-btn ' + (i === page ? 'pg-active' : '') + '" data-pg="' + i + '">' + i + '</button>';
-        h += '<button class="pg-btn" data-pg="' + (page + 1) + '"' + (page >= lastPage ? ' disabled' : '') + '>›</button>';
+        function btn(p, label, active, disabled) {
+            return '<button class="pg-btn' + (active ? ' pg-active' : '') + '" data-pg="' + p + '"' + (disabled ? ' disabled' : '') + '>' + (label || p) + '</button>';
+        }
+        var h = btn(page - 1, '‹', false, page <= 1);
+        // Tampilkan jendela halaman ringkas: 1 … (page-1) [page] (page+1) … last
+        var win = 1, nums = [];
+        for (var i = 1; i <= lastPage; i++) {
+            if (i === 1 || i === lastPage || (i >= page - win && i <= page + win)) nums.push(i);
+        }
+        var prev = 0;
+        nums.forEach(function (i) {
+            if (i - prev > 1) h += '<span class="pg-gap">…</span>';
+            h += btn(i, null, i === page, false);
+            prev = i;
+        });
+        h += btn(page + 1, '›', false, page >= lastPage);
         el.innerHTML = h;
     }
 
+    // Render hasil daftar — dipakai untuk data awal (server) maupun respons AJAX.
+    function applyListResponse(res) {
+        page = res.page; lastPage = res.last_page;
+        var list = document.getElementById('placeList');
+        if (!res.data.length) {
+            list.innerHTML = '<div class="text-center py-12 text-sm text-apkasi-body/70">Tidak ada tempat yang cocok.</div>';
+        } else {
+            list.innerHTML = res.data.map(buildCard).join('');
+        }
+        document.getElementById('listCount').textContent = res.total ? ('Menampilkan ' + res.from + '–' + res.to + ' dari ' + res.total) : '0 tempat';
+        if (res.counts) {
+            Object.keys(res.counts).forEach(function (k) {
+                var c = document.querySelector('[data-cnt="' + k + '"]'); if (c) c.textContent = res.counts[k];
+            });
+        }
+        renderPagination();
+        if (window.lucide) lucide.createIcons();
+        highlightActiveCard();
+    }
+
+    var usedInitial = false;
     function fetchList() {
+        // Paint pertama langsung dari data yang ditanam server (tanpa round-trip AJAX) -> load cepat.
+        if (!usedInitial && INITIAL_LIST && activeCat === 'all' && kotaFilter === 'all' && query === '' && page === 1) {
+            usedInitial = true;
+            applyListResponse(INITIAL_LIST);
+            return;
+        }
+        usedInitial = true;
         document.getElementById('listCount').textContent = 'Memuat…';
         var url = LIST_URL + '?cat=' + encodeURIComponent(activeCat) + '&kota=' + encodeURIComponent(kotaFilter) + '&q=' + encodeURIComponent(query) + '&page=' + page;
         fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(function (r) { return r.json(); })
-            .then(function (res) {
-                page = res.page; lastPage = res.last_page;
-                var list = document.getElementById('placeList');
-                if (!res.data.length) {
-                    list.innerHTML = '<div class="text-center py-12 text-sm text-apkasi-body/70">Tidak ada tempat yang cocok.</div>';
-                } else {
-                    list.innerHTML = res.data.map(buildCard).join('');
-                }
-                document.getElementById('listCount').textContent = res.total ? ('Menampilkan ' + res.from + '–' + res.to + ' dari ' + res.total) : '0 tempat';
-                if (res.counts) {
-                    Object.keys(res.counts).forEach(function (k) {
-                        var c = document.querySelector('[data-cnt="' + k + '"]'); if (c) c.textContent = res.counts[k];
-                    });
-                }
-                renderPagination();
-                if (window.lucide) lucide.createIcons();
-                highlightActiveCard();
-            });
+            .then(applyListResponse);
     }
 
     function highlightActiveCard() {
