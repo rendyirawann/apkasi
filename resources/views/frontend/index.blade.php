@@ -628,7 +628,7 @@
                             {{ $g('lp_poi_heading1', 'Malam Grand Final') }}<br />
                             <span class="text-apkasi-accent">{{ $g('lp_poi_heading2', 'Putri Otonomi Indonesia') }}</span> {{ $g('lp_poi_heading3', '2026') }}
                         </h2>
-                        <p class="text-white/75 text-sm sm:text-base leading-relaxed mb-6 max-w-lg text-justify">
+                        <p class="text-white/75 text-sm sm:text-base leading-relaxed mb-6 text-justify">
                             {{ $g('lp_poi_desc', 'Ajang bergengsi pemilihan duta otonomi daerah dari seluruh kabupaten di Indonesia. Malam penobatan puncak dilaksanakan Kamis, 2 Juli 2026 di Graha Bhineka.') }}
                         </p>
                         @php
