@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Backend\DataMaster;
 
 use App\Http\Controllers\Controller;
 use App\Models\Rundown;
+use App\Support\HandlesUrut;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
 class RundownController extends Controller
 {
+    use HandlesUrut;
+
     public function index()
     {
         return view('backend.data_master.rundown.index');
@@ -57,7 +60,9 @@ class RundownController extends Controller
         }
 
         try {
-            $rundown = Rundown::create($this->payload($request));
+            $payload = $this->payload($request);
+            $payload['urut'] = $this->resolveUrut(Rundown::class, $request);
+            $rundown = Rundown::create($payload);
             $this->syncKegiatan($rundown, $request);
             return response()->json(['success' => 'Rundown berhasil ditambahkan.', 'judul' => 'Berhasil'], 201);
         } catch (\Exception $e) {
@@ -87,7 +92,9 @@ class RundownController extends Controller
         }
 
         try {
-            $rundown->update($this->payload($request));
+            $payload = $this->payload($request);
+            $payload['urut'] = $this->resolveUrut(Rundown::class, $request, $rundown);
+            $rundown->update($payload);
             $this->syncKegiatan($rundown, $request);
             return response()->json(['success' => 'Rundown berhasil diperbarui.', 'judul' => 'Berhasil']);
         } catch (\Exception $e) {

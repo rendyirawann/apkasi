@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\DataMaster;
 
 use App\Http\Controllers\Controller;
 use App\Models\DestinasiWisata;
+use App\Support\HandlesUrut;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -12,6 +13,8 @@ use Yajra\DataTables\Facades\DataTables;
 
 class DestinasiWisataController extends Controller
 {
+    use HandlesUrut;
+
     public function index()
     {
         return view('backend.data_master.destinasi.index');
@@ -76,7 +79,9 @@ class DestinasiWisataController extends Controller
         }
 
         try {
-            $d = DestinasiWisata::create($this->payload($request));
+            $payload = $this->payload($request);
+            $payload['urut'] = $this->resolveUrut(DestinasiWisata::class, $request);
+            $d = DestinasiWisata::create($payload);
             if ($request->hasFile('thumbnail_file')) {
                 $d->thumbnail = $request->file('thumbnail_file')->store('destinasi', 'public');
                 $d->save();
@@ -126,7 +131,9 @@ class DestinasiWisataController extends Controller
         }
 
         try {
-            $d->update($this->payload($request));
+            $payload = $this->payload($request);
+            $payload['urut'] = $this->resolveUrut(DestinasiWisata::class, $request, $d);
+            $d->update($payload);
 
             if ($request->hasFile('thumbnail_file')) {
                 $this->deleteFile($d->thumbnail);

@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Backend\DataMaster;
 
 use App\Http\Controllers\Controller;
 use App\Models\Rental;
+use App\Support\HandlesUrut;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
 class RentalController extends Controller
 {
+    use HandlesUrut;
+
     public function index()
     {
         return view('backend.data_master.rental.index');
@@ -68,7 +71,9 @@ class RentalController extends Controller
         }
 
         try {
-            $rental = Rental::create($this->payload($request));
+            $payload = $this->payload($request);
+            $payload['urut'] = $this->resolveUrut(Rental::class, $request);
+            $rental = Rental::create($payload);
             $this->syncMobil($rental, $request);
             return response()->json(['success' => 'Data rental berhasil ditambahkan.', 'judul' => 'Berhasil'], 201);
         } catch (\Exception $e) {
@@ -98,7 +103,9 @@ class RentalController extends Controller
         }
 
         try {
-            $rental->update($this->payload($request));
+            $payload = $this->payload($request);
+            $payload['urut'] = $this->resolveUrut(Rental::class, $request, $rental);
+            $rental->update($payload);
             $this->syncMobil($rental, $request);
             return response()->json(['success' => 'Data rental berhasil diperbarui.', 'judul' => 'Berhasil']);
         } catch (\Exception $e) {

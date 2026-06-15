@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\DataMaster;
 
 use App\Http\Controllers\Controller;
 use App\Models\Hotel;
+use App\Support\HandlesUrut;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -12,6 +13,8 @@ use Yajra\DataTables\Facades\DataTables;
 
 class HotelController extends Controller
 {
+    use HandlesUrut;
+
     public function index()
     {
         return view('backend.data_master.hotel.index');
@@ -78,7 +81,9 @@ class HotelController extends Controller
         }
 
         try {
-            $hotel = Hotel::create($this->payload($request));
+            $payload = $this->payload($request);
+            $payload['urut'] = $this->resolveUrut(Hotel::class, $request);
+            $hotel = Hotel::create($payload);
             if ($request->hasFile('image_file')) {
                 $hotel->image = $request->file('image_file')->store('hotel', 'public');
                 $hotel->save();
@@ -112,7 +117,9 @@ class HotelController extends Controller
         }
 
         try {
-            $hotel->update($this->payload($request));
+            $payload = $this->payload($request);
+            $payload['urut'] = $this->resolveUrut(Hotel::class, $request, $hotel);
+            $hotel->update($payload);
             if ($request->hasFile('image_file')) {
                 $this->deleteFile($hotel->image);
                 $hotel->image = $request->file('image_file')->store('hotel', 'public');

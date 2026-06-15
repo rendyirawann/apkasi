@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\DataMaster;
 
 use App\Http\Controllers\Controller;
 use App\Models\Gedung;
+use App\Support\HandlesUrut;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -12,6 +13,8 @@ use Yajra\DataTables\Facades\DataTables;
 
 class GedungController extends Controller
 {
+    use HandlesUrut;
+
     public function index()
     {
         return view('backend.data_master.gedung.index');
@@ -68,7 +71,9 @@ class GedungController extends Controller
         }
 
         try {
-            $gedung = Gedung::create($this->payload($request));
+            $payload = $this->payload($request);
+            $payload['urut'] = $this->resolveUrut(Gedung::class, $request);
+            $gedung = Gedung::create($payload);
             if ($request->hasFile('image_file')) {
                 $gedung->image = $request->file('image_file')->store('gedung', 'public');
                 $gedung->save();
@@ -101,7 +106,9 @@ class GedungController extends Controller
         }
 
         try {
-            $gedung->update($this->payload($request));
+            $payload = $this->payload($request);
+            $payload['urut'] = $this->resolveUrut(Gedung::class, $request, $gedung);
+            $gedung->update($payload);
             if ($request->hasFile('image_file')) {
                 $this->deleteFile($gedung->image);
                 $gedung->image = $request->file('image_file')->store('gedung', 'public');

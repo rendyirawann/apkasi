@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Backend\DataMaster;
 use App\Http\Controllers\Controller;
 use App\Models\Pic;
 use App\Models\WilayahProvinsi;
+use App\Support\HandlesUrut;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
 class PicController extends Controller
 {
+    use HandlesUrut;
+
     public function index()
     {
         $provinsi = WilayahProvinsi::orderBy('nama')->get(['id', 'nama']);
@@ -66,7 +69,9 @@ class PicController extends Controller
         }
 
         try {
-            Pic::create($this->payload($request));
+            $payload = $this->payload($request);
+            $payload['urut'] = $this->resolveUrut(Pic::class, $request);
+            Pic::create($payload);
             return response()->json(['success' => 'Data PIC berhasil ditambahkan.', 'judul' => 'Berhasil'], 201);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan di aplikasi.', 'judul' => 'Gagal', 'errorMessage' => $e->getMessage()], 500);
@@ -95,7 +100,9 @@ class PicController extends Controller
         }
 
         try {
-            $pic->update($this->payload($request));
+            $payload = $this->payload($request);
+            $payload['urut'] = $this->resolveUrut(Pic::class, $request, $pic);
+            $pic->update($payload);
             return response()->json(['success' => 'Data PIC berhasil diperbarui.', 'judul' => 'Berhasil']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan di aplikasi.', 'judul' => 'Gagal', 'errorMessage' => $e->getMessage()], 500);
