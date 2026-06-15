@@ -95,6 +95,12 @@
                     </a>
                 </div>
                 <div class="menu-item">
+                    <a class="menu-link {{ request()->is('admin/kuliner*') ? 'active' : '' }}" href="{{ route('kuliner.index') }}">
+                        <span class="menu-icon"><i class="ki-duotone ki-cup fs-4"><span class="path1"></span><span class="path2"></span></i></span>
+                        <span class="menu-title">Kuliner</span>
+                    </a>
+                </div>
+                <div class="menu-item">
                     <a class="menu-link {{ request()->is('admin/pics*') ? 'active' : '' }}" href="{{ route('pics.index') }}">
                         <span class="menu-icon"><i class="ki-duotone ki-user-tick fs-4"><span class="path1"></span><span class="path2"></span></i></span>
                         <span class="menu-title">PIC</span>

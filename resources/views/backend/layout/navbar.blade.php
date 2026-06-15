@@ -210,6 +210,7 @@
 			{ label: 'Hotel', url: '{{ route('hotels.index') }}', icon: 'ki-home-2', group: 'Data Master' },
 			{ label: 'Destinasi Wisata', url: '{{ route('destinasi.index') }}', icon: 'ki-geolocation', group: 'Data Master' },
 			{ label: 'Rental Mobil', url: '{{ route('rentals.index') }}', icon: 'ki-car', group: 'Data Master' },
+			{ label: 'Kuliner', url: '{{ route('kuliner.index') }}', icon: 'ki-cup', group: 'Data Master' },
 			{ label: 'PIC', url: '{{ route('pics.index') }}', icon: 'ki-user-tick', group: 'Data Master' },
 			@endcan
 			@can('landing.edit')
