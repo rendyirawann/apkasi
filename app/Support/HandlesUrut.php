@@ -26,32 +26,28 @@ trait HandlesUrut
     {
         $provided = $request->filled($column) ? (int) $request->input($column) : null;
 
+        // UBAH: kosong / tidak diubah -> pertahankan nilai lama; diisi -> hormati (admin boleh menata ulang).
+        if ($model) {
+            return $provided ?? (int) $model->{$column};
+        }
+
+        // TAMBAH: hitung urut terbesar (dalam scope, mis. per-grup) untuk auto-generate.
         $maxQuery = $modelClass::query();
         foreach ($scope as $col => $val) {
             $maxQuery->where($col, $val);
         }
         $max = (int) $maxQuery->max($column);
 
-        // Tidak diisi -> create: lanjut nomor berikutnya; update: pertahankan nilai lama.
+        // Kosong -> nomor berikutnya.
         if ($provided === null) {
-            return $model ? (int) $model->{$column} : $max + 1;
+            return $max + 1;
         }
 
-        // Update tanpa mengubah urut -> pertahankan.
-        if ($model && $provided === (int) $model->{$column}) {
-            return $provided;
-        }
-
-        // Cek bentrok dengan baris lain (kecuali dirinya sendiri saat update).
+        // Diisi tapi sudah dipakai -> generate urutan yang belum ada (max + 1); kalau bebas -> hormati.
         $clashQuery = $modelClass::query()->where($column, $provided);
         foreach ($scope as $col => $val) {
             $clashQuery->where($col, $val);
         }
-        if ($model) {
-            $clashQuery->where($model->getKeyName(), '!=', $model->getKey());
-        }
-
-        // Sudah ada -> generate urutan yang belum dipakai (max + 1).
         return $clashQuery->exists() ? $max + 1 : $provided;
     }
 }
