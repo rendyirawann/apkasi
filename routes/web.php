@@ -25,6 +25,7 @@ use App\Http\Controllers\Backend\DataMaster\GedungController;
 use App\Http\Controllers\Backend\DataMaster\PicController;
 use App\Http\Controllers\Backend\DataMaster\DestinasiWisataController;
 use App\Http\Controllers\Backend\DataMaster\RentalController;
+use App\Http\Controllers\Backend\DataMaster\KulinerController;
 use App\Http\Controllers\Backend\DataMaster\RundownController;
 use App\Http\Controllers\Backend\Settings\LandingController;
 
@@ -210,6 +211,16 @@ Route::middleware(['auth', 'forbid-banned-user'])->group(function () {
         Route::get('/admin/destinasi/{id}/edit', [DestinasiWisataController::class, 'edit'])->name('destinasi.edit');
         Route::put('/admin/destinasi/{id}', [DestinasiWisataController::class, 'update'])->name('destinasi.update');
         Route::delete('/admin/destinasi/{id}', [DestinasiWisataController::class, 'destroy'])->name('destinasi.destroy');
+
+        // Kuliner
+        Route::get('/admin/kuliner', [KulinerController::class, 'index'])->name('kuliner.index');
+        Route::get('/admin/kuliner/data', [KulinerController::class, 'data'])->name('kuliner.data');
+        Route::post('/admin/kuliner/halal-logo', [KulinerController::class, 'halalLogo'])->name('kuliner.halalLogo');
+        Route::post('/admin/kuliner', [KulinerController::class, 'store'])->name('kuliner.store');
+        Route::get('/admin/kuliner/{id}', [KulinerController::class, 'show'])->name('kuliner.show');
+        Route::get('/admin/kuliner/{id}/edit', [KulinerController::class, 'edit'])->name('kuliner.edit');
+        Route::put('/admin/kuliner/{id}', [KulinerController::class, 'update'])->name('kuliner.update');
+        Route::delete('/admin/kuliner/{id}', [KulinerController::class, 'destroy'])->name('kuliner.destroy');
 
         // Rental Mobil
         Route::get('/admin/rentals', [RentalController::class, 'index'])->name('rentals.index');

@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             HotelSeeder::class,
             DestinasiWisataSeeder::class,
             RentalSeeder::class,
+            KulinerSeeder::class,
             RundownSeeder::class,
             LandingSeeder::class,
             WilayahProvinsiSeeder::class,

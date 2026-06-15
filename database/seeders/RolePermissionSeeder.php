@@ -85,6 +85,14 @@ class RolePermissionSeeder extends Seeder
             'rental.delete',
         ];
 
+        // --- Granular Data Master: Kuliner ---
+        $kulinerPermissions = [
+            'kuliner.show',
+            'kuliner.create',
+            'kuliner.edit',
+            'kuliner.delete',
+        ];
+
         // --- Granular: Rundown Kegiatan ---
         $rundownPermissions = [
             'rundown.show',
@@ -101,7 +109,7 @@ class RolePermissionSeeder extends Seeder
         // Create all permissions
         $allPermissions = array_merge(
             $navPermissions, $userPermissions, $rolePermissions,
-            $hotelPermissions, $gedungPermissions, $picPermissions, $destinasiPermissions, $rentalPermissions, $rundownPermissions, $landingPermissions
+            $hotelPermissions, $gedungPermissions, $picPermissions, $destinasiPermissions, $rentalPermissions, $kulinerPermissions, $rundownPermissions, $landingPermissions
         );
 
         foreach ($allPermissions as $permission) {
@@ -127,7 +135,7 @@ class RolePermissionSeeder extends Seeder
             'view_dashboard',
             'view_data_master',
             'view_help',
-        ], $hotelPermissions, $gedungPermissions, $picPermissions, $destinasiPermissions, $rentalPermissions, $rundownPermissions, $landingPermissions);
+        ], $hotelPermissions, $gedungPermissions, $picPermissions, $destinasiPermissions, $rentalPermissions, $kulinerPermissions, $rundownPermissions, $landingPermissions);
         $roleAdmin->syncPermissions($adminPermissions);
     }
 }
