@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             WilayahKecamatanSeeder::class,
             PicSeeder::class,
             PicLoSeeder::class,
+            PicLoJabatanSeeder::class,
         ]);
     }
 }

@@ -29,8 +29,8 @@ class Pic extends Model
         if (! $this->lo_kecamatan) {
             return null;
         }
-        $kec = preg_replace('/^\s*Kec\.\s*/i', '', $this->lo_kecamatan);
-        return 'Camat ' . trim($kec);
+        $kec = trim(preg_replace('/^\s*Kec\.\s*/i', '', $this->lo_kecamatan));
+        return 'Camat Kecamatan ' . $kec;
     }
 
     /** Sebutan instansi: pakai override lo_jabatan bila diisi, selain itu otomatis dari nama instansi. */
@@ -43,11 +43,11 @@ class Pic extends Model
     }
 
     /**
-     * Aturan otomatis sebutan kepala instansi:
-     * - "Dinas ..."        -> "Kepala Dinas ..."
-     * - "Badan ..."        -> "Kepala Badan ..."
-     * - "Inspektorat ..."  -> "Inspektur ..."
-     * - lainnya (akronim)  -> "Kepala ..."
+     * Aturan otomatis sebutan kepala instansi (format "Jabatan - Nama Instansi"):
+     * - "Inspektorat ..."          -> "Inspektur ..." (kata Inspektorat diganti)
+     * - "Dinas ..." / akronim "D.." -> "Kepala Dinas - <instansi>"
+     * - "Badan ..." / akronim "B.." -> "Kepala Badan - <instansi>"
+     * - lainnya                     -> "Kepala <instansi>"
      */
     public static function defaultJabatanInstansi(?string $instansi): ?string
     {
@@ -58,6 +58,12 @@ class Pic extends Model
         if (preg_match('/^Inspektorat\b/i', $t)) {
             return preg_replace('/^Inspektorat/i', 'Inspektur', $t);
         }
-        return 'Kepala ' . $t; // mencakup "Dinas ...", "Badan ...", & akronim lain
+        if (preg_match('/^Dinas\b/i', $t) || preg_match('/^D[A-Z]/', $t)) {
+            return 'Kepala Dinas - ' . $t;
+        }
+        if (preg_match('/^Badan\b/i', $t) || preg_match('/^B[A-Za-z]/', $t)) {
+            return 'Kepala Badan - ' . $t;
+        }
+        return 'Kepala ' . $t;
     }
 }
