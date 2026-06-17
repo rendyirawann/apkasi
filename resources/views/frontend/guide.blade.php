@@ -382,7 +382,7 @@
                 <i data-lucide="users" class="w-4 h-4"></i> PIC per Provinsi
             </button>
             <button type="button" data-tab="lo" class="text-sm font-semibold px-5 py-2.5 rounded-full border bg-white border-apkasi-leaf text-apkasi-body hover:border-apkasi-accent transition-colors inline-flex items-center gap-2">
-                <i data-lucide="map-pinned" class="w-4 h-4"></i> LO Terbaru
+                <i data-lucide="map-pinned" class="w-4 h-4"></i> LO (Liaison Officer)
             </button>
             <button type="button" data-tab="rental" class="text-sm font-semibold px-5 py-2.5 rounded-full border bg-white border-apkasi-leaf text-apkasi-body hover:border-apkasi-accent transition-colors inline-flex items-center gap-2">
                 <i data-lucide="car" class="w-4 h-4"></i> Rental Kendaraan
