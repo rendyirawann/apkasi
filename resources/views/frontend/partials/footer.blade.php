@@ -9,9 +9,9 @@
 @endphp
 <footer class="bg-apkasi-dark border-t-4 border-apkasi-gold">
     <div class="max-w-[1400px] mx-auto px-5 sm:px-8 py-10 sm:py-14">
-        <div class="flex flex-wrap gap-8 sm:gap-10 mb-10">
+        <div class="flex flex-wrap gap-8 sm:gap-10 lg:justify-between mb-10">
             {{-- Brand --}}
-            <div class="w-full lg:flex-1 lg:min-w-[220px] lg:max-w-sm">
+            <div class="w-full lg:w-auto lg:max-w-xs">
                 <div class="flex items-center gap-3 mb-4">
                     @forelse ($fBrand as $logo)
                         <img src="{{ $logo->gambar_url }}" alt="{{ $logo->alt }}" loading="lazy" decoding="async" class="h-10 brightness-0 invert" />
