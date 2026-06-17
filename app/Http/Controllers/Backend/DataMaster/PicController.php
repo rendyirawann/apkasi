@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend\DataMaster;
 use App\Http\Controllers\Controller;
 use App\Models\Pic;
 use App\Models\WilayahProvinsi;
+use App\Models\WilayahKecamatan;
 use App\Support\HandlesUrut;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -16,8 +17,9 @@ class PicController extends Controller
 
     public function index()
     {
-        $provinsi = WilayahProvinsi::orderBy('nama')->get(['id', 'nama']);
-        return view('backend.data_master.pic.index', compact('provinsi'));
+        $provinsi  = WilayahProvinsi::orderBy('nama')->get(['id', 'nama']);
+        $kecamatan = WilayahKecamatan::where('is_active', true)->orderBy('nama')->get(['id', 'nama']);
+        return view('backend.data_master.pic.index', compact('provinsi', 'kecamatan'));
     }
 
     public function data(Request $request)

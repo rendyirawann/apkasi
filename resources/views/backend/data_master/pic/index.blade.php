@@ -90,7 +90,12 @@
                         </div>
                         <div class="col-md-6">
                             <label class="fw-semibold fs-7 mb-1">LO — Kecamatan <span class="text-muted">(opsional)</span></label>
-                            <input type="text" name="lo_kecamatan" id="p_lo_kecamatan" class="form-control form-control-solid" placeholder="cth: Kec. Lubuk Pakam" />
+                            <select name="lo_kecamatan" id="p_lo_kecamatan" class="form-select form-select-solid">
+                                <option value="">— Pilih Kecamatan —</option>
+                                @foreach ($kecamatan as $k)
+                                    <option value="Kec. {{ $k->nama }}">Kec. {{ $k->nama }}</option>
+                                @endforeach
+                            </select>
                             <div class="text-danger fs-8 mt-1" data-error="lo_kecamatan"></div>
                         </div>
                         <div class="col-md-6">
