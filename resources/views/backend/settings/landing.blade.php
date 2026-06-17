@@ -268,56 +268,65 @@
                             <h3 class="fw-bold fs-4 mb-1">Footer</h3>
                             <div class="text-muted fs-7">Teks tagline brand, sekretariat, dan copyright di bagian bawah landing page.</div>
                         </div>
-                        {{-- Teks & judul kolom (disimpan sebagai Setting) --}}
+                        {{-- A. Teks brand & kolom Pemerintahan (Setting) --}}
                         <form action="{{ route('landing.update') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="row g-4">
-                                <div class="col-md-12"><label class="fw-semibold fs-7 mb-1">Tagline brand</label><input type="text" name="lp_footer_tagline" class="form-control" value="{{ $g('lp_footer_tagline') }}"></div>
-                                <div class="col-md-4"><label class="fw-semibold fs-7 mb-1">Judul Kolom 1</label><input type="text" name="lp_footer_col1_title" class="form-control" value="{{ $g('lp_footer_col1_title', 'Navigasi') }}"></div>
-                                <div class="col-md-4"><label class="fw-semibold fs-7 mb-1">Judul Kolom 2</label><input type="text" name="lp_footer_col2_title" class="form-control" value="{{ $g('lp_footer_col2_title', 'Informasi') }}"></div>
-                                <div class="col-md-4"><label class="fw-semibold fs-7 mb-1">Judul Kolom Pemerintahan</label><input type="text" name="lp_footer_gov_title" class="form-control" value="{{ $g('lp_footer_gov_title', 'Pemerintahan') }}"></div>
-                                <div class="col-md-12"><label class="fw-semibold fs-7 mb-1">Teks Sekretariat</label><input type="text" name="lp_footer_sekretariat" class="form-control" value="{{ $g('lp_footer_sekretariat') }}"></div>
+                                <div class="col-md-6"><label class="fw-semibold fs-7 mb-1">Tagline brand</label><input type="text" name="lp_footer_tagline" class="form-control" value="{{ $g('lp_footer_tagline') }}"></div>
+                                <div class="col-md-6"><label class="fw-semibold fs-7 mb-1">Teks Copyright</label><input type="text" name="lp_footer_copyright" class="form-control" value="{{ $g('lp_footer_copyright') }}"></div>
+                            </div>
+
+                            <div class="separator separator-dashed my-6"></div>
+                            <div class="fw-bold text-gray-800 mb-3"><i class="ki-outline ki-bank fs-5 me-1"></i> Kolom Pemerintahan</div>
+                            <div class="row g-4">
+                                <div class="col-md-4"><label class="fw-semibold fs-7 mb-1">Judul Kolom</label><input type="text" name="lp_footer_gov_title" class="form-control" value="{{ $g('lp_footer_gov_title', 'Pemerintahan') }}"></div>
+                                <div class="col-md-8"><label class="fw-semibold fs-7 mb-1">Teks Pemerintahan</label><input type="text" name="lp_footer_sekretariat" class="form-control" value="{{ $g('lp_footer_sekretariat') }}" placeholder="cth: Dinas Kominfo Kabupaten Deli Serdang, Sumatera Utara"></div>
                                 <div class="col-md-6"><label class="fw-semibold fs-7 mb-1">Label Tautan Portal</label><input type="text" name="lp_footer_portal_label" class="form-control" value="{{ $g('lp_footer_portal_label', 'Portal DS') }}"></div>
                                 <div class="col-md-6"><label class="fw-semibold fs-7 mb-1">URL Portal <span class="text-muted">(kosongkan utk sembunyikan)</span></label><input type="text" name="lp_footer_portal_url" class="form-control" value="{{ $g('lp_footer_portal_url', 'https://portal.deliserdangkab.go.id/') }}"></div>
-                                <div class="col-md-12"><label class="fw-semibold fs-7 mb-1">Teks Copyright</label><input type="text" name="lp_footer_copyright" class="form-control" value="{{ $g('lp_footer_copyright') }}"></div>
                             </div>
                             <div class="d-flex align-items-center justify-content-end gap-3 mt-6">
-                                <span class="text-muted fs-8">Menyimpan teks & judul footer.</span>
+                                <span class="text-muted fs-8">Menyimpan teks brand & kolom Pemerintahan.</span>
                                 <button type="submit" class="btn btn-primary"><i class="ki-outline ki-check fs-3"></i> Simpan Teks Footer</button>
                             </div>
                         </form>
 
                         <div class="separator separator-dashed my-8"></div>
 
-                        {{-- Link kolom footer: tambah / edit / hapus --}}
+                        {{-- B. Kolom link dinamis (tambah kolom & link; ikon sosmed otomatis) --}}
                         <form action="{{ route('landing.footer.sync') }}" method="POST" id="footerLinkForm">
                             @csrf
-                            <div class="mb-4">
-                                <h4 class="fw-bold fs-5 mb-1">Link Kolom Footer</h4>
-                                <div class="text-muted fs-8">Isi label &amp; URL. URL relatif disarankan: <code>/panduan</code>, <code>/peta-hotel</code>, atau <code>/#agenda</code>. Boleh URL penuh untuk tautan eksternal.</div>
+                            <div class="d-flex flex-stack mb-3">
+                                <div>
+                                    <h4 class="fw-bold fs-5 mb-1">Kolom Link Footer</h4>
+                                    <div class="text-muted fs-8">URL relatif: <code>/panduan</code>, <code>/peta-hotel</code>, <code>/#agenda</code>. Link sosmed (Instagram, Facebook, YouTube, TikTok, X, WhatsApp, Telegram, LinkedIn) otomatis menampilkan ikon.</div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-light-primary" id="btnAddFooterCol"><i class="ki-outline ki-plus fs-5"></i> Tambah Kolom</button>
                             </div>
-                            <div class="row g-6">
-                                @foreach (['col1' => $g('lp_footer_col1_title', 'Navigasi'), 'col2' => $g('lp_footer_col2_title', 'Informasi')] as $col => $judul)
-                                    <div class="col-md-6">
-                                        <div class="d-flex flex-stack mb-2">
-                                            <label class="fw-semibold fs-7">Kolom: <span class="text-primary">{{ $judul }}</span></label>
-                                            <button type="button" class="btn btn-sm btn-light-primary py-1 px-3 btn-add-fl" data-col="{{ $col }}"><i class="ki-outline ki-plus fs-6"></i> Tambah Link</button>
-                                        </div>
-                                        <div class="d-flex flex-column gap-2" data-fl-rows="{{ $col }}">
-                                            @foreach ($footerLinks[$col] as $l)
-                                                <div class="input-group input-group-sm">
-                                                    <input type="text" name="{{ $col }}_label[]" class="form-control" placeholder="Label" value="{{ $l->label }}">
-                                                    <input type="text" name="{{ $col }}_url[]" class="form-control" placeholder="URL" value="{{ $l->url }}">
-                                                    <button type="button" class="btn btn-light-danger btn-rm-fl"><i class="ki-outline ki-trash fs-6"></i></button>
-                                                </div>
-                                            @endforeach
+                            <div id="footerColsWrap" class="row g-5">
+                                @foreach ($footerColumns as $i => $col)
+                                    <div class="col-md-6 footer-col-block" data-ci="{{ $i }}">
+                                        <div class="border border-gray-300 rounded p-3 h-100">
+                                            <div class="d-flex align-items-center gap-2 mb-3">
+                                                <input type="text" name="col_judul[{{ $i }}]" class="form-control form-control-sm fw-bold" placeholder="Judul kolom" value="{{ $col->judul }}">
+                                                <button type="button" class="btn btn-icon btn-sm btn-light-danger btn-rm-col" title="Hapus kolom"><i class="ki-outline ki-trash fs-5"></i></button>
+                                            </div>
+                                            <div class="d-flex flex-column gap-2 footer-links-wrap">
+                                                @foreach ($col->links as $l)
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="text" name="link_label[{{ $i }}][]" class="form-control" placeholder="Label" value="{{ $l->label }}">
+                                                        <input type="text" name="link_url[{{ $i }}][]" class="form-control" placeholder="URL" value="{{ $l->url }}">
+                                                        <button type="button" class="btn btn-light-danger btn-rm-link"><i class="ki-outline ki-trash fs-6"></i></button>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-light py-1 px-3 mt-2 btn-add-link" data-ci="{{ $i }}"><i class="ki-outline ki-plus fs-6"></i> Tambah Link</button>
                                         </div>
                                     </div>
                                 @endforeach
                             </div>
                             <div class="d-flex align-items-center justify-content-end gap-3 mt-6">
-                                <span class="text-muted fs-8">Menyimpan link kolom footer.</span>
-                                <button type="submit" class="btn btn-primary"><i class="ki-outline ki-check fs-3"></i> Simpan Link Footer</button>
+                                <span class="text-muted fs-8">Menyimpan kolom & link footer.</span>
+                                <button type="submit" class="btn btn-primary"><i class="ki-outline ki-check fs-3"></i> Simpan Kolom & Link</button>
                             </div>
                         </form>
                     </div>
@@ -426,24 +435,41 @@
         });
     });
 
-    // ---------- Footer: link kolom (baris dinamis tambah/hapus) ----------
-    function footerLinkRow(col) {
-        var w = document.createElement('div');
-        w.className = 'input-group input-group-sm';
-        w.innerHTML = '<input type="text" name="' + col + '_label[]" class="form-control" placeholder="Label">' +
-            '<input type="text" name="' + col + '_url[]" class="form-control" placeholder="URL">' +
-            '<button type="button" class="btn btn-light-danger btn-rm-fl"><i class="ki-outline ki-trash fs-6"></i></button>';
-        return w;
+    // ---------- Footer: kolom & link dinamis (tambah/hapus) ----------
+    var footerColSeq = {{ $footerColumns->count() }} + 100; // ci unik utk kolom baru
+    function footerLinkRowHtml(ci) {
+        return '<div class="input-group input-group-sm">' +
+            '<input type="text" name="link_label[' + ci + '][]" class="form-control" placeholder="Label">' +
+            '<input type="text" name="link_url[' + ci + '][]" class="form-control" placeholder="URL">' +
+            '<button type="button" class="btn btn-light-danger btn-rm-link"><i class="ki-outline ki-trash fs-6"></i></button>' +
+            '</div>';
     }
-    document.querySelectorAll('.btn-add-fl').forEach(function (b) {
-        b.addEventListener('click', function () {
-            var wrap = document.querySelector('[data-fl-rows="' + b.dataset.col + '"]');
-            if (wrap) wrap.appendChild(footerLinkRow(b.dataset.col));
-        });
+    function footerColBlockHtml(ci) {
+        return '<div class="col-md-6 footer-col-block" data-ci="' + ci + '">' +
+            '<div class="border border-gray-300 rounded p-3 h-100">' +
+            '<div class="d-flex align-items-center gap-2 mb-3">' +
+            '<input type="text" name="col_judul[' + ci + ']" class="form-control form-control-sm fw-bold" placeholder="Judul kolom">' +
+            '<button type="button" class="btn btn-icon btn-sm btn-light-danger btn-rm-col" title="Hapus kolom"><i class="ki-outline ki-trash fs-5"></i></button>' +
+            '</div>' +
+            '<div class="d-flex flex-column gap-2 footer-links-wrap">' + footerLinkRowHtml(ci) + '</div>' +
+            '<button type="button" class="btn btn-sm btn-light py-1 px-3 mt-2 btn-add-link" data-ci="' + ci + '"><i class="ki-outline ki-plus fs-6"></i> Tambah Link</button>' +
+            '</div></div>';
+    }
+    var btnAddFooterCol = document.getElementById('btnAddFooterCol');
+    if (btnAddFooterCol) btnAddFooterCol.addEventListener('click', function () {
+        document.getElementById('footerColsWrap').insertAdjacentHTML('beforeend', footerColBlockHtml(footerColSeq++));
     });
     document.addEventListener('click', function (e) {
-        var rm = e.target.closest('.btn-rm-fl');
-        if (rm) rm.closest('.input-group').remove();
+        var addLink = e.target.closest('.btn-add-link');
+        if (addLink) {
+            var wrap = addLink.closest('.border').querySelector('.footer-links-wrap');
+            if (wrap) wrap.insertAdjacentHTML('beforeend', footerLinkRowHtml(addLink.dataset.ci));
+            return;
+        }
+        var rmLink = e.target.closest('.btn-rm-link');
+        if (rmLink) { rmLink.closest('.input-group').remove(); return; }
+        var rmCol = e.target.closest('.btn-rm-col');
+        if (rmCol) { rmCol.closest('.footer-col-block').remove(); return; }
     });
 
     // ---------- FAQ: editor teks (TinyMCE) + baris dinamis ----------

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Models\SiteLogo;
 use App\Models\Faq;
+use App\Models\FooterColumn;
 use App\Models\FooterLink;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -26,12 +27,9 @@ class LandingController extends Controller
         ];
         $faqs = Faq::orderBy('urut')->get();
 
-        $footerLinks = [
-            'col1' => FooterLink::where('kolom', 'col1')->orderBy('urut')->get(),
-            'col2' => FooterLink::where('kolom', 'col2')->orderBy('urut')->get(),
-        ];
+        $footerColumns = FooterColumn::with('links')->orderBy('urut')->orderBy('id')->get();
 
-        return view('backend.settings.landing', compact('s', 'logos', 'faqs', 'footerLinks'));
+        return view('backend.settings.landing', compact('s', 'logos', 'faqs', 'footerColumns'));
     }
 
     public function update(Request $request)
@@ -131,27 +129,44 @@ class LandingController extends Controller
         return back()->with('success', 'FAQ berhasil disimpan.');
     }
 
-    /** Sinkron link kolom footer (col1 & col2) dari form berulang. */
+    /**
+     * Sinkron kolom footer dinamis + link-nya dari form berulang.
+     * Input: col_judul[ci], link_label[ci][], link_url[ci][]. Icon sosmed dideteksi otomatis.
+     */
     public function footerSync(Request $request)
     {
         FooterLink::query()->delete();
-        foreach (['col1', 'col2'] as $kolom) {
-            $labels = (array) $request->input($kolom . '_label', []);
-            $urls   = (array) $request->input($kolom . '_url', []);
-            $i = 0;
+        FooterColumn::query()->delete();
+
+        $juduls  = (array) $request->input('col_judul', []);
+        $urutCol = 0;
+        foreach ($juduls as $ci => $judul) {
+            if (! filled($judul)) continue;
+
+            $column = FooterColumn::create([
+                'judul'     => $judul,
+                'urut'      => ++$urutCol,
+                'is_active' => true,
+            ]);
+
+            $labels   = (array) $request->input("link_label.$ci", []);
+            $urls     = (array) $request->input("link_url.$ci", []);
+            $urutLink = 0;
             foreach ($labels as $idx => $label) {
                 if (! filled($label)) continue;
+                $url = filled($urls[$idx] ?? null) ? $urls[$idx] : '#';
                 FooterLink::create([
-                    'kolom'     => $kolom,
-                    'label'     => $label,
-                    'url'       => filled($urls[$idx] ?? null) ? $urls[$idx] : '#',
-                    'urut'      => ++$i,
-                    'is_active' => true,
+                    'footer_column_id' => $column->id,
+                    'label'            => $label,
+                    'url'              => $url,
+                    'icon'             => FooterLink::detectIcon($url),
+                    'urut'             => ++$urutLink,
+                    'is_active'        => true,
                 ]);
             }
         }
 
-        return back()->with('success', 'Link footer berhasil disimpan.');
+        return back()->with('success', 'Footer berhasil disimpan.');
     }
 
     private function uploadLanding($file): string
