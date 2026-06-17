@@ -135,10 +135,17 @@ class LandingController extends Controller
      */
     public function footerSync(Request $request)
     {
+        $juduls = (array) $request->input('col_judul', []);
+
+        // Pengaman: jika tidak ada kolom berjudul (mis. form ter-submit dari halaman lama/kosong),
+        // JANGAN kosongkan footer -> data yang sudah ada dipertahankan.
+        if (! collect($juduls)->contains(fn ($j) => filled($j))) {
+            return back()->with('error', 'Footer tidak diubah: tidak ada kolom berjudul. Muat ulang halaman lalu coba lagi.');
+        }
+
         FooterLink::query()->delete();
         FooterColumn::query()->delete();
 
-        $juduls  = (array) $request->input('col_judul', []);
         $urutCol = 0;
         foreach ($juduls as $ci => $judul) {
             if (! filled($judul)) continue;
