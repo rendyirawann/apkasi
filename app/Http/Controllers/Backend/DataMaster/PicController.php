@@ -33,6 +33,14 @@ class PicController extends Controller
             ->addColumn('provinsi', function ($row) {
                 return optional($row->provinsi)->nama ?? '<span class="text-muted">-</span>';
             })
+            ->addColumn('lo', function ($row) {
+                if (! $row->lo_kecamatan && ! $row->lo_instansi) {
+                    return '<span class="text-muted">-</span>';
+                }
+                $kec = $row->lo_kecamatan ? '<span class="fw-semibold">' . e($row->lo_kecamatan) . '</span>' : '';
+                $ins = $row->lo_instansi ? '<div class="text-muted fs-8">' . e($row->lo_instansi) . '</div>' : '';
+                return $kec . $ins;
+            })
             ->addColumn('no_hp_badge', function ($row) {
                 return $row->no_hp
                     ? '<span class="fw-bold"><i class="ki-outline ki-phone fs-7 me-1 text-success"></i>' . e($row->no_hp) . '</span>'
@@ -57,7 +65,7 @@ class PicController extends Controller
                 }
                 return $btn . '</div>';
             })
-            ->rawColumns(['provinsi', 'no_hp_badge', 'status', 'action'])
+            ->rawColumns(['provinsi', 'lo', 'no_hp_badge', 'status', 'action'])
             ->make(true);
     }
 
@@ -122,10 +130,12 @@ class PicController extends Controller
     private function rules(): array
     {
         return [
-            'provinsi_id' => 'required|integer|exists:wilayah_provinsi,id',
-            'nama'        => 'required|string|max:255',
-            'no_hp'       => 'nullable|string|max:30',
-            'urut'        => 'nullable|integer|min:0',
+            'provinsi_id'  => 'required|integer|exists:wilayah_provinsi,id',
+            'nama'         => 'required|string|max:255',
+            'lo_kecamatan' => 'nullable|string|max:120',
+            'lo_instansi'  => 'nullable|string|max:200',
+            'no_hp'        => 'nullable|string|max:30',
+            'urut'         => 'nullable|integer|min:0',
         ];
     }
 
@@ -141,11 +151,13 @@ class PicController extends Controller
     private function payload(Request $request): array
     {
         return [
-            'provinsi_id' => (int) $request->provinsi_id,
-            'nama'        => $request->nama,
-            'no_hp'       => $request->no_hp,
-            'urut'        => (int) ($request->urut ?? 0),
-            'is_active'   => $request->boolean('is_active'),
+            'provinsi_id'  => (int) $request->provinsi_id,
+            'nama'         => $request->nama,
+            'lo_kecamatan' => $request->lo_kecamatan ?: null,
+            'lo_instansi'  => $request->lo_instansi ?: null,
+            'no_hp'        => $request->no_hp,
+            'urut'         => (int) ($request->urut ?? 0),
+            'is_active'    => $request->boolean('is_active'),
         ];
     }
 }

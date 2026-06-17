@@ -133,6 +133,56 @@
         render();
     })();
 
+    // ── Kartu LO: pencarian + pagination dinamis (mirror PIC) ──
+    (function () {
+        var PER = 9;
+        var grid = document.getElementById('loGrid');
+        if (!grid) return;
+        var all = Array.prototype.slice.call(grid.querySelectorAll('.lo-card'));
+        var search = document.getElementById('loSearch');
+        var info = document.getElementById('loInfo');
+        var btns = document.getElementById('loPageBtns');
+        var empty = document.getElementById('loEmpty');
+        var page = 1, filtered = all;
+        function makeBtn(label, target, o) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.innerHTML = label;
+            b.className = 'min-w-[34px] h-[34px] px-2.5 rounded-lg text-sm font-semibold transition-colors '
+                + (o.active ? 'bg-apkasi-heading text-white' : 'bg-white border border-apkasi-leaf text-apkasi-body hover:border-apkasi-accent')
+                + (o.disabled ? ' opacity-40 pointer-events-none' : '');
+            if (!o.disabled && !o.active) b.addEventListener('click', function () { page = target; render(); });
+            return b;
+        }
+        function render() {
+            var total = filtered.length;
+            var pages = Math.max(1, Math.ceil(total / PER));
+            if (page > pages) page = pages;
+            if (page < 1) page = 1;
+            all.forEach(function (c) { c.style.display = 'none'; });
+            var start = (page - 1) * PER;
+            var slice = filtered.slice(start, start + PER);
+            slice.forEach(function (c) { c.style.display = ''; });
+            if (info) info.textContent = total ? ('Menampilkan ' + (start + 1) + '–' + (start + slice.length) + ' dari ' + total + ' provinsi') : '';
+            if (empty) empty.classList.toggle('hidden', total > 0);
+            if (btns) {
+                btns.innerHTML = '';
+                if (pages > 1) {
+                    btns.appendChild(makeBtn('‹', page - 1, { disabled: page <= 1 }));
+                    for (var i = 1; i <= pages; i++) btns.appendChild(makeBtn(String(i), i, { active: i === page }));
+                    btns.appendChild(makeBtn('›', page + 1, { disabled: page >= pages }));
+                }
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+        if (search) search.addEventListener('input', function () {
+            var q = search.value.trim().toLowerCase();
+            filtered = q ? all.filter(function (c) { return (c.getAttribute('data-search') || '').indexOf(q) !== -1; }) : all;
+            page = 1; render();
+        });
+        render();
+    })();
+
     // ── Peta Rental (Mapbox + GeoJSON, pola sama spt peta-hotel) ──
     var RENTALS = @json($rentalGeo);
     var RTOKEN = @json($mapboxToken ?? '');
@@ -331,6 +381,9 @@
             <button type="button" data-tab="pic" class="text-sm font-semibold px-5 py-2.5 rounded-full border bg-apkasi-heading border-apkasi-heading text-white transition-colors inline-flex items-center gap-2">
                 <i data-lucide="users" class="w-4 h-4"></i> PIC per Provinsi
             </button>
+            <button type="button" data-tab="lo" class="text-sm font-semibold px-5 py-2.5 rounded-full border bg-white border-apkasi-leaf text-apkasi-body hover:border-apkasi-accent transition-colors inline-flex items-center gap-2">
+                <i data-lucide="map-pinned" class="w-4 h-4"></i> LO Terbaru
+            </button>
             <button type="button" data-tab="rental" class="text-sm font-semibold px-5 py-2.5 rounded-full border bg-white border-apkasi-leaf text-apkasi-body hover:border-apkasi-accent transition-colors inline-flex items-center gap-2">
                 <i data-lucide="car" class="w-4 h-4"></i> Rental Kendaraan
             </button>
@@ -406,6 +459,65 @@
             <div id="picPageBtns" class="flex items-center gap-1.5 flex-wrap"></div>
         </div>
         <!-- <p class="text-xs text-apkasi-body/60 mt-3">Catatan: DKI Jakarta belum tercantum PIC pada dokumen sumber.</p> -->
+    </section>
+
+    {{-- ═══════════ PANEL: LO TERBARU ═══════════ --}}
+    <section data-panel="lo" class="hidden max-w-[1400px] mx-auto px-5 sm:px-8 pt-8 pb-16 sm:pb-20">
+        <div class="mb-5">
+            <h2 class="font-display text-2xl font-bold text-apkasi-dark leading-tight">Pembagian LO &amp; PIC per Provinsi</h2>
+            <p class="text-apkasi-body text-sm mt-1">LO (Liaison Officer): penempatan kecamatan &amp; instansi pendamping tiap provinsi, beserta PIC-nya.</p>
+        </div>
+
+        <div class="mb-5 relative max-w-md">
+            <i data-lucide="search" class="w-4 h-4 text-apkasi-body/50 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            <input type="text" id="loSearch" placeholder="Cari provinsi, kecamatan, instansi, atau PIC..." autocomplete="off"
+                   class="w-full pl-11 pr-4 py-2.5 rounded-full border border-apkasi-leaf bg-white text-sm text-apkasi-dark focus:outline-none focus:border-apkasi-accent focus:ring-2 focus:ring-apkasi-accent/20 transition">
+        </div>
+
+        <div id="loGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            @foreach ($los as $lo)
+                @php $prov = optional($lo->provinsi)->nama ?? '-'; @endphp
+                <div class="lo-card bg-white rounded-2xl border border-apkasi-leaf p-5 flex flex-col hover:shadow-lg hover:border-apkasi-accent/50 transition-all duration-300"
+                     data-search="{{ strtolower($prov . ' ' . $lo->lo_kecamatan . ' ' . $lo->lo_instansi . ' ' . $lo->nama) }}">
+                    <div class="flex items-center gap-2.5 mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-apkasi-gold/15 flex items-center justify-center shrink-0">
+                            <i data-lucide="map-pinned" class="w-5 h-5 text-[#9a7d16]"></i>
+                        </div>
+                        <h3 class="font-bold text-apkasi-dark text-[15px] leading-snug">{{ $prov }}</h3>
+                    </div>
+                    <div class="space-y-2.5 text-sm flex-1">
+                        <div class="flex items-start gap-2">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-apkasi-accent mt-0.5 shrink-0"></i>
+                            <span><span class="text-apkasi-body/55">LO:</span> <span class="font-semibold text-apkasi-dark">{{ $lo->lo_kecamatan }}</span></span>
+                        </div>
+                        @if ($lo->lo_instansi)
+                            <div class="flex items-start gap-2">
+                                <i data-lucide="building-2" class="w-4 h-4 text-apkasi-heading mt-0.5 shrink-0"></i>
+                                <span class="text-apkasi-body">{{ $lo->lo_instansi }}</span>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="flex items-center justify-between gap-2 pt-3 mt-3 border-t border-apkasi-leaf">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <i data-lucide="user-round" class="w-4 h-4 text-apkasi-heading shrink-0"></i>
+                            <span class="text-sm font-semibold text-apkasi-dark truncate">{{ $lo->nama }}</span>
+                        </div>
+                        @if ($lo->no_hp)
+                            <a href="{{ $wa($lo->no_hp) }}" target="_blank" rel="noopener" title="WhatsApp {{ $lo->nama }}"
+                               class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-apkasi-heading text-white hover:bg-apkasi-cta transition-colors shrink-0">
+                                <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            @endforeach
+        </div>
+        <p id="loEmpty" class="hidden text-center text-apkasi-body/60 text-sm py-10">Data LO tidak ditemukan.</p>
+
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6">
+            <span id="loInfo" class="text-xs text-apkasi-body/70"></span>
+            <div id="loPageBtns" class="flex items-center gap-1.5 flex-wrap"></div>
+        </div>
     </section>
 
     {{-- ═══════════ PANEL: RENTAL ═══════════ --}}

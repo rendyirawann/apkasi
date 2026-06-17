@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             FooterLinkSeeder::class,
             WilayahProvinsiSeeder::class,
             PicSeeder::class,
+            PicLoSeeder::class,
         ]);
     }
 }

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pic extends Model
 {
-    protected $fillable = ['provinsi_id', 'nama', 'no_hp', 'urut', 'is_active'];
+    protected $fillable = ['provinsi_id', 'nama', 'lo_kecamatan', 'lo_instansi', 'no_hp', 'urut', 'is_active'];
 
     protected $casts = [
         'is_active' => 'boolean',

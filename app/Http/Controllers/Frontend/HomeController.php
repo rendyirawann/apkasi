@@ -256,9 +256,17 @@ class HomeController extends Controller
             ->orderBy('nama')->orderBy('no_hp')->orderBy('urut')   // PIC sama berurutan -> utk merge tampilan
             ->get();
 
+        // LO (Liaison Officer) per provinsi -> tab "LO Terbaru". Urut berdasarkan kode BPS provinsi.
+        $los = \App\Models\Pic::with('provinsi')
+            ->where('is_active', true)
+            ->whereNotNull('lo_kecamatan')
+            ->get()
+            ->sortBy(fn ($p) => (int) $p->provinsi_id)
+            ->values();
+
         $mapboxToken  = config('services.mapbox.token');
         $rentalBanner = \App\Models\Setting::get('panduan_rental_banner') ?: 'assets/media/landing/pic-rental.jpg';
 
-        return view('frontend.guide', compact('venues', 'tourisms', 'hotels', 'rentals', 'pics', 'mapboxToken', 'rentalBanner'));
+        return view('frontend.guide', compact('venues', 'tourisms', 'hotels', 'rentals', 'pics', 'los', 'mapboxToken', 'rentalBanner'));
     }
 }

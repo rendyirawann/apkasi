@@ -48,6 +48,7 @@
                             <th class="text-center">No</th>
                             <th>Provinsi</th>
                             <th>Nama PIC</th>
+                            <th>LO (Kec / Instansi)</th>
                             <th>No HP</th>
                             <th class="text-center">Status</th>
                             <th class="text-end">Aksi</th>
@@ -86,6 +87,16 @@
                             <label class="required fw-semibold fs-7 mb-1">Nama PIC</label>
                             <input type="text" name="nama" id="p_nama" class="form-control form-control-solid" placeholder="Nama lengkap PIC" />
                             <div class="text-danger fs-8 mt-1" data-error="nama"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fw-semibold fs-7 mb-1">LO — Kecamatan <span class="text-muted">(opsional)</span></label>
+                            <input type="text" name="lo_kecamatan" id="p_lo_kecamatan" class="form-control form-control-solid" placeholder="cth: Kec. Lubuk Pakam" />
+                            <div class="text-danger fs-8 mt-1" data-error="lo_kecamatan"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fw-semibold fs-7 mb-1">LO — Instansi/OPD <span class="text-muted">(opsional)</span></label>
+                            <input type="text" name="lo_instansi" id="p_lo_instansi" class="form-control form-control-solid" placeholder="cth: Inspektorat Kab. Deli Serdang" />
+                            <div class="text-danger fs-8 mt-1" data-error="lo_instansi"></div>
                         </div>
                         <div class="col-md-8">
                             <label class="fw-semibold fs-7 mb-1">No HP</label>
@@ -157,6 +168,7 @@
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
             { data: 'provinsi', name: 'provinsi' },
             { data: 'nama', name: 'nama' },
+            { data: 'lo', name: 'lo' },
             { data: 'no_hp_badge', name: 'no_hp' },
             { data: 'status', name: 'is_active', className: 'text-center' },
             { data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-end' },
@@ -203,6 +215,8 @@
             clearErrors();
             document.getElementById('p_id').value = d.id;
             document.getElementById('p_nama').value = d.nama ?? '';
+            document.getElementById('p_lo_kecamatan').value = d.lo_kecamatan ?? '';
+            document.getElementById('p_lo_instansi').value = d.lo_instansi ?? '';
             document.getElementById('p_no_hp').value = d.no_hp ?? '';
             document.getElementById('p_urut').value = d.urut ?? '';
             document.getElementById('p_is_active').checked = !!d.is_active;
@@ -219,7 +233,7 @@
             const row = (l, v) => '<div class="d-flex justify-content-between py-2 border-bottom border-gray-200"><span class="text-muted">' + l + '</span><span class="fw-bold text-end ms-4">' + (v ?? '-') + '</span></div>';
             let contact = d.no_hp ? '<div class="pt-3 d-flex gap-2"><a href="https://wa.me/' + String(d.no_hp).replace(/[^0-9]/g, '').replace(/^0/, '62') + '" target="_blank" class="btn btn-sm btn-light-success flex-grow-1"><i class="ki-outline ki-whatsapp fs-5"></i> WhatsApp</a><a href="tel:' + d.no_hp + '" class="btn btn-sm btn-light-primary flex-grow-1"><i class="ki-outline ki-phone fs-5"></i> Telepon</a></div>' : '';
             document.getElementById('picViewBody').innerHTML =
-                row('Provinsi', res.provinsi) + row('Nama PIC', d.nama) + row('No HP', d.no_hp) + row('Status', d.is_active ? 'Aktif' : 'Nonaktif') + contact;
+                row('Provinsi', res.provinsi) + row('Nama PIC', d.nama) + row('LO — Kecamatan', d.lo_kecamatan) + row('LO — Instansi', d.lo_instansi) + row('No HP', d.no_hp) + row('Status', d.is_active ? 'Aktif' : 'Nonaktif') + contact;
             viewModal().show();
         }).fail(() => Swal.fire('Gagal', 'Tidak dapat memuat data.', 'error'));
     });
