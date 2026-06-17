@@ -32,37 +32,42 @@ class Pic extends Model
         return 'Camat - ' . trim($this->lo_kecamatan);
     }
 
-    /** Sebutan instansi: pakai override lo_jabatan bila diisi, selain itu otomatis dari nama instansi. */
+    /**
+     * Tampilan sebutan instansi = "<sebutan> - <nama instansi>".
+     * Sebutan diambil dari lo_jabatan (override admin: SEBUTAN saja) atau otomatis dari nama instansi.
+     */
     public function getLoJabatanInstansiAttribute(): ?string
     {
-        if (filled($this->lo_jabatan)) {
-            return $this->lo_jabatan;
+        $instansi = trim((string) $this->lo_instansi);
+        if ($instansi === '') {
+            return null;
         }
-        return self::defaultJabatanInstansi($this->lo_instansi);
+        $title = filled($this->lo_jabatan) ? trim($this->lo_jabatan) : self::defaultJabatanTitle($instansi);
+        return $title ? ($title . ' - ' . $instansi) : $instansi;
     }
 
     /**
-     * Aturan otomatis sebutan kepala instansi (format "Jabatan - Nama Instansi"):
-     * - "Inspektorat ..."          -> "Inspektur ..." (kata Inspektorat diganti)
-     * - "Dinas ..." / akronim "D.." -> "Kepala Dinas - <instansi>"
-     * - "Badan ..." / akronim "B.." -> "Kepala Badan - <instansi>"
-     * - lainnya                     -> "Kepala <instansi>"
+     * Sebutan/jabatan kepala instansi (TITLE saja, tanpa nama instansi):
+     * - "Inspektorat ..."           -> "Inspektur"
+     * - "Dinas ..." / akronim "D.." -> "Kepala Dinas"
+     * - "Badan ..." / akronim "B.." -> "Kepala Badan"
+     * - lainnya                     -> "Kepala"
      */
-    public static function defaultJabatanInstansi(?string $instansi): ?string
+    public static function defaultJabatanTitle(?string $instansi): ?string
     {
         $t = trim((string) $instansi);
         if ($t === '') {
             return null;
         }
         if (preg_match('/^Inspektorat\b/i', $t)) {
-            return preg_replace('/^Inspektorat/i', 'Inspektur', $t);
+            return 'Inspektur';
         }
         if (preg_match('/^Dinas\b/i', $t) || preg_match('/^D[A-Z]/', $t)) {
-            return 'Kepala Dinas - ' . $t;
+            return 'Kepala Dinas';
         }
         if (preg_match('/^Badan\b/i', $t) || preg_match('/^B[A-Za-z]/', $t)) {
-            return 'Kepala Badan - ' . $t;
+            return 'Kepala Badan';
         }
-        return 'Kepala ' . $t;
+        return 'Kepala';
     }
 }

@@ -104,8 +104,8 @@
                             <div class="text-danger fs-8 mt-1" data-error="lo_instansi"></div>
                         </div>
                         <div class="col-md-12">
-                            <label class="fw-semibold fs-7 mb-1">Sebutan/Jabatan Instansi <span class="text-muted">(opsional — kosong = otomatis: Kepala Dinas/Badan, Inspektur)</span></label>
-                            <input type="text" name="lo_jabatan" id="p_lo_jabatan" class="form-control form-control-solid" placeholder="cth: Inspektur Kab. Deli Serdang" />
+                            <label class="fw-semibold fs-7 mb-1">Sebutan/Jabatan Instansi <span class="text-muted">(opsional — isi sebutannya saja, mis. Kepala Dinas; nama instansi otomatis ditambah. Kosong = otomatis)</span></label>
+                            <input type="text" name="lo_jabatan" id="p_lo_jabatan" class="form-control form-control-solid" placeholder="cth: Kepala Dinas" />
                             <div class="text-danger fs-8 mt-1" data-error="lo_jabatan"></div>
                         </div>
                         <div class="col-md-8">

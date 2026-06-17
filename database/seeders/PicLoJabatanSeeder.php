@@ -8,8 +8,8 @@ use Illuminate\Database\Seeder;
 class PicLoJabatanSeeder extends Seeder
 {
     /**
-     * Isi sebutan/jabatan instansi LO (pics.lo_jabatan) otomatis dari nama instansi
-     * memakai aturan Pic::defaultJabatanInstansi (Kepala Dinas/Badan, Inspektur, dll).
+     * Isi sebutan/jabatan instansi LO (pics.lo_jabatan = SEBUTAN saja, mis. "Kepala Dinas")
+     * otomatis dari nama instansi memakai aturan Pic::defaultJabatanTitle.
      * Hanya mengisi yang masih KOSONG -> tidak menimpa penyesuaian manual admin.
      * Jalankan setelah PicLoSeeder.
      */
@@ -19,7 +19,7 @@ class PicLoJabatanSeeder extends Seeder
             ->whereNotNull('lo_instansi')
             ->get()
             ->each(function (Pic $pic) {
-                $jabatan = Pic::defaultJabatanInstansi($pic->lo_instansi);
+                $jabatan = Pic::defaultJabatanTitle($pic->lo_instansi);
                 if ($jabatan) {
                     $pic->lo_jabatan = $jabatan;
                     $pic->save();
