@@ -18,7 +18,7 @@ class PicController extends Controller
     public function index()
     {
         $provinsi  = WilayahProvinsi::orderBy('nama')->get(['id', 'nama']);
-        $kecamatan = WilayahKecamatan::where('is_active', true)->orderBy('nama')->get(['id', 'nama']);
+        $kecamatan = WilayahKecamatan::deliSerdang()->orderBy('nama')->get(['id', 'nama']);
         return view('backend.data_master.pic.index', compact('provinsi', 'kecamatan'));
     }
 

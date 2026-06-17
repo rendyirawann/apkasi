@@ -8,15 +8,22 @@ class WilayahKecamatan extends Model
 {
     protected $table = 'wilayah_kecamatan';
 
-    protected $fillable = ['nama', 'urut', 'is_active'];
+    // id = kode BPS (di-set eksplisit, bukan auto-increment)
+    public $incrementing = false;
+    protected $keyType = 'int';
+
+    protected $fillable = ['id', 'wilayah_kabupaten_id', 'nama'];
 
     protected $casts = [
-        'urut'      => 'integer',
-        'is_active' => 'boolean',
+        'id'                   => 'integer',
+        'wilayah_kabupaten_id' => 'integer',
     ];
 
-    public function scopeActive($q)
+    /** Kode BPS Kabupaten Deli Serdang (tuan rumah acara). */
+    public const KABUPATEN_DELI_SERDANG = 1212;
+
+    public function scopeDeliSerdang($q)
     {
-        return $q->where('is_active', true);
+        return $q->where('wilayah_kabupaten_id', self::KABUPATEN_DELI_SERDANG);
     }
 }
