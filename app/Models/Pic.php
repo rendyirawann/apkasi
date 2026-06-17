@@ -23,14 +23,13 @@ class Pic extends Model
         return $q->where('is_active', true);
     }
 
-    /** Sebutan kecamatan: kepala kecamatan = "Camat <nama>" (prefix "Kec." dibuang). */
+    /** Sebutan kecamatan: "Camat - Kec. <nama>". */
     public function getLoCamatAttribute(): ?string
     {
         if (! $this->lo_kecamatan) {
             return null;
         }
-        $kec = trim(preg_replace('/^\s*Kec\.\s*/i', '', $this->lo_kecamatan));
-        return 'Camat Kecamatan ' . $kec;
+        return 'Camat - ' . trim($this->lo_kecamatan);
     }
 
     /** Sebutan instansi: pakai override lo_jabatan bila diisi, selain itu otomatis dari nama instansi. */
