@@ -478,7 +478,7 @@
             @foreach ($los as $lo)
                 @php $prov = optional($lo->provinsi)->nama ?? '-'; @endphp
                 <div class="lo-card bg-white rounded-2xl border border-apkasi-leaf p-5 flex flex-col hover:shadow-lg hover:border-apkasi-accent/50 transition-all duration-300"
-                     data-search="{{ strtolower($prov . ' ' . $lo->lo_kecamatan . ' ' . $lo->lo_instansi . ' ' . $lo->nama) }}">
+                     data-search="{{ strtolower($prov . ' ' . $lo->lo_camat . ' ' . $lo->lo_jabatan_instansi . ' ' . $lo->nama) }}">
                     <div class="flex items-center gap-2.5 mb-3">
                         <div class="w-10 h-10 rounded-xl bg-apkasi-gold/15 flex items-center justify-center shrink-0">
                             <i data-lucide="map-pinned" class="w-5 h-5 text-[#9a7d16]"></i>
@@ -486,14 +486,16 @@
                         <h3 class="font-bold text-apkasi-dark text-[15px] leading-snug">{{ $prov }}</h3>
                     </div>
                     <div class="space-y-2.5 text-sm flex-1">
-                        <div class="flex items-start gap-2">
-                            <i data-lucide="map-pin" class="w-4 h-4 text-apkasi-accent mt-0.5 shrink-0"></i>
-                            <span><span class="text-apkasi-body/55">LO:</span> <span class="font-semibold text-apkasi-dark">{{ $lo->lo_kecamatan }}</span></span>
-                        </div>
-                        @if ($lo->lo_instansi)
+                        @if ($lo->lo_camat)
+                            <div class="flex items-start gap-2">
+                                <i data-lucide="map-pin" class="w-4 h-4 text-apkasi-accent mt-0.5 shrink-0"></i>
+                                <span class="font-semibold text-apkasi-dark">{{ $lo->lo_camat }}</span>
+                            </div>
+                        @endif
+                        @if ($lo->lo_jabatan_instansi)
                             <div class="flex items-start gap-2">
                                 <i data-lucide="building-2" class="w-4 h-4 text-apkasi-heading mt-0.5 shrink-0"></i>
-                                <span class="text-apkasi-body">{{ $lo->lo_instansi }}</span>
+                                <span class="text-apkasi-body">{{ $lo->lo_jabatan_instansi }}</span>
                             </div>
                         @endif
                     </div>

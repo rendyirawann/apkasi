@@ -136,6 +136,7 @@ class PicController extends Controller
             'nama'         => 'required|string|max:255',
             'lo_kecamatan' => 'nullable|string|max:120',
             'lo_instansi'  => 'nullable|string|max:200',
+            'lo_jabatan'   => 'nullable|string|max:150',
             'no_hp'        => 'nullable|string|max:30',
             'urut'         => 'nullable|integer|min:0',
         ];
@@ -157,6 +158,7 @@ class PicController extends Controller
             'nama'         => $request->nama,
             'lo_kecamatan' => $request->lo_kecamatan ?: null,
             'lo_instansi'  => $request->lo_instansi ?: null,
+            'lo_jabatan'   => $request->lo_jabatan ?: null,
             'no_hp'        => $request->no_hp,
             'urut'         => (int) ($request->urut ?? 0),
             'is_active'    => $request->boolean('is_active'),

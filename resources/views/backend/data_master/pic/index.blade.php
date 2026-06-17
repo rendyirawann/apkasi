@@ -103,6 +103,11 @@
                             <input type="text" name="lo_instansi" id="p_lo_instansi" class="form-control form-control-solid" placeholder="cth: Inspektorat Kab. Deli Serdang" />
                             <div class="text-danger fs-8 mt-1" data-error="lo_instansi"></div>
                         </div>
+                        <div class="col-md-12">
+                            <label class="fw-semibold fs-7 mb-1">Sebutan/Jabatan Instansi <span class="text-muted">(opsional — kosong = otomatis: Kepala Dinas/Badan, Inspektur)</span></label>
+                            <input type="text" name="lo_jabatan" id="p_lo_jabatan" class="form-control form-control-solid" placeholder="cth: Inspektur Kab. Deli Serdang" />
+                            <div class="text-danger fs-8 mt-1" data-error="lo_jabatan"></div>
+                        </div>
                         <div class="col-md-8">
                             <label class="fw-semibold fs-7 mb-1">No HP</label>
                             <input type="text" name="no_hp" id="p_no_hp" class="form-control form-control-solid" placeholder="cth: 0812xxxxxxx" />
@@ -222,6 +227,7 @@
             document.getElementById('p_nama').value = d.nama ?? '';
             document.getElementById('p_lo_kecamatan').value = d.lo_kecamatan ?? '';
             document.getElementById('p_lo_instansi').value = d.lo_instansi ?? '';
+            document.getElementById('p_lo_jabatan').value = d.lo_jabatan ?? '';
             document.getElementById('p_no_hp').value = d.no_hp ?? '';
             document.getElementById('p_urut').value = d.urut ?? '';
             document.getElementById('p_is_active').checked = !!d.is_active;
@@ -238,7 +244,7 @@
             const row = (l, v) => '<div class="d-flex justify-content-between py-2 border-bottom border-gray-200"><span class="text-muted">' + l + '</span><span class="fw-bold text-end ms-4">' + (v ?? '-') + '</span></div>';
             let contact = d.no_hp ? '<div class="pt-3 d-flex gap-2"><a href="https://wa.me/' + String(d.no_hp).replace(/[^0-9]/g, '').replace(/^0/, '62') + '" target="_blank" class="btn btn-sm btn-light-success flex-grow-1"><i class="ki-outline ki-whatsapp fs-5"></i> WhatsApp</a><a href="tel:' + d.no_hp + '" class="btn btn-sm btn-light-primary flex-grow-1"><i class="ki-outline ki-phone fs-5"></i> Telepon</a></div>' : '';
             document.getElementById('picViewBody').innerHTML =
-                row('Provinsi', res.provinsi) + row('Nama PIC', d.nama) + row('LO — Kecamatan', d.lo_kecamatan) + row('LO — Instansi', d.lo_instansi) + row('No HP', d.no_hp) + row('Status', d.is_active ? 'Aktif' : 'Nonaktif') + contact;
+                row('Provinsi', res.provinsi) + row('Nama PIC', d.nama) + row('LO — Kecamatan', d.lo_kecamatan) + row('LO — Instansi', d.lo_instansi) + row('Sebutan Jabatan', d.lo_jabatan) + row('No HP', d.no_hp) + row('Status', d.is_active ? 'Aktif' : 'Nonaktif') + contact;
             viewModal().show();
         }).fail(() => Swal.fire('Gagal', 'Tidak dapat memuat data.', 'error'));
     });
