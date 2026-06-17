@@ -41,5 +41,30 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('appSettings', []);
             }
         });
+
+        // Data footer (link kolom + logo) dibagikan hanya saat partial footer dirender.
+        // Footer ini dipakai landing & halaman dalam, jadi satu sumber data -> konsisten.
+        View::composer('frontend.partials.footer', function ($view) {
+            $links = collect();
+            $brand = collect();
+            $side  = collect();
+            try {
+                if (Schema::hasTable('footer_links')) {
+                    $links = \App\Models\FooterLink::where('is_active', true)
+                        ->orderBy('urut')->orderBy('id')->get()->groupBy('kolom');
+                }
+                if (Schema::hasTable('site_logos')) {
+                    $logos = \App\Models\SiteLogo::whereIn('grup', ['footer_brand', 'footer_side'])
+                        ->where('is_active', true)->orderBy('urut')->get()->groupBy('grup');
+                    $brand = $logos->get('footer_brand', collect());
+                    $side  = $logos->get('footer_side', collect());
+                }
+            } catch (\Throwable $e) {
+                // biarkan kosong -> partial pakai fallback bawaan
+            }
+            $view->with('footerLinks', $links)
+                 ->with('footerBrandLogos', $brand)
+                 ->with('footerSideLogos', $side);
+        });
     }
 }

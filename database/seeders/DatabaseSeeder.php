@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             KulinerSeeder::class,
             RundownSeeder::class,
             LandingSeeder::class,
+            FooterLinkSeeder::class,
             WilayahProvinsiSeeder::class,
             PicSeeder::class,
         ]);

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Models\SiteLogo;
 use App\Models\Faq;
+use App\Models\FooterLink;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -25,7 +26,12 @@ class LandingController extends Controller
         ];
         $faqs = Faq::orderBy('urut')->get();
 
-        return view('backend.settings.landing', compact('s', 'logos', 'faqs'));
+        $footerLinks = [
+            'col1' => FooterLink::where('kolom', 'col1')->orderBy('urut')->get(),
+            'col2' => FooterLink::where('kolom', 'col2')->orderBy('urut')->get(),
+        ];
+
+        return view('backend.settings.landing', compact('s', 'logos', 'faqs', 'footerLinks'));
     }
 
     public function update(Request $request)
@@ -123,6 +129,29 @@ class LandingController extends Controller
         }
 
         return back()->with('success', 'FAQ berhasil disimpan.');
+    }
+
+    /** Sinkron link kolom footer (col1 & col2) dari form berulang. */
+    public function footerSync(Request $request)
+    {
+        FooterLink::query()->delete();
+        foreach (['col1', 'col2'] as $kolom) {
+            $labels = (array) $request->input($kolom . '_label', []);
+            $urls   = (array) $request->input($kolom . '_url', []);
+            $i = 0;
+            foreach ($labels as $idx => $label) {
+                if (! filled($label)) continue;
+                FooterLink::create([
+                    'kolom'     => $kolom,
+                    'label'     => $label,
+                    'url'       => filled($urls[$idx] ?? null) ? $urls[$idx] : '#',
+                    'urut'      => ++$i,
+                    'is_active' => true,
+                ]);
+            }
+        }
+
+        return back()->with('success', 'Link footer berhasil disimpan.');
     }
 
     private function uploadLanding($file): string

@@ -268,17 +268,56 @@
                             <h3 class="fw-bold fs-4 mb-1">Footer</h3>
                             <div class="text-muted fs-7">Teks tagline brand, sekretariat, dan copyright di bagian bawah landing page.</div>
                         </div>
+                        {{-- Teks & judul kolom (disimpan sebagai Setting) --}}
                         <form action="{{ route('landing.update') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="row g-4">
                                 <div class="col-md-12"><label class="fw-semibold fs-7 mb-1">Tagline brand</label><input type="text" name="lp_footer_tagline" class="form-control" value="{{ $g('lp_footer_tagline') }}"></div>
-                                <div class="col-md-6"><label class="fw-semibold fs-7 mb-1">Teks Sekretariat</label><input type="text" name="lp_footer_sekretariat" class="form-control" value="{{ $g('lp_footer_sekretariat') }}"></div>
-                                <div class="col-md-6"><label class="fw-semibold fs-7 mb-1">Teks Copyright</label><input type="text" name="lp_footer_copyright" class="form-control" value="{{ $g('lp_footer_copyright') }}"></div>
-                                <div class="col-md-12"><div class="alert alert-light-warning py-2 px-3 fs-8 mb-0">Kolom <b>Navigasi</b> & <b>Panduan</b> di footer mengikuti menu (tidak diedit di sini).</div></div>
+                                <div class="col-md-4"><label class="fw-semibold fs-7 mb-1">Judul Kolom 1</label><input type="text" name="lp_footer_col1_title" class="form-control" value="{{ $g('lp_footer_col1_title', 'Navigasi') }}"></div>
+                                <div class="col-md-4"><label class="fw-semibold fs-7 mb-1">Judul Kolom 2</label><input type="text" name="lp_footer_col2_title" class="form-control" value="{{ $g('lp_footer_col2_title', 'Informasi') }}"></div>
+                                <div class="col-md-4"><label class="fw-semibold fs-7 mb-1">Judul Kolom Pemerintahan</label><input type="text" name="lp_footer_gov_title" class="form-control" value="{{ $g('lp_footer_gov_title', 'Pemerintahan') }}"></div>
+                                <div class="col-md-12"><label class="fw-semibold fs-7 mb-1">Teks Sekretariat</label><input type="text" name="lp_footer_sekretariat" class="form-control" value="{{ $g('lp_footer_sekretariat') }}"></div>
+                                <div class="col-md-6"><label class="fw-semibold fs-7 mb-1">Label Tautan Portal</label><input type="text" name="lp_footer_portal_label" class="form-control" value="{{ $g('lp_footer_portal_label', 'Portal DS') }}"></div>
+                                <div class="col-md-6"><label class="fw-semibold fs-7 mb-1">URL Portal <span class="text-muted">(kosongkan utk sembunyikan)</span></label><input type="text" name="lp_footer_portal_url" class="form-control" value="{{ $g('lp_footer_portal_url', 'https://portal.deliserdangkab.go.id/') }}"></div>
+                                <div class="col-md-12"><label class="fw-semibold fs-7 mb-1">Teks Copyright</label><input type="text" name="lp_footer_copyright" class="form-control" value="{{ $g('lp_footer_copyright') }}"></div>
                             </div>
                             <div class="d-flex align-items-center justify-content-end gap-3 mt-6">
-                                <span class="text-muted fs-8">Menyimpan hanya field Footer.</span>
-                                <button type="submit" class="btn btn-primary"><i class="ki-outline ki-check fs-3"></i> Simpan Footer</button>
+                                <span class="text-muted fs-8">Menyimpan teks & judul footer.</span>
+                                <button type="submit" class="btn btn-primary"><i class="ki-outline ki-check fs-3"></i> Simpan Teks Footer</button>
+                            </div>
+                        </form>
+
+                        <div class="separator separator-dashed my-8"></div>
+
+                        {{-- Link kolom footer: tambah / edit / hapus --}}
+                        <form action="{{ route('landing.footer.sync') }}" method="POST" id="footerLinkForm">
+                            @csrf
+                            <div class="mb-4">
+                                <h4 class="fw-bold fs-5 mb-1">Link Kolom Footer</h4>
+                                <div class="text-muted fs-8">Isi label &amp; URL. URL relatif disarankan: <code>/panduan</code>, <code>/peta-hotel</code>, atau <code>/#agenda</code>. Boleh URL penuh untuk tautan eksternal.</div>
+                            </div>
+                            <div class="row g-6">
+                                @foreach (['col1' => $g('lp_footer_col1_title', 'Navigasi'), 'col2' => $g('lp_footer_col2_title', 'Informasi')] as $col => $judul)
+                                    <div class="col-md-6">
+                                        <div class="d-flex flex-stack mb-2">
+                                            <label class="fw-semibold fs-7">Kolom: <span class="text-primary">{{ $judul }}</span></label>
+                                            <button type="button" class="btn btn-sm btn-light-primary py-1 px-3 btn-add-fl" data-col="{{ $col }}"><i class="ki-outline ki-plus fs-6"></i> Tambah Link</button>
+                                        </div>
+                                        <div class="d-flex flex-column gap-2" data-fl-rows="{{ $col }}">
+                                            @foreach ($footerLinks[$col] as $l)
+                                                <div class="input-group input-group-sm">
+                                                    <input type="text" name="{{ $col }}_label[]" class="form-control" placeholder="Label" value="{{ $l->label }}">
+                                                    <input type="text" name="{{ $col }}_url[]" class="form-control" placeholder="URL" value="{{ $l->url }}">
+                                                    <button type="button" class="btn btn-light-danger btn-rm-fl"><i class="ki-outline ki-trash fs-6"></i></button>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="d-flex align-items-center justify-content-end gap-3 mt-6">
+                                <span class="text-muted fs-8">Menyimpan link kolom footer.</span>
+                                <button type="submit" class="btn btn-primary"><i class="ki-outline ki-check fs-3"></i> Simpan Link Footer</button>
                             </div>
                         </form>
                     </div>
@@ -385,6 +424,26 @@
             Swal.fire({ title: 'Hapus logo ini?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, hapus', cancelButtonText: 'Batal', confirmButtonColor: '#d33' })
                 .then(function (r) { if (r.isConfirmed) f.submit(); });
         });
+    });
+
+    // ---------- Footer: link kolom (baris dinamis tambah/hapus) ----------
+    function footerLinkRow(col) {
+        var w = document.createElement('div');
+        w.className = 'input-group input-group-sm';
+        w.innerHTML = '<input type="text" name="' + col + '_label[]" class="form-control" placeholder="Label">' +
+            '<input type="text" name="' + col + '_url[]" class="form-control" placeholder="URL">' +
+            '<button type="button" class="btn btn-light-danger btn-rm-fl"><i class="ki-outline ki-trash fs-6"></i></button>';
+        return w;
+    }
+    document.querySelectorAll('.btn-add-fl').forEach(function (b) {
+        b.addEventListener('click', function () {
+            var wrap = document.querySelector('[data-fl-rows="' + b.dataset.col + '"]');
+            if (wrap) wrap.appendChild(footerLinkRow(b.dataset.col));
+        });
+    });
+    document.addEventListener('click', function (e) {
+        var rm = e.target.closest('.btn-rm-fl');
+        if (rm) rm.closest('.input-group').remove();
     });
 
     // ---------- FAQ: editor teks (TinyMCE) + baris dinamis ----------

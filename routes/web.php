@@ -170,6 +170,7 @@ Route::middleware(['auth', 'forbid-banned-user'])->group(function () {
         Route::post('/admin/landing/logo', [LandingController::class, 'logoStore'])->name('landing.logo.store');
         Route::delete('/admin/landing/logo/{id}', [LandingController::class, 'logoDestroy'])->name('landing.logo.destroy');
         Route::post('/admin/landing/faq', [LandingController::class, 'faqSync'])->name('landing.faq.sync');
+        Route::post('/admin/landing/footer', [LandingController::class, 'footerSync'])->name('landing.footer.sync');
     });
 
     // ====================================================
