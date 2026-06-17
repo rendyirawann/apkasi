@@ -70,20 +70,22 @@ class LoginRequest extends FormRequest
             // Ambil jumlah gagal sebelumnya dari Cache, lalu tambah 1
             $fails = Cache::get($failCounterKey, 0) + 1;
 
-            // Simpan counter baru (Expired 1 hari biar besok reset)
-            Cache::put($failCounterKey, $fails, now()->addDay());
+            // Simpan counter baru. Reset cepat: 15 menit tanpa gagal -> hitungan bersih lagi
+            // (sebelumnya 1 hari, sehingga salah ketik pagi hari masih menghukum di sore hari).
+            Cache::put($failCounterKey, $fails, now()->addMinutes(15));
 
             $lockDuration = 0;
 
-            // --- ATURAN HUKUMAN BERTINGKAT ---
-            if ($fails == 3) {
-                $lockDuration = 10; // Gagal ke-3: Tunggu 10 detik
-            } elseif ($fails == 4) {
-                $lockDuration = 15; // Gagal ke-4: Tunggu 15 detik
-            } elseif ($fails == 5) {
-                $lockDuration = 20; // Gagal ke-5: Tunggu 20 detik
-            } elseif ($fails >= 6) {
-                $lockDuration = 60; // Gagal ke-6++: Tunggu 60 detik (Device Ban Sementara)
+            // --- ATURAN HUKUMAN BERTINGKAT (lebih longgar untuk admin) ---
+            // Gagal 1-4x: belum dikunci (hanya pesan salah). Baru mengunci jika gagal beruntun.
+            if ($fails == 5) {
+                $lockDuration = 10; // Gagal ke-5: tunggu 10 detik
+            } elseif ($fails == 6) {
+                $lockDuration = 20; // Gagal ke-6: tunggu 20 detik
+            } elseif ($fails == 7) {
+                $lockDuration = 30; // Gagal ke-7: tunggu 30 detik
+            } elseif ($fails >= 8) {
+                $lockDuration = 60; // Gagal ke-8++: tunggu 60 detik
             }
 
             // Jika kena hukuman, KUNCI RateLimiter sekarang
