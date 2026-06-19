@@ -310,6 +310,38 @@
         b.addEventListener('click', function (e) { e.stopPropagation(); openRentalDetail(b.getAttribute('data-rental-detail')); });
     });
 
+    // ── Modal Kontak Rental: tombol WhatsApp -> daftar nomor (pilih untuk hubungi) ──
+    function rentalKontakHTML(r) {
+        var list = (r.kontak && r.kontak.length) ? r.kontak : (r.kontak_wa ? [{ nama: null, no_hp: r.kontak_wa }] : []);
+        var h = '<div class="flex items-center gap-3 mb-4"><div class="w-11 h-11 rounded-xl bg-apkasi-heading/10 flex items-center justify-center shrink-0"><i data-lucide="message-circle" class="w-5 h-5 text-apkasi-heading"></i></div><div class="min-w-0"><h3 class="font-bold text-apkasi-dark text-base leading-snug">' + r.nama + '</h3><p class="text-[11px] text-apkasi-body/60">Pilih nomor untuk dihubungi</p></div></div>';
+        h += '<div class="flex flex-col gap-2">';
+        list.forEach(function (k) {
+            h += '<div class="flex items-center justify-between gap-2 border border-apkasi-leaf rounded-xl px-3 py-2.5">'
+               + '<span class="text-sm min-w-0 truncate">' + (k.nama ? '<span class="font-semibold text-apkasi-dark">' + k.nama + '</span> ' : '') + '<span class="text-apkasi-body/70 tabular-nums">' + (k.no_hp || '') + '</span></span>'
+               + '<div class="flex items-center gap-1.5 shrink-0">'
+               + '<a href="' + rentalWa(k.no_hp) + '" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full bg-apkasi-heading text-white hover:bg-apkasi-cta transition"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WA</a>'
+               + '<a href="tel:' + String(k.no_hp || '').replace(/[^0-9+]/g, '') + '" title="Telepon" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-apkasi-gold/15 text-[#9a7d16] hover:bg-apkasi-gold hover:text-apkasi-dark transition"><i data-lucide="phone" class="w-3.5 h-3.5"></i></a>'
+               + '</div></div>';
+        });
+        h += '</div>';
+        return h;
+    }
+    var rkModalEl = document.getElementById('rentalKontakModal');
+    function openRentalKontak(id) {
+        var r = RENTALS.find(function (x) { return String(x.id) === String(id); });
+        if (!r || !rkModalEl) return;
+        document.getElementById('rentalKontakBody').innerHTML = rentalKontakHTML(r);
+        rkModalEl.classList.remove('hidden'); rkModalEl.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+        if (window.lucide) lucide.createIcons();
+    }
+    function closeRentalKontak() { if (rkModalEl) { rkModalEl.classList.add('hidden'); rkModalEl.classList.remove('flex'); document.body.style.overflow = ''; } }
+    if (rkModalEl) rkModalEl.querySelectorAll('[data-rk-close]').forEach(function (el) { el.addEventListener('click', closeRentalKontak); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && rkModalEl && !rkModalEl.classList.contains('hidden')) closeRentalKontak(); });
+    document.querySelectorAll('[data-rental-kontak]').forEach(function (b) {
+        b.addEventListener('click', function (e) { e.stopPropagation(); openRentalKontak(b.getAttribute('data-rental-kontak')); });
+    });
+
     if (window.lucide) lucide.createIcons();
 </script>
 @endpush
@@ -581,30 +613,20 @@
                             @endif
                         @endif
                     </div>
-                    @php
-                        // Daftar kontak seragam: CP bernama bila ada, kalau tidak pakai 1 nomor kontak_wa.
-                        $cps = $r->kontak->count()
-                            ? $r->kontak->map(fn ($k) => (object) ['nama' => $k->nama, 'no_hp' => $k->no_hp])
-                            : ($r->kontak_wa ? collect([(object) ['nama' => null, 'no_hp' => $r->kontak_wa]]) : collect());
-                    @endphp
-                    <div class="mt-4 pt-3 border-t border-apkasi-leaf">
-                        @if ($cps->count())
-                            <div class="text-[11px] font-bold uppercase tracking-wider text-apkasi-body/60 mb-2">Kontak</div>
-                            <div class="space-y-1.5 mb-3">
-                                @foreach ($cps as $k)
-                                    <div class="flex items-center justify-between gap-2">
-                                        <span class="text-xs min-w-0 truncate">@if ($k->nama)<span class="font-semibold text-apkasi-dark">{{ $k->nama }}</span> @endif<span class="text-apkasi-body/70 tabular-nums">{{ $k->no_hp }}</span></span>
-                                        <div class="flex items-center gap-1 shrink-0">
-                                            <a href="{{ $wa($k->no_hp) }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-apkasi-heading text-white hover:bg-apkasi-cta transition-colors"><i data-lucide="message-circle" class="w-3 h-3"></i> WA</a>
-                                            <a href="{{ $tel($k->no_hp) }}" title="Telepon" class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-apkasi-gold/15 text-[#9a7d16] hover:bg-apkasi-gold hover:text-apkasi-dark transition-colors"><i data-lucide="phone" class="w-3 h-3"></i></a>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif
+                    <div class="flex items-center gap-2 mt-4">
                         <button type="button" data-rental-detail="{{ $r->id }}" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full border border-apkasi-leaf text-apkasi-heading hover:bg-apkasi-leaf/50 transition-colors">
                             <i data-lucide="list" class="w-4 h-4"></i> Detail
                         </button>
+                        @if ($r->kontak->count() || $r->kontak_wa)
+                            <button type="button" data-rental-kontak="{{ $r->id }}" class="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full bg-apkasi-heading text-white hover:bg-apkasi-cta transition-colors">
+                                <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
+                            </button>
+                        @endif
+                        @if ($r->telepon)
+                            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $r->telepon) }}" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full border border-apkasi-leaf text-apkasi-heading hover:bg-apkasi-leaf/50 transition-colors">
+                                <i data-lucide="phone" class="w-4 h-4"></i> {{ $r->telepon }}
+                            </a>
+                        @endif
                     </div>
                 </div>
             @empty
@@ -619,6 +641,15 @@
         <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[88vh] overflow-y-auto">
             <button type="button" data-rd-close class="absolute top-3.5 right-3.5 z-10 w-9 h-9 inline-flex items-center justify-center rounded-full bg-white/90 border border-apkasi-leaf text-apkasi-body hover:bg-apkasi-heading hover:text-white shadow transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
             <div id="rentalDetailBody" class="p-6"></div>
+        </div>
+    </div>
+
+    {{-- ═══════════ MODAL KONTAK RENTAL (daftar nomor WhatsApp) ═══════════ --}}
+    <div id="rentalKontakModal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-apkasi-dark/55 backdrop-blur-sm" data-rk-close></div>
+        <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm max-h-[88vh] overflow-y-auto">
+            <button type="button" data-rk-close class="absolute top-3.5 right-3.5 z-10 w-9 h-9 inline-flex items-center justify-center rounded-full bg-white/90 border border-apkasi-leaf text-apkasi-body hover:bg-apkasi-heading hover:text-white shadow transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+            <div id="rentalKontakBody" class="p-6"></div>
         </div>
     </div>
 
