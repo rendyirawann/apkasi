@@ -51,10 +51,10 @@ class RentalSeeder extends Seeder
             ],
             [
                 'nama' => 'PT Naga Hitam Rentcar',
-                'alamat' => null,
+                'alamat' => 'Jl. Brigjend Katamso Gg. Kenangan No.46, Kp. Baru, Kec. Medan Maimun, Kota Medan, Sumatera Utara 20158',
                 'deskripsi' => 'www.nagahitamrentcar.co.id',
                 'kontak_wa' => null, // kontak via Contact Person (3 CP) di bawah
-                'lat' => null, 'lng' => null,
+                'lat' => 3.5625, 'lng' => 98.6884, // perkiraan ruas Brigjend Katamso, Kampung Baru, Medan Maimun (titik tepat bisa diatur di admin)
                 'mobil' => ['City Car', 'All New Innova Zenix', 'Fortuner / Pajero Sport', 'Toyota Hiace', 'Sedan Premium (Mercedes-Benz)'],
                 'kontak' => [
                     ['Indra', '081370631286'],
