@@ -49,11 +49,25 @@ class RentalSeeder extends Seeder
                 'kontak_wa' => '081370979431', 'lat' => 3.5504, 'lng' => 98.8645,
                 'mobil' => ['Innova Reborn', 'Xpander', 'All New Avanza'],
             ],
+            [
+                'nama' => 'PT Naga Hitam Rentcar',
+                'alamat' => null,
+                'deskripsi' => 'www.nagahitamrentcar.co.id',
+                'kontak_wa' => null, // kontak via Contact Person (3 CP) di bawah
+                'lat' => null, 'lng' => null,
+                'mobil' => ['City Car', 'All New Innova Zenix', 'Fortuner / Pajero Sport', 'Toyota Hiace', 'Sedan Premium (Mercedes-Benz)'],
+                'kontak' => [
+                    ['Indra', '081370631286'],
+                    ['Moses', '081368048363'],
+                    ['Dimas', '085765499827'],
+                ],
+            ],
         ];
 
         foreach ($data as $i => $row) {
-            $mobil = $row['mobil'];
-            unset($row['mobil']);
+            $mobil  = $row['mobil'];
+            $kontak = $row['kontak'] ?? [];
+            unset($row['mobil'], $row['kontak']);
             $row['maps_url'] = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($row['nama'] . ', Sumatera Utara');
 
             $rental = Rental::updateOrCreate(
@@ -65,6 +79,11 @@ class RentalSeeder extends Seeder
             foreach ($mobil as $j => $m) {
                 // Dokumen tanpa jumlah unit -> jumlah_unit null.
                 $rental->mobil()->create(['nama_mobil' => $m, 'jumlah_unit' => null, 'urut' => $j + 1]);
+            }
+
+            $rental->kontak()->delete();
+            foreach ($kontak as $k => [$nama, $hp]) {
+                $rental->kontak()->create(['nama' => $nama, 'no_hp' => $hp, 'urut' => $k + 1]);
             }
         }
 

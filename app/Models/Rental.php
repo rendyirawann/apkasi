@@ -20,6 +20,11 @@ class Rental extends Model
         return $this->hasMany(RentalMobil::class, 'rental_id')->orderBy('urut');
     }
 
+    public function kontak()
+    {
+        return $this->hasMany(RentalKontak::class, 'rental_id')->orderBy('urut');
+    }
+
     public function scopeActive($q)
     {
         return $q->where('is_active', true);

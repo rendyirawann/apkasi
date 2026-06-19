@@ -24,7 +24,7 @@ class RentalController extends Controller
             abort(404);
         }
 
-        $query = Rental::query()->with('mobil')->orderBy('urut')->orderBy('id');
+        $query = Rental::query()->with(['mobil', 'kontak'])->orderBy('urut')->orderBy('id');
 
         return DataTables::of($query)
             ->addIndexColumn()
@@ -75,6 +75,7 @@ class RentalController extends Controller
             $payload['urut'] = $this->resolveUrut(Rental::class, $request);
             $rental = Rental::create($payload);
             $this->syncMobil($rental, $request);
+            $this->syncKontak($rental, $request);
             return response()->json(['success' => 'Data rental berhasil ditambahkan.', 'judul' => 'Berhasil'], 201);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan di aplikasi.', 'judul' => 'Gagal', 'errorMessage' => $e->getMessage()], 500);
@@ -83,14 +84,14 @@ class RentalController extends Controller
 
     public function show($id)
     {
-        $r = Rental::with('mobil')->findOrFail($id);
-        return response()->json(['data' => $r, 'mobil' => $r->mobil]);
+        $r = Rental::with(['mobil', 'kontak'])->findOrFail($id);
+        return response()->json(['data' => $r, 'mobil' => $r->mobil, 'kontak' => $r->kontak]);
     }
 
     public function edit($id)
     {
-        $r = Rental::with('mobil')->findOrFail($id);
-        return response()->json(['data' => $r, 'mobil' => $r->mobil]);
+        $r = Rental::with(['mobil', 'kontak'])->findOrFail($id);
+        return response()->json(['data' => $r, 'mobil' => $r->mobil, 'kontak' => $r->kontak]);
     }
 
     public function update(Request $request, $id)
@@ -107,6 +108,7 @@ class RentalController extends Controller
             $payload['urut'] = $this->resolveUrut(Rental::class, $request, $rental);
             $rental->update($payload);
             $this->syncMobil($rental, $request);
+            $this->syncKontak($rental, $request);
             return response()->json(['success' => 'Data rental berhasil diperbarui.', 'judul' => 'Berhasil']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan di aplikasi.', 'judul' => 'Gagal', 'errorMessage' => $e->getMessage()], 500);
@@ -140,6 +142,22 @@ class RentalController extends Controller
         }
     }
 
+    private function syncKontak(Rental $rental, Request $request): void
+    {
+        $rental->kontak()->delete();
+        $namas = (array) $request->input('kontak_nama', []);
+        $hps   = (array) $request->input('kontak_hp', []);
+        $i = 0;
+        foreach ($namas as $idx => $nama) {
+            if (! filled($nama)) continue;
+            $rental->kontak()->create([
+                'nama'  => $nama,
+                'no_hp' => $hps[$idx] ?? '',
+                'urut'  => ++$i,
+            ]);
+        }
+    }
+
     private function rules(): array
     {
         return [
@@ -153,6 +171,10 @@ class RentalController extends Controller
             'mobil_nama.*' => 'nullable|string|max:255',
             'mobil_unit'   => 'nullable|array',
             'mobil_unit.*' => 'nullable|integer|min:0',
+            'kontak_nama'   => 'nullable|array',
+            'kontak_nama.*' => 'nullable|string|max:100',
+            'kontak_hp'     => 'nullable|array',
+            'kontak_hp.*'   => 'nullable|string|max:30',
         ];
     }
 

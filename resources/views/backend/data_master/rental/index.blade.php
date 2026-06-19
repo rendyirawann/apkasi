@@ -105,6 +105,15 @@
                             <div class="text-danger fs-8 mt-1" data-error="mobil_nama.0"></div>
                         </div>
 
+                        {{-- Contact Person (child, boleh lebih dari satu) --}}
+                        <div class="col-md-12">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="fw-semibold fs-7 mb-0">Contact Person <span class="text-muted">(nama + no HP, boleh lebih dari satu)</span></label>
+                                <button type="button" class="btn btn-sm btn-light-primary py-1 px-3" id="btnAddKontak"><i class="ki-outline ki-plus fs-5"></i> Tambah CP</button>
+                            </div>
+                            <div id="r_kontak" class="d-flex flex-column gap-2"></div>
+                        </div>
+
                         <div class="col-md-12">
                             <label class="form-check form-switch form-check-custom form-check-solid">
                                 <input class="form-check-input" type="checkbox" name="is_active" id="r_is_active" value="1" checked />
@@ -189,12 +198,30 @@
         const b = e.target.closest('.btn-rm-mobil'); if (b) b.closest('.input-group').remove();
     });
 
+    function kontakRow(n, h) {
+        const w = document.createElement('div');
+        w.className = 'input-group input-group-sm';
+        w.innerHTML = '<input type="text" name="kontak_nama[]" class="form-control form-control-solid" placeholder="Nama CP (cth: Indra)" value="' + (n ? n.replace(/"/g, '&quot;') : '') + '" />' +
+            '<input type="text" name="kontak_hp[]" class="form-control form-control-solid" style="max-width:210px" placeholder="No HP (cth: 0813xxxx)" value="' + (h ? String(h).replace(/"/g, '&quot;') : '') + '" />' +
+            '<button type="button" class="btn btn-light-danger btn-rm-kontak"><i class="ki-outline ki-trash fs-6"></i></button>';
+        return w;
+    }
+    function resetKontak(items) {
+        const c = document.getElementById('r_kontak'); c.innerHTML = '';
+        if (items && items.length) items.forEach(k => c.appendChild(kontakRow(k.nama, k.no_hp)));
+    }
+    document.getElementById('btnAddKontak').addEventListener('click', () => document.getElementById('r_kontak').appendChild(kontakRow('', '')));
+    document.getElementById('r_kontak').addEventListener('click', function (e) {
+        const b = e.target.closest('.btn-rm-kontak'); if (b) b.closest('.input-group').remove();
+    });
+
     $('#btnAddRental').on('click', function () {
         mode = 'create';
         document.getElementById('rentalForm').reset();
         document.getElementById('r_id').value = '';
         document.getElementById('r_is_active').checked = true;
         resetMobil([]);
+        resetKontak([]);
         clearErrors();
         document.getElementById('rentalFormTitle').textContent = 'Tambah Rental';
         formModal().show();
@@ -208,6 +235,7 @@
             FIELDS.forEach(f => { document.getElementById('r_' + f).value = (d[f] ?? ''); });
             document.getElementById('r_is_active').checked = !!d.is_active;
             resetMobil(res.mobil || []);
+            resetKontak(res.kontak || []);
             document.getElementById('rentalFormTitle').textContent = 'Edit Rental';
             formModal().show();
         }).fail(() => Swal.fire('Gagal', 'Tidak dapat memuat data.', 'error'));
@@ -220,8 +248,10 @@
             const row = (l, v) => '<div class="d-flex justify-content-between py-2 border-bottom border-gray-200"><span class="text-muted">' + l + '</span><span class="fw-bold text-end ms-4">' + (v ?? '-') + '</span></div>';
             let total = 0;
             let mobil = (res.mobil || []).map(function (m) { total += parseInt(m.jumlah_unit || 0, 10); var u = (m.jumlah_unit != null && m.jumlah_unit !== '') ? '<span class="badge badge-light-primary">' + m.jumlah_unit + ' unit</span>' : '<span class="badge badge-light-success">tersedia</span>'; return '<div class="d-flex justify-content-between py-1"><span>' + m.nama_mobil + '</span>' + u + '</div>'; }).join('');
+            let kontak = (res.kontak || []).map(function (k) { return '<div class="d-flex justify-content-between py-1"><span>' + k.nama + '</span><span class="fw-bold text-gray-800">' + (k.no_hp || '-') + '</span></div>'; }).join('');
             document.getElementById('rentalViewBody').innerHTML =
                 row('Nama', d.nama) + row('Alamat', d.alamat) + row('WhatsApp', d.kontak_wa) + row('Telepon', d.telepon) + row('Keterangan', d.deskripsi) +
+                (kontak ? '<div class="pt-3"><div class="text-muted mb-2">Contact Person</div>' + kontak + '</div>' : '') +
                 '<div class="pt-3"><div class="text-muted mb-2 d-flex justify-content-between">Armada Mobil' + (total > 0 ? ' <span class="fw-bold text-gray-800">Total ' + total + ' unit</span>' : '') + '</div>' + (mobil || '<span class="text-muted">-</span>') + '</div>';
             viewModal().show();
         }).fail(() => Swal.fire('Gagal', 'Tidak dapat memuat data.', 'error'));

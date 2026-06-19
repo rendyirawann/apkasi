@@ -245,7 +245,7 @@ class HomeController extends Controller
         ];
 
         // Rental mobil (dari DB: tabel rentals + child rental_mobil)
-        $rentals = \App\Models\Rental::with('mobil')
+        $rentals = \App\Models\Rental::with(['mobil', 'kontak'])
             ->where('is_active', true)
             ->orderBy('urut')
             ->get();
