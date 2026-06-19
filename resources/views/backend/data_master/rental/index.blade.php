@@ -94,6 +94,24 @@
                             <label class="fw-semibold fs-7 mb-1">Keterangan <span class="text-muted">(opsional)</span></label>
                             <textarea name="deskripsi" id="r_deskripsi" rows="2" class="form-control form-control-solid" placeholder="cth: Melayani drop bandara, sewa harian + driver"></textarea>
                         </div>
+                        <div class="col-md-4">
+                            <label class="fw-semibold fs-7 mb-1">Latitude <span class="text-muted">(titik peta)</span></label>
+                            <input type="text" name="lat" id="r_lat" class="form-control form-control-solid" placeholder="cth: 3.589700" />
+                            <div class="text-danger fs-8 mt-1" data-error="lat"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="fw-semibold fs-7 mb-1">Longitude</label>
+                            <input type="text" name="lng" id="r_lng" class="form-control form-control-solid" placeholder="cth: 98.678900" />
+                            <div class="text-danger fs-8 mt-1" data-error="lng"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="fw-semibold fs-7 mb-1">Link Google Maps <span class="text-muted">(opsional)</span></label>
+                            <input type="text" name="maps_url" id="r_maps_url" class="form-control form-control-solid" placeholder="https://maps.app.goo.gl/..." />
+                            <div class="text-danger fs-8 mt-1" data-error="maps_url"></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="alert alert-light-primary py-2 px-3 fs-8 mb-0"><i class="ki-outline ki-information fs-6 me-1"></i> Cara isi koordinat: buka <b>Google Maps</b>, klik kanan tepat di lokasi rental → klik angka koordinat yang muncul (otomatis tersalin, mis. <code>3.5897, 98.6789</code>) → tempel <b>angka pertama ke Latitude</b>, <b>angka kedua ke Longitude</b>. Kosongkan bila belum ada (titik tidak muncul di peta).</div>
+                        </div>
 
                         {{-- Armada mobil (child) --}}
                         <div class="col-md-12">
@@ -153,7 +171,7 @@
 <script>
     $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
     const URLS = { data: "{{ route('rentals.data') }}", store: "{{ route('rentals.store') }}", base: "{{ url('admin/rentals') }}" };
-    const FIELDS = ['nama', 'urut', 'alamat', 'kontak_wa', 'telepon', 'deskripsi'];
+    const FIELDS = ['nama', 'urut', 'alamat', 'kontak_wa', 'telepon', 'deskripsi', 'lat', 'lng', 'maps_url'];
     let mode = 'create';
 
     const table = $('#rentalTable').DataTable({
@@ -250,7 +268,7 @@
             let mobil = (res.mobil || []).map(function (m) { total += parseInt(m.jumlah_unit || 0, 10); var u = (m.jumlah_unit != null && m.jumlah_unit !== '') ? '<span class="badge badge-light-primary">' + m.jumlah_unit + ' unit</span>' : '<span class="badge badge-light-success">tersedia</span>'; return '<div class="d-flex justify-content-between py-1"><span>' + m.nama_mobil + '</span>' + u + '</div>'; }).join('');
             let kontak = (res.kontak || []).map(function (k) { return '<div class="d-flex justify-content-between py-1"><span>' + k.nama + '</span><span class="fw-bold text-gray-800">' + (k.no_hp || '-') + '</span></div>'; }).join('');
             document.getElementById('rentalViewBody').innerHTML =
-                row('Nama', d.nama) + row('Alamat', d.alamat) + row('WhatsApp', d.kontak_wa) + row('Telepon', d.telepon) + row('Keterangan', d.deskripsi) +
+                row('Nama', d.nama) + row('Alamat', d.alamat) + row('WhatsApp', d.kontak_wa) + row('Telepon', d.telepon) + row('Keterangan', d.deskripsi) + row('Koordinat', (d.lat && d.lng) ? (d.lat + ', ' + d.lng) : '-') +
                 (kontak ? '<div class="pt-3"><div class="text-muted mb-2">Contact Person</div>' + kontak + '</div>' : '') +
                 '<div class="pt-3"><div class="text-muted mb-2 d-flex justify-content-between">Armada Mobil' + (total > 0 ? ' <span class="fw-bold text-gray-800">Total ' + total + ' unit</span>' : '') + '</div>' + (mobil || '<span class="text-muted">-</span>') + '</div>';
             viewModal().show();
