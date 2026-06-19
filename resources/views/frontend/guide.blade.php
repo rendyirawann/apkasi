@@ -581,13 +581,19 @@
                             @endif
                         @endif
                     </div>
-                    @if ($r->kontak->count())
-                        <div class="mt-4 pt-3 border-t border-apkasi-leaf">
-                            <div class="text-[11px] font-bold uppercase tracking-wider text-apkasi-body/60 mb-2">Contact Person</div>
+                    @php
+                        // Daftar kontak seragam: CP bernama bila ada, kalau tidak pakai 1 nomor kontak_wa.
+                        $cps = $r->kontak->count()
+                            ? $r->kontak->map(fn ($k) => (object) ['nama' => $k->nama, 'no_hp' => $k->no_hp])
+                            : ($r->kontak_wa ? collect([(object) ['nama' => null, 'no_hp' => $r->kontak_wa]]) : collect());
+                    @endphp
+                    <div class="mt-4 pt-3 border-t border-apkasi-leaf">
+                        @if ($cps->count())
+                            <div class="text-[11px] font-bold uppercase tracking-wider text-apkasi-body/60 mb-2">Kontak</div>
                             <div class="space-y-1.5 mb-3">
-                                @foreach ($r->kontak as $k)
+                                @foreach ($cps as $k)
                                     <div class="flex items-center justify-between gap-2">
-                                        <span class="text-xs min-w-0 truncate"><span class="font-semibold text-apkasi-dark">{{ $k->nama }}</span> <span class="text-apkasi-body/70 tabular-nums">{{ $k->no_hp }}</span></span>
+                                        <span class="text-xs min-w-0 truncate">@if ($k->nama)<span class="font-semibold text-apkasi-dark">{{ $k->nama }}</span> @endif<span class="text-apkasi-body/70 tabular-nums">{{ $k->no_hp }}</span></span>
                                         <div class="flex items-center gap-1 shrink-0">
                                             <a href="{{ $wa($k->no_hp) }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-apkasi-heading text-white hover:bg-apkasi-cta transition-colors"><i data-lucide="message-circle" class="w-3 h-3"></i> WA</a>
                                             <a href="{{ $tel($k->no_hp) }}" title="Telepon" class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-apkasi-gold/15 text-[#9a7d16] hover:bg-apkasi-gold hover:text-apkasi-dark transition-colors"><i data-lucide="phone" class="w-3 h-3"></i></a>
@@ -595,27 +601,11 @@
                                     </div>
                                 @endforeach
                             </div>
-                            <button type="button" data-rental-detail="{{ $r->id }}" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full border border-apkasi-leaf text-apkasi-heading hover:bg-apkasi-leaf/50 transition-colors">
-                                <i data-lucide="list" class="w-4 h-4"></i> Detail
-                            </button>
-                        </div>
-                    @else
-                        <div class="flex items-center gap-2 mt-4">
-                            <button type="button" data-rental-detail="{{ $r->id }}" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full border border-apkasi-leaf text-apkasi-heading hover:bg-apkasi-leaf/50 transition-colors">
-                                <i data-lucide="list" class="w-4 h-4"></i> Detail
-                            </button>
-                            @if ($r->kontak_wa)
-                                <a href="{{ $wa($r->kontak_wa) }}" target="_blank" rel="noopener" class="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full bg-apkasi-heading text-white hover:bg-apkasi-cta transition-colors">
-                                    <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
-                                </a>
-                            @endif
-                            @if ($r->telepon)
-                                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $r->telepon) }}" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full border border-apkasi-leaf text-apkasi-heading hover:bg-apkasi-leaf/50 transition-colors">
-                                    <i data-lucide="phone" class="w-4 h-4"></i> {{ $r->telepon }}
-                                </a>
-                            @endif
-                        </div>
-                    @endif
+                        @endif
+                        <button type="button" data-rental-detail="{{ $r->id }}" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-full border border-apkasi-leaf text-apkasi-heading hover:bg-apkasi-leaf/50 transition-colors">
+                            <i data-lucide="list" class="w-4 h-4"></i> Detail
+                        </button>
+                    </div>
                 </div>
             @empty
                 <div class="col-span-full text-center py-10 text-sm text-apkasi-body/70">Belum ada data rental.</div>
