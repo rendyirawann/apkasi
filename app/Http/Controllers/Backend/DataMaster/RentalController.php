@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Rental;
 use App\Support\HandlesUrut;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
 class RentalController extends Controller
@@ -74,6 +76,10 @@ class RentalController extends Controller
             $payload = $this->payload($request);
             $payload['urut'] = $this->resolveUrut(Rental::class, $request);
             $rental = Rental::create($payload);
+            if ($request->hasFile('logo_file')) {
+                $rental->logo = $request->file('logo_file')->store('rental', 'public');
+                $rental->save();
+            }
             $this->syncMobil($rental, $request);
             $this->syncKontak($rental, $request);
             return response()->json(['success' => 'Data rental berhasil ditambahkan.', 'judul' => 'Berhasil'], 201);
@@ -85,13 +91,13 @@ class RentalController extends Controller
     public function show($id)
     {
         $r = Rental::with(['mobil', 'kontak'])->findOrFail($id);
-        return response()->json(['data' => $r, 'mobil' => $r->mobil, 'kontak' => $r->kontak]);
+        return response()->json(['data' => $r, 'mobil' => $r->mobil, 'kontak' => $r->kontak, 'logo_url' => $r->logo_url]);
     }
 
     public function edit($id)
     {
         $r = Rental::with(['mobil', 'kontak'])->findOrFail($id);
-        return response()->json(['data' => $r, 'mobil' => $r->mobil, 'kontak' => $r->kontak]);
+        return response()->json(['data' => $r, 'mobil' => $r->mobil, 'kontak' => $r->kontak, 'logo_url' => $r->logo_url]);
     }
 
     public function update(Request $request, $id)
@@ -107,6 +113,11 @@ class RentalController extends Controller
             $payload = $this->payload($request);
             $payload['urut'] = $this->resolveUrut(Rental::class, $request, $rental);
             $rental->update($payload);
+            if ($request->hasFile('logo_file')) {
+                $this->deleteFile($rental->logo);
+                $rental->logo = $request->file('logo_file')->store('rental', 'public');
+                $rental->save();
+            }
             $this->syncMobil($rental, $request);
             $this->syncKontak($rental, $request);
             return response()->json(['success' => 'Data rental berhasil diperbarui.', 'judul' => 'Berhasil']);
@@ -158,6 +169,15 @@ class RentalController extends Controller
         }
     }
 
+    private function deleteFile(?string $path): void
+    {
+        // Jangan hapus aset public bawaan (logos/..) atau URL eksternal — hanya hasil upload di storage.
+        if ($path && ! Str::startsWith($path, ['http://', 'https://', 'logos/'])
+            && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
+    }
+
     private function rules(): array
     {
         return [
@@ -166,6 +186,7 @@ class RentalController extends Controller
             'telepon'      => 'nullable|string|max:30',
             'kontak_wa'    => 'nullable|string|max:30',
             'deskripsi'    => 'nullable|string|max:1000',
+            'logo_file'    => 'nullable|image|mimes:jpg,jpeg,png,webp,svg|max:5120',
             'lat'          => 'nullable|numeric|between:-90,90',
             'lng'          => 'nullable|numeric|between:-180,180',
             'maps_url'     => 'nullable|url|max:255',

@@ -18,6 +18,7 @@
         'lat' => $r->lat, 'lng' => $r->lng, 'maps_url' => $r->maps_url,
         'mobil' => $r->mobil->map(fn ($m) => ['nama' => $m->nama_mobil, 'unit' => $m->jumlah_unit])->values(),
         'kontak' => $r->kontak->map(fn ($k) => ['nama' => $k->nama, 'no_hp' => $k->no_hp])->values(),
+        'logo' => $r->logo_url,
     ])->values();
 @endphp
 
@@ -271,7 +272,8 @@
 
     // ── Modal Detail Rental (daftar mobil + kontak) ──
     function rentalDetailHTML(r) {
-        var h = '<div class="flex items-center gap-3 mb-3"><div class="w-11 h-11 rounded-xl bg-apkasi-heading/10 flex items-center justify-center shrink-0"><i data-lucide="car" class="w-5 h-5 text-apkasi-heading"></i></div><h3 class="font-bold text-apkasi-dark text-lg leading-snug">' + r.nama + '</h3></div>';
+        var dic = r.logo ? '<div class="w-11 h-11 rounded-xl bg-white border border-apkasi-leaf flex items-center justify-center shrink-0 overflow-hidden"><img src="' + r.logo + '" alt="" class="w-full h-full object-contain p-0.5"></div>' : '<div class="w-11 h-11 rounded-xl bg-apkasi-heading/10 flex items-center justify-center shrink-0"><i data-lucide="car" class="w-5 h-5 text-apkasi-heading"></i></div>';
+        var h = '<div class="flex items-center gap-3 mb-3">' + dic + '<h3 class="font-bold text-apkasi-dark text-lg leading-snug">' + r.nama + '</h3></div>';
         if (r.alamat) h += '<p class="flex items-start gap-2 text-sm text-apkasi-body leading-relaxed mb-4"><i data-lucide="map-pin" class="w-4 h-4 text-apkasi-body/50 mt-0.5 shrink-0"></i> ' + r.alamat + '</p>';
         if (r.mobil && r.mobil.length) {
             h += '<div class="text-xs font-bold uppercase tracking-wider text-apkasi-body/70 mb-2">Armada Mobil (' + r.mobil.length + ' jenis)</div><div class="flex flex-col gap-1.5 mb-4">';
@@ -313,7 +315,8 @@
     // ── Modal Kontak Rental: tombol WhatsApp -> daftar nomor (pilih untuk hubungi) ──
     function rentalKontakHTML(r) {
         var list = (r.kontak && r.kontak.length) ? r.kontak : (r.kontak_wa ? [{ nama: null, no_hp: r.kontak_wa }] : []);
-        var h = '<div class="flex items-center gap-3 mb-4"><div class="w-11 h-11 rounded-xl bg-apkasi-heading/10 flex items-center justify-center shrink-0"><i data-lucide="message-circle" class="w-5 h-5 text-apkasi-heading"></i></div><div class="min-w-0"><h3 class="font-bold text-apkasi-dark text-base leading-snug">' + r.nama + '</h3><p class="text-[11px] text-apkasi-body/60">Pilih nomor untuk dihubungi</p></div></div>';
+        var kic = r.logo ? '<div class="w-11 h-11 rounded-xl bg-white border border-apkasi-leaf flex items-center justify-center shrink-0 overflow-hidden"><img src="' + r.logo + '" alt="" class="w-full h-full object-contain p-0.5"></div>' : '<div class="w-11 h-11 rounded-xl bg-apkasi-heading/10 flex items-center justify-center shrink-0"><i data-lucide="message-circle" class="w-5 h-5 text-apkasi-heading"></i></div>';
+        var h = '<div class="flex items-center gap-3 mb-4">' + kic + '<div class="min-w-0"><h3 class="font-bold text-apkasi-dark text-base leading-snug">' + r.nama + '</h3><p class="text-[11px] text-apkasi-body/60">Pilih nomor untuk dihubungi</p></div></div>';
         h += '<div class="flex flex-col gap-2">';
         list.forEach(function (k) {
             h += '<div class="flex items-center justify-between gap-2 border border-apkasi-leaf rounded-xl px-3 py-2.5">'
@@ -590,9 +593,15 @@
                 @php $totalUnit = $r->mobil->sum('jumlah_unit'); @endphp
                 <div data-rental-id="{{ $r->id }}" class="bg-white rounded-2xl border border-apkasi-leaf p-5 hover:shadow-lg transition-all duration-300 flex flex-col">
                     <div class="flex items-center gap-3 mb-3">
-                        <div class="w-11 h-11 rounded-xl bg-apkasi-heading/10 flex items-center justify-center shrink-0">
-                            <i data-lucide="car" class="w-5 h-5 text-apkasi-heading"></i>
-                        </div>
+                        @if ($r->logo_url)
+                            <div class="w-11 h-11 rounded-xl bg-white border border-apkasi-leaf flex items-center justify-center shrink-0 overflow-hidden">
+                                <img src="{{ $r->logo_url }}" alt="{{ $r->nama }}" loading="lazy" class="w-full h-full object-contain p-0.5" />
+                            </div>
+                        @else
+                            <div class="w-11 h-11 rounded-xl bg-apkasi-heading/10 flex items-center justify-center shrink-0">
+                                <i data-lucide="car" class="w-5 h-5 text-apkasi-heading"></i>
+                            </div>
+                        @endif
                         <h3 class="font-bold text-apkasi-dark text-[15px] leading-snug">{{ $r->nama }}</h3>
                     </div>
                     @if ($r->alamat)

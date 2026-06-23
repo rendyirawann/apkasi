@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Rental extends Model
 {
-    protected $fillable = ['nama', 'alamat', 'telepon', 'kontak_wa', 'deskripsi', 'lat', 'lng', 'maps_url', 'urut', 'is_active'];
+    protected $fillable = ['nama', 'alamat', 'telepon', 'kontak_wa', 'deskripsi', 'logo', 'lat', 'lng', 'maps_url', 'urut', 'is_active'];
 
     protected $casts = [
         'is_active' => 'boolean',
@@ -28,5 +28,11 @@ class Rental extends Model
     public function scopeActive($q)
     {
         return $q->where('is_active', true);
+    }
+
+    /** URL logo rental (opsional). Dukung aset public (logos/..) maupun hasil upload (storage). */
+    public function getLogoUrlAttribute(): ?string
+    {
+        return $this->logo ? \App\Support\Media::url($this->logo) : null;
     }
 }

@@ -94,6 +94,12 @@
                             <label class="fw-semibold fs-7 mb-1">Keterangan <span class="text-muted">(opsional)</span></label>
                             <textarea name="deskripsi" id="r_deskripsi" rows="2" class="form-control form-control-solid" placeholder="cth: Melayani drop bandara, sewa harian + driver"></textarea>
                         </div>
+                        <div class="col-md-12">
+                            <label class="fw-semibold fs-7 mb-1">Logo Rental <span class="text-muted">(opsional, maks 5MB — jpg/png/webp/svg; tampil sebagai ikon di nama rental pada /panduan)</span></label>
+                            <input type="file" name="logo_file" id="r_logo_file" accept=".jpg,.jpeg,.png,.webp,.svg" class="form-control form-control-solid" />
+                            <div class="text-danger fs-8 mt-1" data-error="logo_file"></div>
+                            <div id="r_logo_preview" class="mt-2"></div>
+                        </div>
                         <div class="col-md-4">
                             <label class="fw-semibold fs-7 mb-1">Latitude <span class="text-muted">(titik peta)</span></label>
                             <input type="text" name="lat" id="r_lat" class="form-control form-control-solid" placeholder="cth: 3.589700" />
@@ -240,6 +246,7 @@
         document.getElementById('r_is_active').checked = true;
         resetMobil([]);
         resetKontak([]);
+        document.getElementById('r_logo_preview').innerHTML = '';
         clearErrors();
         document.getElementById('rentalFormTitle').textContent = 'Tambah Rental';
         formModal().show();
@@ -254,6 +261,10 @@
             document.getElementById('r_is_active').checked = !!d.is_active;
             resetMobil(res.mobil || []);
             resetKontak(res.kontak || []);
+            document.getElementById('r_logo_file').value = '';
+            document.getElementById('r_logo_preview').innerHTML = res.logo_url
+                ? '<img src="' + res.logo_url + '" class="rounded border mt-1" style="height:60px;object-fit:contain;background:#fff;padding:3px" /> <div class="text-muted fs-8 mt-1">Biarkan kosong jika tidak ingin mengganti logo.</div>'
+                : '<span class="text-muted fs-8">Belum ada logo.</span>';
             document.getElementById('rentalFormTitle').textContent = 'Edit Rental';
             formModal().show();
         }).fail(() => Swal.fire('Gagal', 'Tidak dapat memuat data.', 'error'));
@@ -268,6 +279,7 @@
             let mobil = (res.mobil || []).map(function (m) { total += parseInt(m.jumlah_unit || 0, 10); var u = (m.jumlah_unit != null && m.jumlah_unit !== '') ? '<span class="badge badge-light-primary">' + m.jumlah_unit + ' unit</span>' : '<span class="badge badge-light-success">tersedia</span>'; return '<div class="d-flex justify-content-between py-1"><span>' + m.nama_mobil + '</span>' + u + '</div>'; }).join('');
             let kontak = (res.kontak || []).map(function (k) { return '<div class="d-flex justify-content-between py-1"><span>' + k.nama + '</span><span class="fw-bold text-gray-800">' + (k.no_hp || '-') + '</span></div>'; }).join('');
             document.getElementById('rentalViewBody').innerHTML =
+                (res.logo_url ? '<div class="text-center mb-3"><img src="' + res.logo_url + '" style="height:70px;object-fit:contain" /></div>' : '') +
                 row('Nama', d.nama) + row('Alamat', d.alamat) + row('WhatsApp', d.kontak_wa) + row('Telepon', d.telepon) + row('Keterangan', d.deskripsi) + row('Koordinat', (d.lat && d.lng) ? (d.lat + ', ' + d.lng) : '-') +
                 (kontak ? '<div class="pt-3"><div class="text-muted mb-2">Contact Person</div>' + kontak + '</div>' : '') +
                 '<div class="pt-3"><div class="text-muted mb-2 d-flex justify-content-between">Armada Mobil' + (total > 0 ? ' <span class="fw-bold text-gray-800">Total ' + total + ' unit</span>' : '') + '</div>' + (mobil || '<span class="text-muted">-</span>') + '</div>';
