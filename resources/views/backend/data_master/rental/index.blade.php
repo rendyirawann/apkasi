@@ -97,6 +97,7 @@
                         <div class="col-md-12">
                             <label class="fw-semibold fs-7 mb-1">Logo Rental <span class="text-muted">(opsional, maks 5MB — jpg/png/webp/svg; tampil sebagai ikon di nama rental pada /panduan)</span></label>
                             <input type="file" name="logo_file" id="r_logo_file" accept=".jpg,.jpeg,.png,.webp,.svg" class="form-control form-control-solid" />
+                            <input type="hidden" name="remove_logo" id="r_remove_logo" value="0" />
                             <div class="text-danger fs-8 mt-1" data-error="logo_file"></div>
                             <div id="r_logo_preview" class="mt-2"></div>
                         </div>
@@ -179,6 +180,8 @@
     const URLS = { data: "{{ route('rentals.data') }}", store: "{{ route('rentals.store') }}", base: "{{ url('admin/rentals') }}" };
     const FIELDS = ['nama', 'urut', 'alamat', 'kontak_wa', 'telepon', 'deskripsi', 'lat', 'lng', 'maps_url'];
     let mode = 'create';
+    let currentLogoUrl = '';
+    const escHtml = (s) => { const d = document.createElement('div'); d.textContent = (s == null ? '' : s); return d.innerHTML; };
 
     const table = $('#rentalTable').DataTable({
         dom: "<'row align-items-center'<'col-sm-6 d-flex align-items-center'l><'col-sm-6'>>" +
@@ -239,6 +242,42 @@
         const b = e.target.closest('.btn-rm-kontak'); if (b) b.closest('.input-group').remove();
     });
 
+    // ===== Logo: preview + hapus (urungkan) =====
+    function renderLogoPreview(url) {
+        const el = document.getElementById('r_logo_preview');
+        if (url) {
+            el.innerHTML =
+                '<div class="d-flex align-items-center gap-3">' +
+                    '<img src="' + url + '" class="rounded border" style="height:60px;object-fit:contain;background:#fff;padding:3px" />' +
+                    '<button type="button" class="btn btn-sm btn-light-danger" id="btnRemoveLogo"><i class="ki-outline ki-trash fs-6 me-1"></i>Hapus Logo</button>' +
+                '</div>' +
+                '<div class="text-muted fs-8 mt-1">Biarkan kosong jika tidak ingin mengganti logo.</div>';
+        } else {
+            el.innerHTML = '<span class="text-muted fs-8">Belum ada logo.</span>';
+        }
+    }
+    document.getElementById('r_logo_preview').addEventListener('click', function (e) {
+        if (e.target.closest('#btnRemoveLogo')) {
+            document.getElementById('r_remove_logo').value = '1';
+            document.getElementById('r_logo_file').value = '';
+            this.innerHTML =
+                '<div class="d-flex align-items-center gap-3">' +
+                    '<span class="badge badge-light-danger py-2"><i class="ki-outline ki-trash fs-7 me-1"></i>Logo akan dihapus saat disimpan</span>' +
+                    '<button type="button" class="btn btn-sm btn-light" id="btnUndoLogo">Urungkan</button>' +
+                '</div>';
+        } else if (e.target.closest('#btnUndoLogo')) {
+            document.getElementById('r_remove_logo').value = '0';
+            renderLogoPreview(currentLogoUrl);
+        }
+    });
+    // Pilih file baru => batalkan niat hapus (file baru menggantikan logo).
+    document.getElementById('r_logo_file').addEventListener('change', function () {
+        if (this.files && this.files.length) {
+            document.getElementById('r_remove_logo').value = '0';
+            document.getElementById('r_logo_preview').innerHTML = '<span class="text-muted fs-8"><i class="ki-outline ki-file fs-6 me-1"></i>File baru dipilih: ' + escHtml(this.files[0].name) + '</span>';
+        }
+    });
+
     $('#btnAddRental').on('click', function () {
         mode = 'create';
         document.getElementById('rentalForm').reset();
@@ -246,6 +285,8 @@
         document.getElementById('r_is_active').checked = true;
         resetMobil([]);
         resetKontak([]);
+        currentLogoUrl = '';
+        document.getElementById('r_remove_logo').value = '0';
         document.getElementById('r_logo_preview').innerHTML = '';
         clearErrors();
         document.getElementById('rentalFormTitle').textContent = 'Tambah Rental';
@@ -262,9 +303,9 @@
             resetMobil(res.mobil || []);
             resetKontak(res.kontak || []);
             document.getElementById('r_logo_file').value = '';
-            document.getElementById('r_logo_preview').innerHTML = res.logo_url
-                ? '<img src="' + res.logo_url + '" class="rounded border mt-1" style="height:60px;object-fit:contain;background:#fff;padding:3px" /> <div class="text-muted fs-8 mt-1">Biarkan kosong jika tidak ingin mengganti logo.</div>'
-                : '<span class="text-muted fs-8">Belum ada logo.</span>';
+            document.getElementById('r_remove_logo').value = '0';
+            currentLogoUrl = res.logo_url || '';
+            renderLogoPreview(currentLogoUrl);
             document.getElementById('rentalFormTitle').textContent = 'Edit Rental';
             formModal().show();
         }).fail(() => Swal.fire('Gagal', 'Tidak dapat memuat data.', 'error'));

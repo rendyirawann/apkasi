@@ -114,8 +114,14 @@ class RentalController extends Controller
             $payload['urut'] = $this->resolveUrut(Rental::class, $request, $rental);
             $rental->update($payload);
             if ($request->hasFile('logo_file')) {
+                // Upload logo baru => menggantikan logo lama.
                 $this->deleteFile($rental->logo);
                 $rental->logo = $request->file('logo_file')->store('rental', 'public');
+                $rental->save();
+            } elseif ($request->boolean('remove_logo')) {
+                // Hapus logo tanpa mengganti => kembali ke ikon mobil di /panduan.
+                $this->deleteFile($rental->logo);
+                $rental->logo = null;
                 $rental->save();
             }
             $this->syncMobil($rental, $request);
@@ -187,6 +193,7 @@ class RentalController extends Controller
             'kontak_wa'    => 'nullable|string|max:30',
             'deskripsi'    => 'nullable|string|max:1000',
             'logo_file'    => 'nullable|image|mimes:jpg,jpeg,png,webp,svg|max:5120',
+            'remove_logo'  => 'nullable|boolean',
             'lat'          => 'nullable|numeric|between:-90,90',
             'lng'          => 'nullable|numeric|between:-180,180',
             'maps_url'     => 'nullable|url|max:255',
