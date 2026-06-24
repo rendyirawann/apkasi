@@ -26,6 +26,7 @@ use App\Http\Controllers\Backend\DataMaster\PicController;
 use App\Http\Controllers\Backend\DataMaster\DestinasiWisataController;
 use App\Http\Controllers\Backend\DataMaster\RentalController;
 use App\Http\Controllers\Backend\DataMaster\KulinerController;
+use App\Http\Controllers\Backend\DataMaster\RekayasaController;
 use App\Http\Controllers\Backend\DataMaster\RundownController;
 use App\Http\Controllers\Backend\Settings\LandingController;
 
@@ -231,6 +232,15 @@ Route::middleware(['auth', 'forbid-banned-user'])->group(function () {
         Route::get('/admin/rentals/{id}/edit', [RentalController::class, 'edit'])->name('rentals.edit');
         Route::put('/admin/rentals/{id}', [RentalController::class, 'update'])->name('rentals.update');
         Route::delete('/admin/rentals/{id}', [RentalController::class, 'destroy'])->name('rentals.destroy');
+
+        // Rekayasa Lalu Lintas (galeri peta di landing)
+        Route::get('/admin/rekayasa', [RekayasaController::class, 'index'])->name('rekayasa.index');
+        Route::get('/admin/rekayasa/data', [RekayasaController::class, 'data'])->name('rekayasa.data');
+        Route::post('/admin/rekayasa', [RekayasaController::class, 'store'])->name('rekayasa.store');
+        Route::get('/admin/rekayasa/{id}', [RekayasaController::class, 'show'])->name('rekayasa.show');
+        Route::get('/admin/rekayasa/{id}/edit', [RekayasaController::class, 'edit'])->name('rekayasa.edit');
+        Route::put('/admin/rekayasa/{id}', [RekayasaController::class, 'update'])->name('rekayasa.update');
+        Route::delete('/admin/rekayasa/{id}', [RekayasaController::class, 'destroy'])->name('rekayasa.destroy');
 
         // Rundown Kegiatan
         Route::get('/admin/rundown', [RundownController::class, 'index'])->name('rundown.index');

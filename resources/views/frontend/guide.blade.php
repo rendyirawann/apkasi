@@ -578,6 +578,12 @@
             </div>
         @endif
 
+        @if (!empty($rentalBanner2))
+            <div class="rounded-2xl overflow-hidden border border-apkasi-leaf mb-6 shadow-sm">
+                <img src="{{ \App\Support\Media::url($rentalBanner2) }}" alt="Rental Kendaraan APKASI 2026 — Naga Hitam Rentcar" loading="lazy" class="w-full h-auto block">
+            </div>
+        @endif
+
         @php $rentalsGeo = $rentals->filter(fn($r) => $r->lat && $r->lng); @endphp
         @if (($mapboxToken ?? false) && $rentalsGeo->count())
         <div class="rounded-2xl overflow-hidden border border-apkasi-leaf mb-6 shadow-sm relative">

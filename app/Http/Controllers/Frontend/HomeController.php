@@ -93,6 +93,13 @@ class HomeController extends Controller
             ->orderBy('tanggal')
             ->get();
 
+        // Rekayasa lalu lintas (galeri peta di landing) — gambar aktif + lokasi acaranya.
+        $rekayasa = \App\Models\RekayasaLaluLintas::with('lokasi')
+            ->where('is_active', true)
+            ->orderBy('urut')
+            ->orderBy('id')
+            ->get();
+
         // Semua logo aktif dlm SATU query lalu dikelompokkan per grup (hindari 5 query terpisah).
         $logosByGrup = \App\Models\SiteLogo::where('is_active', true)
             ->orderBy('urut')->orderBy('id')->get()->groupBy('grup');
@@ -126,7 +133,7 @@ class HomeController extends Controller
         }
 
         return view('frontend.index', compact(
-            'eventTargetDate', 'rundownHighlights', 'agenda',
+            'eventTargetDate', 'rundownHighlights', 'agenda', 'rekayasa',
             'navbarLogos', 'heroLogosV1', 'heroLogosV2', 'heroLogosV3', 'partnerLogos', 'footerBrandLogos', 'footerSideLogos', 'visitsTotal',
             'faqs', 'countdownTarget', 'eventRangeText', 'showIntro'
         ));
@@ -264,9 +271,10 @@ class HomeController extends Controller
             ->sortBy(fn ($p) => (int) $p->provinsi_id)
             ->values();
 
-        $mapboxToken  = config('services.mapbox.token');
-        $rentalBanner = \App\Models\Setting::get('panduan_rental_banner') ?: 'assets/media/landing/pic-rental.jpg';
+        $mapboxToken   = config('services.mapbox.token');
+        $rentalBanner  = \App\Models\Setting::get('panduan_rental_banner') ?: 'assets/media/landing/pic-rental.jpg';
+        $rentalBanner2 = \App\Models\Setting::get('panduan_rental_banner2') ?: 'assets/media/landing/rentalnagahitam.png';
 
-        return view('frontend.guide', compact('venues', 'tourisms', 'hotels', 'rentals', 'pics', 'los', 'mapboxToken', 'rentalBanner'));
+        return view('frontend.guide', compact('venues', 'tourisms', 'hotels', 'rentals', 'pics', 'los', 'mapboxToken', 'rentalBanner', 'rentalBanner2'));
     }
 }

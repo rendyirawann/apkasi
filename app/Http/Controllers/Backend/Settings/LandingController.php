@@ -49,7 +49,8 @@ class LandingController extends Controller
             'lp_wabup_foto_file'     => 'lp_wabup_foto',
             'lp_hero_bg_image_file'  => 'lp_hero_bg_image',
             'lp_hero_leaders_file'   => 'lp_hero_leaders_img',
-            'panduan_rental_banner_file' => 'panduan_rental_banner',
+            'panduan_rental_banner_file'  => 'panduan_rental_banner',
+            'panduan_rental_banner2_file' => 'panduan_rental_banner2',
         ];
         foreach ($imageFields as $fileKey => $settingKey) {
             if ($request->hasFile($fileKey)) {

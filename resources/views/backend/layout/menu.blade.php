@@ -101,6 +101,12 @@
                     </a>
                 </div>
                 <div class="menu-item">
+                    <a class="menu-link {{ request()->is('admin/rekayasa*') ? 'active' : '' }}" href="{{ route('rekayasa.index') }}">
+                        <span class="menu-icon"><i class="ki-duotone ki-map fs-4"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i></span>
+                        <span class="menu-title">Rekayasa Lalu Lintas</span>
+                    </a>
+                </div>
+                <div class="menu-item">
                     <a class="menu-link {{ request()->is('admin/pics*') ? 'active' : '' }}" href="{{ route('pics.index') }}">
                         <span class="menu-icon"><i class="ki-duotone ki-user-tick fs-4"><span class="path1"></span><span class="path2"></span></i></span>
                         <span class="menu-title">PIC</span>

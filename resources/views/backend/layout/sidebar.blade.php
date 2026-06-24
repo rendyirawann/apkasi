@@ -66,7 +66,7 @@
 
             <!--begin::Data Master-->
             @can('view_data_master')
-            @php $isDataMaster = request()->is('admin/gedung*') || request()->is('admin/hotels*') || request()->is('admin/pics*') || request()->is('admin/destinasi*') || request()->is('admin/rentals*') || request()->is('admin/kuliner*') || request()->is('admin/rundown*'); @endphp
+            @php $isDataMaster = request()->is('admin/gedung*') || request()->is('admin/hotels*') || request()->is('admin/pics*') || request()->is('admin/destinasi*') || request()->is('admin/rentals*') || request()->is('admin/kuliner*') || request()->is('admin/rekayasa*') || request()->is('admin/rundown*'); @endphp
             <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ $isDataMaster ? 'here show' : '' }}">
                 <span class="menu-link">
                     <span class="menu-icon">
@@ -110,6 +110,12 @@
                         <a class="menu-link {{ request()->is('admin/kuliner*') ? 'active' : '' }}" href="{{ route('kuliner.index') }}">
                             <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
                             <span class="menu-title">Kuliner</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a class="menu-link {{ request()->is('admin/rekayasa*') ? 'active' : '' }}" href="{{ route('rekayasa.index') }}">
+                            <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                            <span class="menu-title">Rekayasa Lalu Lintas</span>
                         </a>
                     </div>
                     <div class="menu-item">

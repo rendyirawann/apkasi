@@ -181,6 +181,7 @@
             <div class="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
                 <a href="#tentang" class="text-sm px-4 py-2 rounded-full transition-colors duration-200 font-semibold text-apkasi-dark">Tentang</a>
                 <a href="#agenda" class="text-sm px-4 py-2 rounded-full transition-colors duration-200 font-medium text-apkasi-body hover:text-apkasi-dark hover:bg-apkasi-dark/5">Agenda</a>
+                <a href="#rekayasa" class="text-sm px-4 py-2 rounded-full transition-colors duration-200 font-medium text-apkasi-body hover:text-apkasi-dark hover:bg-apkasi-dark/5">Lalu Lintas</a>
                 <a href="#poi" class="text-sm px-4 py-2 rounded-full transition-colors duration-200 font-medium text-apkasi-body hover:text-apkasi-dark hover:bg-apkasi-dark/5">Putri Otonomi</a>
                 <a href="{{ route('guide') }}" class="text-sm px-4 py-2 rounded-full transition-colors duration-200 font-medium text-apkasi-body hover:text-apkasi-dark hover:bg-apkasi-dark/5">Panduan</a>
             </div>
@@ -213,6 +214,7 @@
             <div class="flex flex-col gap-1">
                 <a href="#tentang" class="m-link text-xl font-semibold text-apkasi-dark py-3 border-b border-apkasi-dark/5">Tentang</a>
                 <a href="#agenda" class="m-link text-xl font-semibold text-apkasi-dark py-3 border-b border-apkasi-dark/5">Agenda</a>
+                <a href="#rekayasa" class="m-link text-xl font-semibold text-apkasi-dark py-3 border-b border-apkasi-dark/5">Lalu Lintas</a>
                 <a href="#poi" class="m-link text-xl font-semibold text-apkasi-dark py-3 border-b border-apkasi-dark/5">Putri Otonomi</a>
                 <a href="{{ route('guide') }}" class="m-link text-xl font-semibold text-apkasi-dark py-3 border-b border-apkasi-dark/5">Panduan</a>
             </div>
@@ -635,6 +637,240 @@
             </div>
         </div>
     </div>
+
+    {{-- ═══════════ REKAYASA LALU LINTAS ═══════════ --}}
+    @php
+        $rekayasaItems = ($rekayasa ?? collect());
+        $rekayasaTotal = $rekayasaItems->count();
+        $rekayasaData  = $rekayasaItems->map(fn ($r) => [
+            'src'       => $r->gambar_url,
+            'judul'     => $r->judul,
+            'deskripsi' => $r->deskripsi,
+            'lokasi'    => $r->lokasi->pluck('nama')->values(),
+        ])->values();
+    @endphp
+    @if ($rekayasaTotal)
+    <section id="rekayasa" class="py-16 sm:py-20 md:py-28 bg-apkasi-cream">
+        <div data-reveal class="max-w-[1400px] mx-auto px-5 sm:px-8 transition-all duration-700 opacity-0 translate-y-8">
+            <div class="text-center mb-12 sm:mb-16">
+                <span class="inline-flex items-center gap-1.5 bg-apkasi-heading/8 text-apkasi-heading text-xs sm:text-sm font-semibold tracking-wide uppercase px-4 py-1.5 rounded-full mb-4">
+                    <i data-lucide="route" class="w-4 h-4"></i> Info Lalu Lintas
+                </span>
+                <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-apkasi-dark leading-tight mb-3">Rekayasa Lalu Lintas APKASI Kabupaten Deli Serdang</h2>
+                <p class="text-apkasi-body text-sm sm:text-base max-w-2xl mx-auto">Peta jalur pengaturan lalu lintas dan titik parkir selama rangkaian kegiatan. Klik gambar untuk memperbesar &amp; menggeser foto.</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-5xl mx-auto">
+                @foreach ($rekayasaItems->take(4) as $rk)
+                    @php $isLast = $loop->iteration === 4 && $rekayasaTotal > 4; @endphp
+                    <button type="button" data-rekayasa-open="{{ $loop->index }}"
+                        class="group relative aspect-[4/3] rounded-2xl overflow-hidden bg-apkasi-dark/5 border border-apkasi-leaf shadow-sm focus:outline-none focus:ring-2 focus:ring-apkasi-heading focus:ring-offset-2">
+                        <img src="{{ $rk->gambar_url }}" alt="{{ $rk->judul }}" loading="lazy" decoding="async"
+                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                        {{-- Buka gambar di tab baru (muncul saat hover) --}}
+                        <span data-rekayasa-newtab="{{ $rk->gambar_url }}" role="link" title="Buka gambar di tab baru"
+                            class="absolute top-2 left-2 z-10 w-8 h-8 rounded-full bg-white/85 text-apkasi-dark flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow cursor-pointer hover:bg-white">
+                            <i data-lucide="external-link" class="w-4 h-4"></i>
+                        </span>
+                        @if ($isLast)
+                            <div class="absolute inset-0 bg-apkasi-dark/70 flex flex-col items-center justify-center text-white">
+                                <span class="text-2xl sm:text-4xl font-bold leading-none">+{{ $rekayasaTotal - 4 }}</span>
+                                <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wide mt-1 opacity-90">gambar lagi</span>
+                            </div>
+                        @else
+                            <span class="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/85 text-apkasi-dark flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow">
+                                <i data-lucide="maximize-2" class="w-4 h-4"></i>
+                            </span>
+                            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-apkasi-dark/80 to-transparent p-2.5 sm:p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span class="block text-white text-[11px] sm:text-xs font-semibold leading-snug line-clamp-2 text-left">{{ $rk->judul }}</span>
+                            </div>
+                        @endif
+                    </button>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    {{-- Lightbox Rekayasa Lalu Lintas (galeri slider) --}}
+    <div id="rekayasaLightbox" class="fixed inset-0 z-[90] hidden items-center justify-center p-3 sm:p-6">
+        <div class="absolute inset-0 bg-apkasi-dark/90 backdrop-blur-sm" data-rekayasa-close></div>
+        <div class="relative w-full max-w-5xl max-h-[92vh] bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+            {{-- Toolbar: zoom in / reset / zoom out / buka tab baru --}}
+            <div class="absolute top-3 left-3 z-20 flex items-center gap-1.5">
+                <button type="button" id="rekayasaZoomOut" title="Perkecil (-)" class="w-9 h-9 inline-flex items-center justify-center rounded-full bg-apkasi-dark/60 text-white hover:bg-apkasi-dark transition-colors">
+                    <i data-lucide="zoom-out" class="w-4 h-4"></i>
+                </button>
+                <button type="button" id="rekayasaZoomReset" title="Reset zoom" class="h-9 px-3 inline-flex items-center justify-center rounded-full bg-apkasi-dark/60 text-white hover:bg-apkasi-dark transition-colors text-xs font-bold leading-none">
+                    <span id="rekayasaZoomLabel">100%</span>
+                </button>
+                <button type="button" id="rekayasaZoomIn" title="Perbesar (+)" class="w-9 h-9 inline-flex items-center justify-center rounded-full bg-apkasi-dark/60 text-white hover:bg-apkasi-dark transition-colors">
+                    <i data-lucide="zoom-in" class="w-4 h-4"></i>
+                </button>
+                <a id="rekayasaNewTab" href="#" target="_blank" rel="noopener" title="Buka gambar di tab baru" class="w-9 h-9 inline-flex items-center justify-center rounded-full bg-apkasi-dark/60 text-white hover:bg-apkasi-dark transition-colors">
+                    <i data-lucide="external-link" class="w-4 h-4"></i>
+                </a>
+            </div>
+            <button type="button" data-rekayasa-close class="absolute top-3 right-3 z-20 w-9 h-9 inline-flex items-center justify-center rounded-full bg-apkasi-dark/60 text-white hover:bg-apkasi-dark transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div id="rekayasaViewport" class="relative bg-apkasi-dark/95 flex items-center justify-center overflow-hidden select-none" style="min-height:45vh;max-height:65vh">
+                <img id="rekayasaImg" src="" alt="" draggable="false" class="max-w-full max-h-[65vh] object-contain will-change-transform" style="transform:translate(0px,0px) scale(1);transition:transform .12s ease-out;cursor:zoom-in" />
+                <button type="button" id="rekayasaPrev" class="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-12 sm:h-12 inline-flex items-center justify-center rounded-full bg-white/85 text-apkasi-dark hover:bg-white transition-colors shadow-lg">
+                    <i data-lucide="chevron-left" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                </button>
+                <button type="button" id="rekayasaNext" class="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-12 sm:h-12 inline-flex items-center justify-center rounded-full bg-white/85 text-apkasi-dark hover:bg-white transition-colors shadow-lg">
+                    <i data-lucide="chevron-right" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                </button>
+                <span id="rekayasaCounter" class="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 text-xs font-semibold text-white bg-apkasi-dark/60 px-3 py-1 rounded-full pointer-events-none"></span>
+            </div>
+            <div class="p-5 sm:p-6 overflow-y-auto">
+                <h3 id="rekayasaTitle" class="font-display text-lg sm:text-xl font-bold text-apkasi-dark leading-snug"></h3>
+                <p id="rekayasaDesc" class="text-sm text-apkasi-body leading-relaxed mt-2 hidden"></p>
+                <div id="rekayasaLokasiWrap" class="mt-3 hidden">
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-apkasi-heading mb-1.5">Lokasi Acara</p>
+                    <div id="rekayasaLokasi" class="flex flex-wrap gap-1.5"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+    (function () {
+        const DATA = @json($rekayasaData);
+        const box = document.getElementById('rekayasaLightbox');
+        if (!box) return;
+
+        // Buka gambar di tab baru dari thumbnail (ikon saat hover) — tanpa membuka lightbox.
+        document.querySelectorAll('[data-rekayasa-newtab]').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const u = el.getAttribute('data-rekayasa-newtab');
+                if (u) window.open(u, '_blank', 'noopener');
+            });
+        });
+
+        if (!DATA.length) return;
+        const imgEl = document.getElementById('rekayasaImg');
+        const viewport = document.getElementById('rekayasaViewport');
+        const titleEl = document.getElementById('rekayasaTitle');
+        const descEl = document.getElementById('rekayasaDesc');
+        const lokWrap = document.getElementById('rekayasaLokasiWrap');
+        const lokEl = document.getElementById('rekayasaLokasi');
+        const counterEl = document.getElementById('rekayasaCounter');
+        const zoomLabel = document.getElementById('rekayasaZoomLabel');
+        const newTabA = document.getElementById('rekayasaNewTab');
+        let idx = 0;
+
+        // ---- Zoom & pan ----
+        const MIN = 1, MAX = 5;
+        let scale = 1, tx = 0, ty = 0;
+        function applyTransform() {
+            imgEl.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
+            imgEl.style.cursor = scale > 1 ? 'grab' : 'zoom-in';
+            zoomLabel.textContent = Math.round(scale * 100) + '%';
+        }
+        function clampPan() {
+            const vw = viewport.clientWidth, vh = viewport.clientHeight;
+            const ow = imgEl.clientWidth * scale, oh = imgEl.clientHeight * scale;
+            const maxX = Math.max(0, (ow - vw) / 2);
+            const maxY = Math.max(0, (oh - vh) / 2);
+            tx = Math.min(maxX, Math.max(-maxX, tx));
+            ty = Math.min(maxY, Math.max(-maxY, ty));
+        }
+        function setScale(s) {
+            scale = Math.min(MAX, Math.max(MIN, s));
+            if (scale === 1) { tx = 0; ty = 0; }
+            clampPan();
+            applyTransform();
+        }
+        function resetZoom() { scale = 1; tx = 0; ty = 0; applyTransform(); }
+
+        const pinSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
+        const esc = (s) => { const d = document.createElement('div'); d.textContent = (s == null ? '' : s); return d.innerHTML; };
+
+        function render() {
+            const it = DATA[idx];
+            imgEl.src = it.src || '';
+            imgEl.alt = it.judul || '';
+            newTabA.href = it.src || '#';
+            resetZoom();
+            titleEl.textContent = it.judul || '';
+            if (it.deskripsi) { descEl.textContent = it.deskripsi; descEl.classList.remove('hidden'); }
+            else { descEl.textContent = ''; descEl.classList.add('hidden'); }
+            const lok = it.lokasi || [];
+            if (lok.length) {
+                lokEl.innerHTML = lok.map(n => '<span class="inline-flex items-center gap-1 bg-apkasi-leaf/40 text-apkasi-dark text-xs font-semibold px-2.5 py-1 rounded-full">' + pinSvg + esc(n) + '</span>').join('');
+                lokWrap.classList.remove('hidden');
+            } else { lokEl.innerHTML = ''; lokWrap.classList.add('hidden'); }
+            counterEl.textContent = (idx + 1) + ' / ' + DATA.length;
+        }
+        function openAt(i) {
+            idx = ((i % DATA.length) + DATA.length) % DATA.length;
+            render();
+            box.classList.remove('hidden'); box.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+        function close() {
+            box.classList.add('hidden'); box.classList.remove('flex');
+            document.body.style.overflow = '';
+        }
+        function go(d) { idx = ((idx + d) % DATA.length + DATA.length) % DATA.length; render(); }
+
+        document.querySelectorAll('[data-rekayasa-open]').forEach(b => {
+            b.addEventListener('click', () => openAt(parseInt(b.getAttribute('data-rekayasa-open'), 10) || 0));
+        });
+        document.querySelectorAll('[data-rekayasa-close]').forEach(b => b.addEventListener('click', close));
+        document.getElementById('rekayasaPrev').addEventListener('click', () => go(-1));
+        document.getElementById('rekayasaNext').addEventListener('click', () => go(1));
+        document.getElementById('rekayasaZoomIn').addEventListener('click', () => setScale(scale * 1.4));
+        document.getElementById('rekayasaZoomOut').addEventListener('click', () => setScale(scale / 1.4));
+        document.getElementById('rekayasaZoomReset').addEventListener('click', resetZoom);
+        imgEl.addEventListener('dblclick', () => setScale(scale > 1 ? 1 : 2));
+
+        // Zoom dengan scroll mouse
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            setScale(scale * (e.deltaY < 0 ? 1.15 : (1 / 1.15)));
+        }, { passive: false });
+
+        // Geser (pan) saat ter-zoom
+        let dragging = false, sx = 0, sy = 0, stx = 0, sty = 0;
+        viewport.addEventListener('pointerdown', (e) => {
+            if (scale <= 1 || e.target.closest('button, a')) return;
+            dragging = true; sx = e.clientX; sy = e.clientY; stx = tx; sty = ty;
+            imgEl.style.transition = 'none'; imgEl.style.cursor = 'grabbing';
+            try { viewport.setPointerCapture(e.pointerId); } catch (_) {}
+        });
+        viewport.addEventListener('pointermove', (e) => {
+            if (!dragging) return;
+            tx = stx + (e.clientX - sx); ty = sty + (e.clientY - sy);
+            clampPan(); applyTransform();
+        });
+        function endDrag() {
+            if (!dragging) return;
+            dragging = false;
+            imgEl.style.transition = 'transform .12s ease-out';
+            imgEl.style.cursor = scale > 1 ? 'grab' : 'zoom-in';
+        }
+        viewport.addEventListener('pointerup', endDrag);
+        viewport.addEventListener('pointercancel', endDrag);
+        viewport.addEventListener('pointerleave', endDrag);
+
+        document.addEventListener('keydown', (e) => {
+            if (box.classList.contains('hidden')) return;
+            if (e.key === 'Escape') close();
+            else if (e.key === 'ArrowLeft') go(-1);
+            else if (e.key === 'ArrowRight') go(1);
+            else if (e.key === '+' || e.key === '=') { e.preventDefault(); setScale(scale * 1.4); }
+            else if (e.key === '-' || e.key === '_') { e.preventDefault(); setScale(scale / 1.4); }
+            else if (e.key === '0') { e.preventDefault(); resetZoom(); }
+        });
+    })();
+    </script>
+    @endpush
+    @endif
 
     {{-- ═══════════ POI ═══════════ --}}
     <section id="poi" class="py-16 sm:py-20 md:py-28 bg-white">

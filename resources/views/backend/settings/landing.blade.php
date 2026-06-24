@@ -102,13 +102,20 @@
                                     </div>
                                 </div>
 
-                                {{-- Banner Rental (halaman Panduan › tab Rental) --}}
+                                {{-- Banner Rental (halaman Panduan › tab Rental) — 2 slot tetap, ganti gambar saja --}}
                                 <div class="col-md-12">
                                     <div class="separator separator-dashed my-1"></div>
-                                    <label class="fw-semibold fs-7 mb-1 mt-2 d-block">Banner Rental Kendaraan <span class="text-muted">(tampil di atas peta — halaman Panduan › tab Rental; jpg/png/webp, maks 5MB)</span></label>
+                                    <label class="fw-semibold fs-7 mb-1 mt-2 d-block">Banner Rental Kendaraan #1 <span class="text-muted">(tampil di atas peta — halaman Panduan › tab Rental; jpg/png/webp, maks 5MB)</span></label>
                                     <input type="file" name="panduan_rental_banner_file" accept=".jpg,.jpeg,.png,.webp" data-max-mb="5" class="form-control form-control-sm">
                                     @if ($g('panduan_rental_banner'))
                                         <img src="{{ \App\Support\Media::url($g('panduan_rental_banner')) }}" class="mt-2 rounded border" style="height:80px;width:auto;object-fit:contain">
+                                    @endif
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="fw-semibold fs-7 mb-1 mt-2 d-block">Banner Rental Kendaraan #2 <span class="text-muted">(tampil tepat di bawah banner #1; jpg/png/webp, maks 5MB)</span></label>
+                                    <input type="file" name="panduan_rental_banner2_file" accept=".jpg,.jpeg,.png,.webp" data-max-mb="5" class="form-control form-control-sm">
+                                    @if ($g('panduan_rental_banner2'))
+                                        <img src="{{ \App\Support\Media::url($g('panduan_rental_banner2')) }}" class="mt-2 rounded border" style="height:80px;width:auto;object-fit:contain">
                                     @endif
                                 </div>
 
