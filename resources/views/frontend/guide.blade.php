@@ -572,17 +572,13 @@
             <p class="text-apkasi-body text-sm mt-1">Kontak penyedia sewa kendaraan untuk delegasi & rombongan.</p>
         </div>
 
-        @if (!empty($rentalBanner))
-            <div class="rounded-2xl overflow-hidden border border-apkasi-leaf mb-6 shadow-sm">
-                <img src="{{ \App\Support\Media::url($rentalBanner) }}" alt="PIC Kendaraan APKASI 2026 — Partner Transportasi Terpercaya" loading="lazy" class="w-full h-auto block">
-            </div>
-        @endif
-
-        @if (!empty($rentalBanner2))
-            <div class="rounded-2xl overflow-hidden border border-apkasi-leaf mb-6 shadow-sm">
-                <img src="{{ \App\Support\Media::url($rentalBanner2) }}" alt="Rental Kendaraan APKASI 2026 — Naga Hitam Rentcar" loading="lazy" class="w-full h-auto block">
-            </div>
-        @endif
+        @foreach ($rentalBanners as $rb)
+            @if ($rb->gambar_url)
+                <div class="rounded-2xl overflow-hidden border border-apkasi-leaf mb-6 shadow-sm">
+                    <img src="{{ $rb->gambar_url }}" alt="{{ $rb->judul ?: 'Banner Rental Kendaraan APKASI 2026' }}" loading="lazy" class="w-full h-auto block">
+                </div>
+            @endif
+        @endforeach
 
         @php $rentalsGeo = $rentals->filter(fn($r) => $r->lat && $r->lng); @endphp
         @if (($mapboxToken ?? false) && $rentalsGeo->count())

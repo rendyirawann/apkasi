@@ -66,7 +66,7 @@
 
             <!--begin::Data Master-->
             @can('view_data_master')
-            @php $isDataMaster = request()->is('admin/gedung*') || request()->is('admin/hotels*') || request()->is('admin/pics*') || request()->is('admin/destinasi*') || request()->is('admin/rentals*') || request()->is('admin/kuliner*') || request()->is('admin/rekayasa*') || request()->is('admin/rundown*'); @endphp
+            @php $isDataMaster = request()->is('admin/gedung*') || request()->is('admin/hotels*') || request()->is('admin/pics*') || request()->is('admin/destinasi*') || request()->is('admin/rentals*') || request()->is('admin/rental-banners*') || request()->is('admin/kuliner*') || request()->is('admin/rekayasa*') || request()->is('admin/rundown*'); @endphp
             <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ $isDataMaster ? 'here show' : '' }}">
                 <span class="menu-link">
                     <span class="menu-icon">
@@ -104,6 +104,12 @@
                         <a class="menu-link {{ request()->is('admin/rentals*') ? 'active' : '' }}" href="{{ route('rentals.index') }}">
                             <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
                             <span class="menu-title">Rental Mobil</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a class="menu-link {{ request()->is('admin/rental-banners*') ? 'active' : '' }}" href="{{ route('rental-banners.index') }}">
+                            <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                            <span class="menu-title">Banner Rental</span>
                         </a>
                     </div>
                     <div class="menu-item">

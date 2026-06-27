@@ -53,7 +53,7 @@
 
         <!--begin::Data Master-->
         @can('view_data_master')
-        @php $isDataMaster = request()->is('admin/gedung*') || request()->is('admin/hotels*') || request()->is('admin/pics*') || request()->is('admin/destinasi*') || request()->is('admin/rentals*') || request()->is('admin/rundown*'); @endphp
+        @php $isDataMaster = request()->is('admin/gedung*') || request()->is('admin/hotels*') || request()->is('admin/pics*') || request()->is('admin/destinasi*') || request()->is('admin/rentals*') || request()->is('admin/rental-banners*') || request()->is('admin/kuliner*') || request()->is('admin/rekayasa*') || request()->is('admin/rundown*'); @endphp
         <div data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="bottom-start"
             class="menu-item menu-lg-down-accordion me-0 me-lg-2 {{ $isDataMaster ? 'here show menu-here-bg' : '' }}">
             <span class="menu-link py-3">
@@ -92,6 +92,12 @@
                     <a class="menu-link {{ request()->is('admin/rentals*') ? 'active' : '' }}" href="{{ route('rentals.index') }}">
                         <span class="menu-icon"><i class="ki-duotone ki-car fs-4"><span class="path1"></span><span class="path2"></span></i></span>
                         <span class="menu-title">Rental Mobil</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->is('admin/rental-banners*') ? 'active' : '' }}" href="{{ route('rental-banners.index') }}">
+                        <span class="menu-icon"><i class="ki-duotone ki-picture fs-4"><span class="path1"></span><span class="path2"></span></i></span>
+                        <span class="menu-title">Banner Rental</span>
                     </a>
                 </div>
                 <div class="menu-item">

@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             PicLoSeeder::class,
             PicLoJabatanSeeder::class,
             RekayasaLaluLintasSeeder::class,
+            RentalBannerSeeder::class,
         ]);
     }
 }

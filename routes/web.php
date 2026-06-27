@@ -27,6 +27,7 @@ use App\Http\Controllers\Backend\DataMaster\DestinasiWisataController;
 use App\Http\Controllers\Backend\DataMaster\RentalController;
 use App\Http\Controllers\Backend\DataMaster\KulinerController;
 use App\Http\Controllers\Backend\DataMaster\RekayasaController;
+use App\Http\Controllers\Backend\DataMaster\RentalBannerController;
 use App\Http\Controllers\Backend\DataMaster\RundownController;
 use App\Http\Controllers\Backend\Settings\LandingController;
 
@@ -241,6 +242,15 @@ Route::middleware(['auth', 'forbid-banned-user'])->group(function () {
         Route::get('/admin/rekayasa/{id}/edit', [RekayasaController::class, 'edit'])->name('rekayasa.edit');
         Route::put('/admin/rekayasa/{id}', [RekayasaController::class, 'update'])->name('rekayasa.update');
         Route::delete('/admin/rekayasa/{id}', [RekayasaController::class, 'destroy'])->name('rekayasa.destroy');
+
+        // Banner Rental (galeri banner di tab Rental halaman Panduan)
+        Route::get('/admin/rental-banners', [RentalBannerController::class, 'index'])->name('rental-banners.index');
+        Route::get('/admin/rental-banners/data', [RentalBannerController::class, 'data'])->name('rental-banners.data');
+        Route::post('/admin/rental-banners', [RentalBannerController::class, 'store'])->name('rental-banners.store');
+        Route::get('/admin/rental-banners/{id}', [RentalBannerController::class, 'show'])->name('rental-banners.show');
+        Route::get('/admin/rental-banners/{id}/edit', [RentalBannerController::class, 'edit'])->name('rental-banners.edit');
+        Route::put('/admin/rental-banners/{id}', [RentalBannerController::class, 'update'])->name('rental-banners.update');
+        Route::delete('/admin/rental-banners/{id}', [RentalBannerController::class, 'destroy'])->name('rental-banners.destroy');
 
         // Rundown Kegiatan
         Route::get('/admin/rundown', [RundownController::class, 'index'])->name('rundown.index');

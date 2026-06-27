@@ -272,14 +272,10 @@ class HomeController extends Controller
             ->values();
 
         $mapboxToken = config('services.mapbox.token');
-        // Banner rental tampil bila toggle "enabled" aktif DAN gambarnya tidak dihapus (kosong => sembunyi).
-        $rentalBanner  = \App\Models\Setting::get('panduan_rental_banner_enabled', '1') !== '0'
-            ? (\App\Models\Setting::get('panduan_rental_banner') ?: null)
-            : null;
-        $rentalBanner2 = \App\Models\Setting::get('panduan_rental_banner2_enabled', '1') !== '0'
-            ? (\App\Models\Setting::get('panduan_rental_banner2') ?: null)
-            : null;
+        // Banner tab Rental — dikelola via Data Master > Banner Rental (tabel rental_banners), tampil berurutan.
+        $rentalBanners = \App\Models\RentalBanner::where('is_active', true)
+            ->orderBy('urut')->orderBy('id')->get();
 
-        return view('frontend.guide', compact('venues', 'tourisms', 'hotels', 'rentals', 'pics', 'los', 'mapboxToken', 'rentalBanner', 'rentalBanner2'));
+        return view('frontend.guide', compact('venues', 'tourisms', 'hotels', 'rentals', 'pics', 'los', 'mapboxToken', 'rentalBanners'));
     }
 }

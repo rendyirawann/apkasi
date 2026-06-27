@@ -41,13 +41,6 @@ class LandingController extends Controller
             }
         }
 
-        // Toggle tampil/sembunyikan tiap banner rental (key di luar prefix lp_)
-        foreach (['panduan_rental_banner_enabled', 'panduan_rental_banner2_enabled'] as $tog) {
-            if ($request->has($tog)) {
-                Setting::set($tog, $request->boolean($tog) ? '1' : '0');
-            }
-        }
-
         // Upload gambar tunggal (about, poi, foto pimpinan, background hero)
         $imageFields = [
             'lp_about_image_file'    => 'lp_about_image',
@@ -56,23 +49,12 @@ class LandingController extends Controller
             'lp_wabup_foto_file'     => 'lp_wabup_foto',
             'lp_hero_bg_image_file'  => 'lp_hero_bg_image',
             'lp_hero_leaders_file'   => 'lp_hero_leaders_img',
-            'panduan_rental_banner_file'  => 'panduan_rental_banner',
-            'panduan_rental_banner2_file' => 'panduan_rental_banner2',
         ];
         foreach ($imageFields as $fileKey => $settingKey) {
             if ($request->hasFile($fileKey)) {
                 $request->validate([$fileKey => 'image|mimes:jpg,jpeg,png,webp|max:5120']);
                 $this->deleteLanding(Setting::get($settingKey));
                 Setting::set($settingKey, $this->uploadLanding($request->file($fileKey)));
-            }
-        }
-
-        // Hapus gambar banner rental (bila dicentang & tidak mengunggah file baru).
-        // deleteLanding hanya menghapus file di storage; aset bawaan di public/assets aman.
-        foreach (['panduan_rental_banner_remove' => 'panduan_rental_banner', 'panduan_rental_banner2_remove' => 'panduan_rental_banner2'] as $flag => $settingKey) {
-            if ($request->boolean($flag) && ! $request->hasFile($settingKey . '_file')) {
-                $this->deleteLanding(Setting::get($settingKey));
-                Setting::set($settingKey, '');
             }
         }
 
