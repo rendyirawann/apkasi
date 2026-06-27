@@ -79,9 +79,11 @@ class LandingSeeder extends Seeder
             'lp_footer_sekretariat' => 'Dinas Kominfo Kabupaten Deli Serdang, Sumatera Utara',
             'lp_footer_copyright'   => '© 2026 Pemerintah Kabupaten Deli Serdang & APKASI. All rights reserved.',
 
-            // Banner di atas peta tab Rental (halaman Panduan) — 2 slot tetap (edit gambar saja)
-            'panduan_rental_banner'  => 'assets/media/landing/pic-rental.jpg',
-            'panduan_rental_banner2' => 'assets/media/landing/rentalnagahitam.png',
+            // Banner di atas peta tab Rental (halaman Panduan) — 2 slot tetap (edit/hapus gambar + tampil/sembunyikan)
+            'panduan_rental_banner'          => 'assets/media/landing/pic-rental.jpg',
+            'panduan_rental_banner2'         => 'assets/media/landing/rentalnagahitam.png',
+            'panduan_rental_banner_enabled'  => '1',
+            'panduan_rental_banner2_enabled' => '1',
         ];
 
         foreach ($settings as $key => $value) {

@@ -102,20 +102,48 @@
                                     </div>
                                 </div>
 
-                                {{-- Banner Rental (halaman Panduan › tab Rental) — 2 slot tetap, ganti gambar saja --}}
+                                {{-- Banner Rental (halaman Panduan › tab Rental) — 2 slot tetap, ganti gambar + tampil/sembunyikan per banner --}}
                                 <div class="col-md-12">
                                     <div class="separator separator-dashed my-1"></div>
-                                    <label class="fw-semibold fs-7 mb-1 mt-2 d-block">Banner Rental Kendaraan #1 <span class="text-muted">(tampil di atas peta — halaman Panduan › tab Rental; jpg/png/webp, maks 5MB)</span></label>
+                                    @php $rb1On = $g('panduan_rental_banner_enabled', '1'); @endphp
+                                    <div class="d-flex flex-stack mb-1 mt-2">
+                                        <label class="fw-semibold fs-7 mb-0">Banner Rental Kendaraan #1</label>
+                                        <label class="form-check form-check-custom form-check-solid form-check-sm ms-3">
+                                            <input type="hidden" name="panduan_rental_banner_enabled" value="0">
+                                            <input class="form-check-input" type="checkbox" name="panduan_rental_banner_enabled" value="1" {{ $rb1On === '0' ? '' : 'checked' }}>
+                                            <span class="form-check-label fw-semibold">Tampilkan</span>
+                                        </label>
+                                    </div>
+                                    <div class="text-muted fs-8 mb-2">Tampil di atas peta — halaman Panduan › tab Rental; jpg/png/webp, maks 5MB.</div>
                                     <input type="file" name="panduan_rental_banner_file" accept=".jpg,.jpeg,.png,.webp" data-max-mb="5" class="form-control form-control-sm">
                                     @if ($g('panduan_rental_banner'))
-                                        <img src="{{ \App\Support\Media::url($g('panduan_rental_banner')) }}" class="mt-2 rounded border" style="height:80px;width:auto;object-fit:contain">
+                                        <img src="{{ \App\Support\Media::url($g('panduan_rental_banner')) }}" class="mt-2 rounded border d-block" style="height:80px;width:auto;object-fit:contain">
+                                        <label class="form-check form-check-sm form-check-custom form-check-solid mt-2">
+                                            <input class="form-check-input" type="checkbox" name="panduan_rental_banner_remove" value="1">
+                                            <span class="form-check-label fw-semibold text-danger fs-8">Hapus gambar ini saat disimpan</span>
+                                        </label>
+                                        <div class="text-muted fs-8 mt-1">Permanen. Untuk sekadar menyembunyikan tanpa menghapus, matikan tombol <b>Tampilkan</b> di atas.</div>
                                     @endif
                                 </div>
                                 <div class="col-md-12">
-                                    <label class="fw-semibold fs-7 mb-1 mt-2 d-block">Banner Rental Kendaraan #2 <span class="text-muted">(tampil tepat di bawah banner #1; jpg/png/webp, maks 5MB)</span></label>
+                                    @php $rb2On = $g('panduan_rental_banner2_enabled', '1'); @endphp
+                                    <div class="d-flex flex-stack mb-1 mt-2">
+                                        <label class="fw-semibold fs-7 mb-0">Banner Rental Kendaraan #2</label>
+                                        <label class="form-check form-check-custom form-check-solid form-check-sm ms-3">
+                                            <input type="hidden" name="panduan_rental_banner2_enabled" value="0">
+                                            <input class="form-check-input" type="checkbox" name="panduan_rental_banner2_enabled" value="1" {{ $rb2On === '0' ? '' : 'checked' }}>
+                                            <span class="form-check-label fw-semibold">Tampilkan</span>
+                                        </label>
+                                    </div>
+                                    <div class="text-muted fs-8 mb-2">Tampil tepat di bawah banner #1; jpg/png/webp, maks 5MB.</div>
                                     <input type="file" name="panduan_rental_banner2_file" accept=".jpg,.jpeg,.png,.webp" data-max-mb="5" class="form-control form-control-sm">
                                     @if ($g('panduan_rental_banner2'))
-                                        <img src="{{ \App\Support\Media::url($g('panduan_rental_banner2')) }}" class="mt-2 rounded border" style="height:80px;width:auto;object-fit:contain">
+                                        <img src="{{ \App\Support\Media::url($g('panduan_rental_banner2')) }}" class="mt-2 rounded border d-block" style="height:80px;width:auto;object-fit:contain">
+                                        <label class="form-check form-check-sm form-check-custom form-check-solid mt-2">
+                                            <input class="form-check-input" type="checkbox" name="panduan_rental_banner2_remove" value="1">
+                                            <span class="form-check-label fw-semibold text-danger fs-8">Hapus gambar ini saat disimpan</span>
+                                        </label>
+                                        <div class="text-muted fs-8 mt-1">Permanen. Untuk sekadar menyembunyikan tanpa menghapus, matikan tombol <b>Tampilkan</b> di atas.</div>
                                     @endif
                                 </div>
 

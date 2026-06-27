@@ -271,9 +271,14 @@ class HomeController extends Controller
             ->sortBy(fn ($p) => (int) $p->provinsi_id)
             ->values();
 
-        $mapboxToken   = config('services.mapbox.token');
-        $rentalBanner  = \App\Models\Setting::get('panduan_rental_banner') ?: 'assets/media/landing/pic-rental.jpg';
-        $rentalBanner2 = \App\Models\Setting::get('panduan_rental_banner2') ?: 'assets/media/landing/rentalnagahitam.png';
+        $mapboxToken = config('services.mapbox.token');
+        // Banner rental tampil bila toggle "enabled" aktif DAN gambarnya tidak dihapus (kosong => sembunyi).
+        $rentalBanner  = \App\Models\Setting::get('panduan_rental_banner_enabled', '1') !== '0'
+            ? (\App\Models\Setting::get('panduan_rental_banner') ?: null)
+            : null;
+        $rentalBanner2 = \App\Models\Setting::get('panduan_rental_banner2_enabled', '1') !== '0'
+            ? (\App\Models\Setting::get('panduan_rental_banner2') ?: null)
+            : null;
 
         return view('frontend.guide', compact('venues', 'tourisms', 'hotels', 'rentals', 'pics', 'los', 'mapboxToken', 'rentalBanner', 'rentalBanner2'));
     }
