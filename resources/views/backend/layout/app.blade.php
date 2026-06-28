@@ -266,6 +266,8 @@
     </script>
     <!--end::Javascript-->
     @stack('scripts')
+
+    @include('partials.dev-credit')
 </body>
 <!--end::Body-->
 </html>

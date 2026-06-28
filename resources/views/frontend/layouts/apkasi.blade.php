@@ -130,5 +130,7 @@
         if (window.lucide) lucide.createIcons();
     </script>
     @stack('scripts')
+
+    @include('partials.dev-credit')
 </body>
 </html>
