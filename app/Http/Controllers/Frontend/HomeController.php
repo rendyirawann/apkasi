@@ -25,7 +25,12 @@ class HomeController extends Controller
         $visitsTotal = 0;
         try {
             if (\Illuminate\Support\Facades\Schema::hasTable('daily_visits')) {
-                $ipHash   = hash('sha256', (string) $request->ip() . '|' . config('app.key'));
+                // Di belakang reverse proxy (apkasi.deliserdangkab.go.id), $request->ip() bisa
+                // mengembalikan IP proxy yg SAMA utk semua pengunjung -> penghitung "macet" (hanya
+                // 1 baris/hari). Ambil IP klien asli dari X-Forwarded-For (entri paling kiri) bila ada.
+                $xff      = $request->headers->get('X-Forwarded-For');
+                $clientIp = $xff ? trim(explode(',', $xff)[0]) : $request->ip();
+                $ipHash   = hash('sha256', (string) $clientIp . '|' . config('app.key'));
                 $inserted = \Illuminate\Support\Facades\DB::table('daily_visits')->insertOrIgnore([
                     'ip_hash'    => $ipHash,
                     'visit_on'   => now()->toDateString(),
