@@ -29,7 +29,9 @@ class HomeController extends Controller
                 // mengembalikan IP proxy yg SAMA utk semua pengunjung -> penghitung "macet" (hanya
                 // 1 baris/hari). Ambil IP klien asli dari X-Forwarded-For (entri paling kiri) bila ada.
                 $xff      = $request->headers->get('X-Forwarded-For');
-                $clientIp = $xff ? trim(explode(',', $xff)[0]) : $request->ip();
+                $clientIp = $xff
+                    ? trim(explode(',', $xff)[0])
+                    : ($request->headers->get('X-Real-IP') ?: $request->ip());
                 $ipHash   = hash('sha256', (string) $clientIp . '|' . config('app.key'));
                 $inserted = \Illuminate\Support\Facades\DB::table('daily_visits')->insertOrIgnore([
                     'ip_hash'    => $ipHash,
